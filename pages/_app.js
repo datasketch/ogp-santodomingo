@@ -1,7 +1,12 @@
-import '../styles/globals.css'
+import { ChakraProvider } from "@chakra-ui/react"
+import 'leaflet/dist/leaflet.css'
 
-function MyApp({ Component, pageProps }) {
-  return <Component {...pageProps} />
+function App({ Component, pageProps }) {
+  return (
+    <ChakraProvider>
+      <Component {...pageProps} />
+    </ChakraProvider>
+  )
 }
 
-export default MyApp
+export default App
