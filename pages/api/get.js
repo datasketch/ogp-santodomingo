@@ -11,8 +11,10 @@ export default async function handler (req, res) {
     process.env.PROJECT_ID,
     'denuncias'
   )
+
   if (!result.ok) {
     return res.status(result.status).json({ data: result.data.msg })
   }
+
   return res.status(result.status).json(result.data)
 }

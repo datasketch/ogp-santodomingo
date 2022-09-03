@@ -1,4 +1,5 @@
 import { Box, Flex, Link, Text } from '@chakra-ui/react'
+import axios from 'axios'
 import NextLink from 'next/link'
 import { useEffect, useState } from 'react'
 
@@ -9,18 +10,14 @@ export default function Home () {
 
   useEffect(() => {
     let ignore = false
-    fetch('/api/get').then(res => {
-      setIsLoading(false)
-      if (!res.ok) {
-        throw new Error('Se ha presentado un error')
-      }
+    axios.get('/api/get').then(response => {
       if (!ignore) {
-        return res.json()
+        setIsLoading(false)
+        setComplaints(response.data.list)
       }
-    }).then(data => {
-      if (data) setComplaints(data.list)
     }).catch(error => {
-      setErrorMessage(error.message)
+      setIsLoading(false)
+      setErrorMessage(error.response.data.data)
     })
     return () => {
       ignore = true

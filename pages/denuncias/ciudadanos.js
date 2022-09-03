@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form'
 import isEmail from 'validator/lib/isEmail'
 import toast, { Toaster } from 'react-hot-toast'
 import { complainantTypes, complaintTypes, componentsList, dictionary, parishList, sectorsList } from '../../utils'
+import axios from 'axios'
 
 const Map = dynamic(() => import('../../components/Map'), {
   ssr: false
@@ -26,17 +27,15 @@ function CitizenFormPage () {
       [dictionary.ubicacion]: coordinates
     }
 
-    const op = fetch('/api/save', {
-      method: 'POST',
-      body: JSON.stringify(info)
-    }).then(res => {
-      if (!res.ok) throw new Error('Se ha presentado un error')
-    })
+    const op = axios.post('/api/save', info)
 
     toast.promise(op, {
       loading: 'Enviando...',
       success: 'Éxito',
-      error: e => e.message
+      error: error => {
+        console.log(error)
+        return 'Se ha presentado un error'
+      }
     }).then(() => reset())
   }
 
