@@ -2,7 +2,7 @@ export const dictionary = {
   tipoDenunciante: 'Tipo de denunciante',
   nombresApellidos: 'Nombres y Apellidos',
   identificador: 'CI / RUC',
-  razonSocial: 'Razón social',
+  razonSocial: 'Razon social',
   email: 'Email',
   telefono: 'Telefono',
   tipoDenuncia: 'Tipo de denuncia',

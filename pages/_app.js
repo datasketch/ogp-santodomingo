@@ -1,7 +1,8 @@
-import { ChakraProvider } from "@chakra-ui/react"
+import { ChakraProvider } from '@chakra-ui/react'
 import 'leaflet/dist/leaflet.css'
 
-function App({ Component, pageProps }) {
+// eslint-disable-next-line react/prop-types
+function App ({ Component, pageProps }) {
   return (
     <ChakraProvider>
       <Component {...pageProps} />

@@ -3,17 +3,18 @@ import dynamic from 'next/dynamic'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import isEmail from 'validator/lib/isEmail'
+import toast, { Toaster } from 'react-hot-toast'
 import { complainantTypes, complaintStates, complaintTypes, componentsList, dictionary, parishList, sectorsList } from '../../utils'
 
 const Map = dynamic(() => import('../../components/Map'), {
-  ssr: false,
+  ssr: false
 })
 
 function PublicServantFormPage () {
   const center = { lat: -0.254167, lng: -79.1719 }
 
-  const { handleSubmit, register, formState: { errors } } = useForm({
-    mode: 'onBlur',
+  const { handleSubmit, register, reset, formState: { errors, isSubmitting } } = useForm({
+    mode: 'onBlur'
   })
 
   const [tipoDenunciante, setTipoDenunciante] = useState('')
@@ -24,7 +25,22 @@ function PublicServantFormPage () {
       ...data,
       [dictionary.ubicacion]: coordinates
     }
-    console.log(info);
+    toast.promise(
+      fetch('/api/save-compliant', {
+        method: 'POST',
+        body: JSON.stringify(info)
+      }),
+      {
+        loading: 'Enviando...',
+        success: 'Éxito',
+        error: 'Algo salió mal'
+      }
+    ).then(() => {
+      reset()
+      window.scrollTo({ left: 0, top: 0 })
+    }).catch(error => {
+      console.log(error)
+    })
   }
 
   return (
@@ -35,15 +51,16 @@ function PublicServantFormPage () {
       py={4}
       mx="auto"
     >
+      <Toaster />
       <Heading size="lg">Formulario de denuncias - Funcionarios</Heading>
-      <form action="" onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <Stack dir="column" spacing={5} mt={5}>
           <FormControl isRequired>
             <FormLabel>Tipo de denunciante</FormLabel>
             <Select
               placeholder='Seleccione una opción'
               {...register(dictionary.tipoDenunciante, {
-                onChange: e => setTipoDenunciante(e.target.value),
+                onChange: e => setTipoDenunciante(e.target.value)
               })}
             >
               {complainantTypes.map(option => (
@@ -79,7 +96,7 @@ function PublicServantFormPage () {
                 <FormErrorMessage>
                   {errors[dictionary.email].message}
                 </FormErrorMessage>
-              )
+            )
             }
           </FormControl>
           <FormControl>
@@ -135,11 +152,13 @@ function PublicServantFormPage () {
                 </Checkbox>
               ))}
             </Stack>
-            { errors && errors[dictionary.componenteAfectado] ? (
+            { errors && errors[dictionary.componenteAfectado]
+              ? (
                 <FormErrorMessage>
                   {errors[dictionary.componenteAfectado].message || errors[dictionary.componenteAfectado].root.message}
                 </FormErrorMessage>
-              ) : <FormHelperText>Seleccione al menos un componente</FormHelperText>
+                )
+              : <FormHelperText>Seleccione al menos un componente</FormHelperText>
             }
           </FormControl>
           <FormControl isRequired>
@@ -204,11 +223,15 @@ function PublicServantFormPage () {
               center={center}
               onMarkerMove={(coords) => {
                 const { lat, lng } = coords
-                setCoordinates(`${lat}, ${lng}` )
+                setCoordinates(`${lat}, ${lng}`)
               }}
             />
           </FormControl>
-          <Button type='submit'>
+          <Button
+            type='submit'
+            colorScheme={'teal'}
+            disabled={isSubmitting}
+          >
             Enviar
           </Button>
         </Stack>
