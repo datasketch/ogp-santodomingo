@@ -27,7 +27,7 @@ export const complaintTypes = ['Verbal', 'Escrita', 'Red social', 'Online']
 
 export const complaintStates = ['Denuncia recibida', 'Denuncia atendida', 'Denuncia archivada']
 
-export const parishList = ['Abraham Calazacón', 'Bombolí', 'Chiguilpe', 'Río Toachi', 'Río verde', 'Santo Domingo', 'Zaracay', 'Alluriquin', 'Puerto Limón', 'Luz de América', 'San Jacinto del Bua', 'Valle Hermoso', 'El Esfuerzo', 'Santa María del Toachi', 'La Concordia', 'Monterrey', 'La Villegas', 'Plan piloto']
+export const parishList = ['Abraham Calazacón', 'Bombolí', 'Chiguilpe', 'Río Toachi', 'Río Verde', 'Santo Domingo', 'Zaracay', 'Alluriquin', 'Puerto Limón', 'Luz de América', 'San Jacinto del Bua', 'Valle Hermoso', 'El Esfuerzo', 'Santa María del Toachi', 'La Concordia', 'Monterrey', 'La Villegas', 'Plan Piloto']
 
 export const sectorsList = ['Urbano', 'Rural']
 

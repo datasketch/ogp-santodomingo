@@ -25,22 +25,19 @@ function PublicServantFormPage () {
       ...data,
       [dictionary.ubicacion]: coordinates
     }
-    toast.promise(
-      fetch('/api/save-compliant', {
-        method: 'POST',
-        body: JSON.stringify(info)
-      }),
-      {
-        loading: 'Enviando...',
-        success: 'Éxito',
-        error: 'Algo salió mal'
-      }
-    ).then(() => {
-      reset()
-      window.scrollTo({ left: 0, top: 0 })
-    }).catch(error => {
-      console.log(error)
+
+    const op = fetch('/api/save', {
+      method: 'POST',
+      body: JSON.stringify(info)
+    }).then(res => {
+      if (!res.ok) throw new Error('Se ha presentado un error')
     })
+
+    toast.promise(op, {
+      loading: 'Enviando...',
+      success: 'Éxito',
+      error: e => e.message
+    }).then(() => reset())
   }
 
   return (
