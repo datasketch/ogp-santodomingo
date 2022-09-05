@@ -24,7 +24,8 @@ function CitizenFormPage () {
   const onSubmit = data => {
     const info = {
       ...data,
-      [dictionary.ubicacion]: coordinates
+      [dictionary.ubicacion]: coordinates,
+      [dictionary.componenteAfectado]: data[dictionary.componenteAfectado].join(', ')
     }
 
     const op = axios.post('/api/save', info)
