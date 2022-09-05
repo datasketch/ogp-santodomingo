@@ -103,10 +103,11 @@ function CitizenFormPage () {
             <FormLabel>Fecha del incidente</FormLabel>
             <Input type="datetime-local" {...register(dictionary.fechaIncidente)} />
           </FormControl>
-          <FormControl isRequired>
+          <FormControl isRequired isDisabled>
             <FormLabel>Tipo de denuncia</FormLabel>
             <Select
               placeholder='Seleccione una opción'
+              defaultValue="Online"
               {...register(dictionary.tipoDenuncia)}
             >
               {complaintTypes.map(option => (

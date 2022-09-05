@@ -1,7 +1,5 @@
 import { Api } from 'nocodb-sdk'
 
-// const PROJECT_ID = 'p_2x3nn9jmw9xkg6'
-
 export const proxy = {
   instance: null,
   get (apiToken) {
@@ -30,6 +28,16 @@ export const proxy = {
     const api = this.get(apiToken)
     try {
       const data = await api.dbTableRow.list('v1', projectId, table)
+      return { ok: true, status: 200, data }
+    } catch (error) {
+      const { status, data } = error.response
+      return { ok: false, status, data }
+    }
+  },
+  async update (apiToken, projectId, table, id, body) {
+    const api = this.get(apiToken)
+    try {
+      const data = await api.dbTableRow.update('v1', projectId, table, id, body)
       return { ok: true, status: 200, data }
     } catch (error) {
       const { status, data } = error.response
