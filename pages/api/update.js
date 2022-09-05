@@ -8,6 +8,7 @@ export default async function handler (req, res) {
   }
   const { id } = req.body
   const result = await proxy.update(
+    process.env.BASE_URL,
     process.env.API_TOKEN,
     process.env.PROJECT_ID,
     'denuncias',
