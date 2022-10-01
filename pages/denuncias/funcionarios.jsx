@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import isEmail from 'validator/lib/isEmail'
 import toast from 'react-hot-toast'
-import { complainantTypes, complaintStatuses, complaintTypes, affectedComponents, dictionary, parishes, defendantTypes, sectors } from '../../utils'
+import { complainantTypes, complaintStatuses, complaintTypes, affectedComponents, dictionary, parishes, defendantTypes, sectors } from '../../utils/complaints'
 import axios from 'axios'
 import { useRouter } from 'next/router'
 

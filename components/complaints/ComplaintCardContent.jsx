@@ -1,46 +1,17 @@
 import { Badge, Box, Stack, Text } from '@chakra-ui/react'
-import PropTypes from 'prop-types'
-import { useDrag } from 'react-dnd'
-import { sourceEnum } from '../utils'
 import { format } from 'date-fns'
+import { es } from 'date-fns/locale'
+import PropTypes from 'prop-types'
+import { sourceEnum } from '../../utils/complaints'
 
 const colorScheme = {
   [sourceEnum.CITIZEN]: 'orange',
   [sourceEnum.OFFICER]: 'pink'
 }
 
-function ColumnCard ({ color = 'white', data }) {
-  const [{ opacity }, dragRef] = useDrag(
-    () => ({
-      type: 'card',
-      item: {
-        id: data.id,
-        status: data.complaintStatus
-      },
-      collect: (monitor) => ({
-        opacity: monitor.isDragging() ? 0.5 : 1
-      })
-    })
-  )
+function ComplaintCardContent ({ data }) {
   return (
-    <Box
-      as="div"
-      role="group"
-      rounded="lg"
-      p={4}
-      boxShadow="lg"
-      cursor="grab"
-      minW={200}
-      bgColor="white"
-      ref={dragRef}
-      style={{ opacity }}
-      border="1px"
-      borderColor="transparent"
-      position="relative"
-      _hover={{
-        borderColor: 'blackAlpha.300'
-      }}
-    >
+    <>
       {data.source && (
         <Badge
           bg={colorScheme[data.source]}
@@ -71,7 +42,7 @@ function ColumnCard ({ color = 'white', data }) {
             {data.complaintDate && (
               <Box>
                 <Text fontSize="xs" letterSpacing="wide">Fecha de denuncia</Text>
-                <Text fontSize="small" fontWeight="semibold">{format(new Date(data.complaintDate), 'MMMM dd, yyyy')}</Text>
+                <Text fontSize="small" fontWeight="semibold">{format(new Date(data.complaintDate), 'MMMM dd, yyyy', { locale: es })}</Text>
               </Box>
             )}
             {data.complaintType && (
@@ -97,13 +68,12 @@ function ColumnCard ({ color = 'white', data }) {
           </Box>
         )}
       </Stack>
-    </Box>
+    </>
   )
 }
 
-ColumnCard.propTypes = {
-  data: PropTypes.object,
-  color: PropTypes.string
+ComplaintCardContent.propTypes = {
+  data: PropTypes.object
 }
 
-export default ColumnCard
+export default ComplaintCardContent

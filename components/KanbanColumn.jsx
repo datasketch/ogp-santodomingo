@@ -2,24 +2,31 @@ import { Badge, Box, Heading, Stack } from '@chakra-ui/react'
 import PropTypes from 'prop-types'
 import { useDrop } from 'react-dnd'
 
-function Column ({ category, target, children, onDrop }) {
+function KanbanColumn ({ title, target, onDrop, children }) {
   const [{ canDrop }, drop] = useDrop(() => ({
     accept: 'card',
     drop: ({ id, status }) => {
       if (status === target) {
         return
       }
-      onDrop(id, status, target)
+      onDrop(id, target)
     },
     collect: (monitor) => ({
       canDrop: monitor.canDrop()
     })
   }))
+
   return (
-    <Box bgColor='gray.50'>
+    <Box
+      bgColor='gray.50'
+      flexShrink="0"
+      flexGrow="1"
+      minW="sm"
+      w="sm"
+    >
       <Heading fontSize="md" letterSpacing="wide" p={4}>
         <Badge px={2} py={1} rounded="lg">
-          {category}
+          {title}
         </Badge>
       </Heading>
       <Stack
@@ -40,11 +47,11 @@ function Column ({ category, target, children, onDrop }) {
   )
 }
 
-Column.propTypes = {
-  category: PropTypes.string,
+KanbanColumn.propTypes = {
+  title: PropTypes.string,
   target: PropTypes.string,
   onDrop: PropTypes.func,
   children: PropTypes.oneOfType([PropTypes.node, PropTypes.arrayOf(PropTypes.node)])
 }
 
-export default Column
+export default KanbanColumn

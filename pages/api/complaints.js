@@ -14,7 +14,7 @@ export default async function handler (req, res) {
     return res.status(400).json({ error: true, reason: 'Bad Request' })
   }
 
-  const knex = getKnex()
+  const knex = getKnex('sd_denuncias')
 
   try {
     let data = {}
