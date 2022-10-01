@@ -1,34 +1,55 @@
 export const dictionary = {
-  tipoDenunciante: 'Tipo de denunciante',
-  nombresApellidos: 'Nombres y Apellidos',
-  identificador: 'CI / RUC',
-  razonSocial: 'Razon social',
+  complainantType: 'Tipo de denunciante',
+  fullName: 'Nombres y Apellidos',
+  identifier: 'CI / RUC',
+  companyName: 'Razon social',
   email: 'Email',
-  telefono: 'Telefono',
-  tipoDenuncia: 'Tipo de denuncia',
-  estadoDenuncia: 'Estado de la denuncia',
-  fechaDenuncia: 'Fecha de denuncia',
-  inicialesFuncionarioReceptor: 'Iniciales funcionario receptor',
-  fechaIncidente: 'Fecha del incidente',
-  componenteAfectado: 'Componente afectado',
+  phoneNumber: 'Telefono',
+  complaintType: 'Tipo de denuncia',
+  complaintStatus: 'Estado de la denuncia',
+  complaintDate: 'Fecha de denuncia',
+  receivingOfficer: 'Iniciales funcionario receptor',
+  incidentDate: 'Fecha del incidente',
+  affectedComponent: 'Componente afectado',
   canton: 'Canton',
-  parroquia: 'Parroquia',
+  parish: 'Parroquia',
   sector: 'Sector',
-  direccion: 'Direccion',
-  tipoDenunciado: 'Tipo de denunciado',
-  nombreDenunciado: 'Nombre del denunciado',
-  descripcionDenuncia: 'Descripcion del acto que se denuncia',
-  ubicacion: 'Ubicacion'
+  address: 'Direccion',
+  defendantType: 'Tipo de denunciado',
+  defendantName: 'Nombre del denunciado',
+  description: 'Descripcion del acto que se denuncia',
+  location: 'Ubicacion',
+  createdAt: 'created_at',
+  updatedAt: 'updated_at',
+  id: 'id',
+  source: 'Fuente'
 }
+
+export const reverseDictionary = Object.entries(dictionary).reduce((result, [key, value]) => {
+  return { ...result, [value]: key }
+}, {})
 
 export const complainantTypes = ['Institución pública', 'Medio de comunicación', 'Persona Jurídica', 'Persona Natural']
 
 export const complaintTypes = ['Verbal', 'Escrita', 'Red social', 'Online']
 
-export const complaintStates = ['Denuncia recibida', 'Denuncia atendida', 'Denuncia archivada']
+export const complaintStatuses = ['Denuncia recibida', 'Denuncia atendida', 'Denuncia archivada']
 
-export const parishList = ['Abraham Calazacón', 'Bombolí', 'Chiguilpe', 'Río Toachi', 'Río Verde', 'Santo Domingo', 'Zaracay', 'Alluriquin', 'Puerto Limón', 'Luz de América', 'San Jacinto del Bua', 'Valle Hermoso', 'El Esfuerzo', 'Santa María del Toachi', 'La Concordia', 'Monterrey', 'La Villegas', 'Plan Piloto']
+export const parishes = ['Abraham Calazacón', 'Bombolí', 'Chiguilpe', 'Río Toachi', 'Río Verde', 'Santo Domingo', 'Zaracay', 'Alluriquin', 'Puerto Limón', 'Luz de América', 'San Jacinto del Bua', 'Valle Hermoso', 'El Esfuerzo', 'Santa María del Toachi', 'La Concordia', 'Monterrey', 'La Villegas', 'Plan Piloto']
 
-export const sectorsList = ['Urbano', 'Rural']
+export const sectors = ['Urbano', 'Rural']
 
-export const componentsList = ['Aire', 'Agua', 'Suelo', 'Ruido']
+export const affectedComponents = ['Aire', 'Agua', 'Suelo', 'Ruido']
+
+export const defendantTypes = ['Institución pública', 'Persona Jurídica', 'Persona Natural', 'Otro', 'Por determinar']
+
+export const complaintStatusEnum = {
+  RECEIVED: 'Denuncia recibida',
+  ATTENDED: 'Denuncia atendida',
+  ARCHIVED: 'Denuncia archivada'
+}
+
+export const sourceEnum = {
+  CITIZEN: 'Ciudadano',
+  OFFICER: 'Funcionario'
+}

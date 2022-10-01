@@ -4,31 +4,34 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import isEmail from 'validator/lib/isEmail'
 import toast, { Toaster } from 'react-hot-toast'
-import { complainantTypes, complaintStates, complaintTypes, componentsList, dictionary, parishList, sectorsList } from '../../utils'
+import { complainantTypes, complaintTypes, affectedComponents, dictionary, parishes, defendantTypes, sectors } from '../../utils'
 import axios from 'axios'
+import { useRouter } from 'next/router'
 
 const Map = dynamic(() => import('../../components/Map'), {
   ssr: false
 })
 
-function PublicServantFormPage () {
+function CitizenFormPage () {
+  const router = useRouter()
   const center = { lat: -0.254167, lng: -79.1719 }
 
-  const { handleSubmit, register, reset, formState: { errors, isSubmitting } } = useForm({
+  const { handleSubmit, register, formState: { errors, isSubmitting } } = useForm({
     mode: 'onBlur'
   })
 
-  const [tipoDenunciante, setTipoDenunciante] = useState('')
+  const [complainantType, setcomplainantType] = useState('')
   const [coordinates, setCoordinates] = useState(`${center.lat}, ${center.lng}`)
 
   const onSubmit = data => {
     const info = {
       ...data,
-      [dictionary.ubicacion]: coordinates,
-      [dictionary.componenteAfectado]: data[dictionary.componenteAfectado].join(', ')
+      [dictionary.location]: coordinates,
+      [dictionary.affectedComponent]: data[dictionary.affectedComponent].join(', '),
+      [dictionary.source]: 'Ciudadano'
     }
 
-    const op = axios.post('/api/save', info)
+    const op = axios.post('/api/create', info)
 
     toast.promise(op, {
       loading: 'Enviando...',
@@ -37,7 +40,9 @@ function PublicServantFormPage () {
         console.log(error)
         return 'Se ha presentado un error'
       }
-    }).then(() => reset())
+    }).then(() => {
+      router.push('/')
+    })
   }
 
   return (
@@ -49,15 +54,15 @@ function PublicServantFormPage () {
       mx="auto"
     >
       <Toaster />
-      <Heading size="lg">Formulario de denuncias - Funcionarios</Heading>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <Heading size="lg">Formulario de denuncias - Ciudadanos</Heading>
+      <form action="" onSubmit={handleSubmit(onSubmit)}>
         <Stack dir="column" spacing={5} mt={5}>
           <FormControl isRequired>
             <FormLabel>Tipo de denunciante</FormLabel>
             <Select
               placeholder='Seleccione una opción'
-              {...register(dictionary.tipoDenunciante, {
-                onChange: e => setTipoDenunciante(e.target.value)
+              {...register(dictionary.complainantType, {
+                onChange: e => setcomplainantType(e.target.value)
               })}
             >
               {complainantTypes.map(option => (
@@ -65,20 +70,20 @@ function PublicServantFormPage () {
               ))}
             </Select>
           </FormControl>
-          {tipoDenunciante === 'Persona Natural' && (
-            <FormControl isRequired>
+          {complainantType === 'Persona Natural' && (
+            <FormControl>
               <FormLabel>Nombres y Apellidos</FormLabel>
-              <Input {...register(dictionary.nombresApellidos)} />
+              <Input {...register(dictionary.fullName)} />
             </FormControl>
           )}
-          <FormControl isRequired>
+          <FormControl>
             <FormLabel>C.I. / RUC</FormLabel>
-            <Input {...register(dictionary.identificador)} />
+            <Input {...register(dictionary.identifier)} />
           </FormControl>
-          {tipoDenunciante && tipoDenunciante !== 'Persona Natural' && (
+          {complainantType && complainantType !== 'Persona Natural' && (
             <FormControl>
               <FormLabel>Razón social</FormLabel>
-              <Input {...register(dictionary.razonSocial)} />
+              <Input {...register(dictionary.companyName)} />
             </FormControl>
           )}
           <FormControl
@@ -89,57 +94,39 @@ function PublicServantFormPage () {
             <Input type="email" {...register(dictionary.email, {
               validate: v => isEmail(v) || 'Por favor introduzca un email válido'
             })} />
-            { errors && errors[dictionary.email] && (
-                <FormErrorMessage>
-                  {errors[dictionary.email].message}
-                </FormErrorMessage>
+            {errors && errors[dictionary.email] && (
+              <FormErrorMessage>
+                {errors[dictionary.email].message}
+              </FormErrorMessage>
             )
             }
           </FormControl>
-          <FormControl>
+          <FormControl isRequired>
             <FormLabel>Teléfono</FormLabel>
-            <Input {...register(dictionary.telefono)} />
+            <Input {...register(dictionary.phoneNumber)} />
           </FormControl>
           <FormControl isRequired>
+            <FormLabel>Fecha del incidente</FormLabel>
+            <Input type="datetime-local" {...register(dictionary.incidentDate)} />
+          </FormControl>
+          <FormControl isRequired isDisabled>
             <FormLabel>Tipo de denuncia</FormLabel>
             <Select
               placeholder='Seleccione una opción'
-              {...register(dictionary.tipoDenuncia)}
+              defaultValue="Online"
+              {...register(dictionary.complaintType)}
             >
               {complaintTypes.map(option => (
                 <option value={option} key={option}>{option}</option>
               ))}
             </Select>
           </FormControl>
-          <FormControl isRequired>
-            <FormLabel>Estado de la denuncia</FormLabel>
-            <Select
-              placeholder='Seleccione una opción'
-              {...register(dictionary.estadoDenuncia)}
-            >
-              {complaintStates.map(option => (
-                <option value={option} key={option}>{option}</option>
-              ))}
-            </Select>
-          </FormControl>
-          <FormControl isRequired>
-            <FormLabel>Fecha de denuncia</FormLabel>
-            <Input type="date" {...register(dictionary.fechaDenuncia)} />
-          </FormControl>
-          <FormControl isRequired>
-            <FormLabel>Iniciales funcionario receptor</FormLabel>
-            <Input {...register(dictionary.inicialesFuncionarioReceptor)} />
-          </FormControl>
-          <FormControl isRequired>
-            <FormLabel>Fecha del incidente</FormLabel>
-            <Input type="datetime-local" {...register(dictionary.fechaIncidente)} />
-          </FormControl>
-          <FormControl isInvalid={errors && errors[dictionary.componenteAfectado]}>
+          <FormControl isInvalid={errors && errors[dictionary.affectedComponent]}>
             <FormLabel>Componente afectado</FormLabel>
             <Stack direction='row' spacing={3}>
-              {componentsList.map(option => (
+              {affectedComponents.map(option => (
                 <Checkbox
-                  {...register(dictionary.componenteAfectado, {
+                  {...register(dictionary.affectedComponent, {
                     validate: v => (v && v.length) || 'Seleccione al menos un componente'
                   })}
                   value={option}
@@ -149,11 +136,11 @@ function PublicServantFormPage () {
                 </Checkbox>
               ))}
             </Stack>
-            { errors && errors[dictionary.componenteAfectado]
+            {errors && errors[dictionary.affectedComponent]
               ? (
-                <FormErrorMessage>
-                  {errors[dictionary.componenteAfectado].message || errors[dictionary.componenteAfectado].root.message}
-                </FormErrorMessage>
+              <FormErrorMessage>
+                {errors[dictionary.affectedComponent].message || errors[dictionary.affectedComponent].root.message}
+              </FormErrorMessage>
                 )
               : <FormHelperText>Seleccione al menos un componente</FormHelperText>
             }
@@ -173,46 +160,42 @@ function PublicServantFormPage () {
             <FormLabel>Parroquia</FormLabel>
             <Select
               placeholder='Seleccione una opción'
-              {...register(dictionary.parroquia)}
+              {...register(dictionary.parish)}
             >
-              {parishList.map(option => (
+              {parishes.map(option => (
                 <option value={option} key={option}>{option}</option>
               ))}
             </Select>
           </FormControl>
-          <FormControl isRequired>
+          <FormControl>
             <FormLabel>Sector</FormLabel>
             <Select
               placeholder='Seleccione una opción'
               {...register(dictionary.sector)}
             >
-              {sectorsList.map(option => (
+              {sectors.map(option => (
                 <option value={option} key={option}>{option}</option>
               ))}
             </Select>
           </FormControl>
           <FormControl isRequired>
-            <FormLabel>Dirección</FormLabel>
-            <Input {...register(dictionary.direccion)} />
-          </FormControl>
-          <FormControl isRequired>
             <FormLabel>Tipo de denunciado</FormLabel>
             <Select
               placeholder='Seleccione una opción'
-              {...register(dictionary.tipoDenunciado)}
+              {...register(dictionary.defendantType)}
             >
-              {['Institución pública', 'Persona Jurídica', 'Persona Natural'].map(option => (
+              {defendantTypes.map(option => (
                 <option value={option} key={option}>{option}</option>
               ))}
             </Select>
           </FormControl>
           <FormControl isRequired>
             <FormLabel>Nombre del denunciado</FormLabel>
-            <Input {...register(dictionary.nombreDenunciado)} />
+            <Input {...register(dictionary.defendantName)} />
           </FormControl>
           <FormControl>
             <FormLabel>Descripción del acto que se denuncia</FormLabel>
-            <Textarea {...register(dictionary.descripcionDenuncia)} />
+            <Textarea {...register(dictionary.description)} />
           </FormControl>
           <FormControl>
             <FormLabel>Ubicación</FormLabel>
@@ -237,4 +220,4 @@ function PublicServantFormPage () {
   )
 }
 
-export default PublicServantFormPage
+export default CitizenFormPage

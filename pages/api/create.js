@@ -1,12 +1,8 @@
 import { getKnex } from '../../knex'
-import omit from 'lodash.omit'
 
 export default async function handler (req, res) {
   if (req.method !== 'POST') {
-    return res.status(403).json({
-      error: true,
-      message: 'Forbidden'
-    })
+    return res.status(403).json({ error: true, reason: 'Forbidden' })
   }
 
   if (!req.body) {
@@ -14,14 +10,10 @@ export default async function handler (req, res) {
   }
 
   try {
-    const { id } = req.body
     const knex = getKnex()
-    const update = omit(req.body, 'id')
-    await knex('denuncias')
-      .where('id', '=', id)
-      .update(update)
+    const id = await knex.insert([req.body], ['id']).into('denuncias')
     await knex.destroy()
-    return res.status(200).json()
+    return res.status(200).json({ data: id })
   } catch (error) {
     console.log(error)
     return res.status(500).json(error)
