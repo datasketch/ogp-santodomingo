@@ -11,4 +11,13 @@ function mapComplaints (data) {
   })
 }
 
-export { mapComplaints }
+function mapComplaint (complaint) {
+  return Object.keys(complaint).reduce((result, key) => {
+    return {
+      ...result,
+      [reverseDictionary[key]]: complaint[key]
+    }
+  }, {})
+}
+
+export { mapComplaints, mapComplaint }

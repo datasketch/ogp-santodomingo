@@ -31,7 +31,7 @@ function PublicServantFormPage () {
       [dictionary.source]: 'Funcionario'
     }
 
-    const op = axios.post('/api/create', info)
+    const op = axios.post('/api/complaints', info)
 
     toast.promise(op, {
       loading: 'Enviando...',

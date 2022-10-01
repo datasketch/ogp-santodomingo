@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import isEmail from 'validator/lib/isEmail'
 import toast, { Toaster } from 'react-hot-toast'
-import { complainantTypes, complaintTypes, affectedComponents, dictionary, parishes, defendantTypes, sectors } from '../../utils'
+import { complainantTypes, complaintTypes, affectedComponents, dictionary, parishes, defendantTypes, sectors, complaintStatusEnum } from '../../utils'
 import axios from 'axios'
 import { useRouter } from 'next/router'
 
@@ -28,10 +28,11 @@ function CitizenFormPage () {
       ...data,
       [dictionary.location]: coordinates,
       [dictionary.affectedComponent]: data[dictionary.affectedComponent].join(', '),
-      [dictionary.source]: 'Ciudadano'
+      [dictionary.source]: 'Ciudadano',
+      [dictionary.complaintStatus]: complaintStatusEnum.RECEIVED
     }
 
-    const op = axios.post('/api/create', info)
+    const op = axios.post('/api/complaints', info)
 
     toast.promise(op, {
       loading: 'Enviando...',

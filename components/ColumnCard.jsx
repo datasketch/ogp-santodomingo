@@ -28,7 +28,7 @@ function ColumnCard ({ color = 'white', data }) {
       ref={dragRef}
       style={{ opacity }}
     >
-      <p>{data.companyName || data.fullName}</p>
+      <p>{data.fullName || data.companyName}</p>
     </Box>
   )
 }

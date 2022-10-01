@@ -7,7 +7,7 @@ function Layout ({ children }) {
   return (
     <>
       <Toaster />
-      <Box as="div" maxW="container.xl" mx="auto">
+      <Box as="div" maxW="container.xl" mx="auto" px={4}>
         <Navbar />
         <main>
           { children }

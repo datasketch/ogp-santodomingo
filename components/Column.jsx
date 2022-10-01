@@ -9,7 +9,7 @@ function Column ({ category, target, children, onDrop }) {
       if (status === target) {
         return
       }
-      onDrop(id, target)
+      onDrop(id, status, target)
     },
     collect: (monitor) => ({
       canDrop: monitor.canDrop()
@@ -28,7 +28,7 @@ function Column ({ category, target, children, onDrop }) {
         p={4}
         pt={0}
         spacing={4}
-        bgColor={canDrop ? 'gray.100' : 'gray.50'}
+        opacity={canDrop ? '0.5' : '1'}
         rounded='lg'
         boxShadow="md"
         overflow="auto"
