@@ -2,7 +2,7 @@ import { Box } from '@chakra-ui/react'
 import PropTypes from 'prop-types'
 import { useDrag } from 'react-dnd'
 
-function KanbanCard ({ item, data, mapper = (_) => _, children }) {
+function KanbanCard ({ item, data, onClick, mapper = (_) => _, children }) {
   const [{ opacity }, dragRef] = useDrag(
     () => ({
       type: 'card',
@@ -31,6 +31,7 @@ function KanbanCard ({ item, data, mapper = (_) => _, children }) {
       _hover={{
         borderColor: 'blackAlpha.300'
       }}
+      onClick={onClick}
     >
       {children(cardData)}
     </Box>
@@ -41,7 +42,8 @@ KanbanCard.propTypes = {
   item: PropTypes.object,
   data: PropTypes.object,
   mapper: PropTypes.func,
-  children: PropTypes.func
+  children: PropTypes.func,
+  onClick: PropTypes.func
 }
 
 export default KanbanCard

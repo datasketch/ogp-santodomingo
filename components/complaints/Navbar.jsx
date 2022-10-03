@@ -4,6 +4,9 @@ import NextLink from 'next/link'
 function Navbar () {
   return (
     <Flex gap={2}>
+      <NextLink href="/denuncias" passHref>
+        <Link p={[1, 2]} textDecoration="underline">Tablero</Link>
+      </NextLink>
       <NextLink href="/denuncias/ciudadanos" passHref>
         <Link p={[1, 2]} textDecoration="underline">Ciudadanos</Link>
       </NextLink>

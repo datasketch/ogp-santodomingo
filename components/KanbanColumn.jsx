@@ -22,7 +22,7 @@ function KanbanColumn ({ title, target, onDrop, children }) {
       flexShrink="0"
       flexGrow="1"
       minW="sm"
-      w="sm"
+      w={{ base: 'full', md: 'sm' }}
     >
       <Heading fontSize="md" letterSpacing="wide" p={4}>
         <Badge px={2} py={1} rounded="lg">

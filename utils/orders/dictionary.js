@@ -15,9 +15,17 @@ export const dictionary = {
   survival: 'Supervivencia individuos',
   measurementDate: 'Fecha medición',
   actor: 'Actor',
-  details: 'Detalle',
   createdAt: 'created_at',
-  updatedAt: 'updated_at'
+  updatedAt: 'updated_at',
+  id: 'id'
+}
+
+export const orderDetailDictionary = {
+  id: 'id',
+  plant: 'Planta',
+  qty: 'Cantidad',
+  container: 'Contenedor',
+  type: 'Tipo'
 }
 
 export const reverseDictionary = Object.entries(dictionary).reduce((result, [key, value]) => {

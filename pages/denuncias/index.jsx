@@ -8,10 +8,11 @@ import { complaintStatusEnum } from '../../utils/complaints'
 import { dictionary } from '../../utils/complaints/dictionary'
 import groupBy from 'lodash.groupby'
 import KanbanCard from '../../components/KanbanCard'
+import Layout from '../../components/complaints/Layout'
 import ComplaintCardContent from '../../components/complaints/ComplaintCardContent'
 import { mapComplaint } from '../../utils/complaints/mapper'
 
-export default function Home () {
+export default function ComplaintsHomePage () {
   const { data, error, mutate } = useSWR('/api/complaints', (url) => axios.get(url).then(res => res.data))
 
   if (error) return <Text align="center" color="red">Se ha presentado un error</Text>
@@ -79,5 +80,13 @@ export default function Home () {
           : <Text align="center">No hay denuncias a gestionar</Text>}
       </Box>
     </>
+  )
+}
+
+ComplaintsHomePage.getLayout = function getLayout (page) {
+  return (
+    <Layout>
+      {page}
+    </Layout>
   )
 }

@@ -7,6 +7,7 @@ import toast, { Toaster } from 'react-hot-toast'
 import { complainantTypes, complaintTypes, affectedComponents, dictionary, parishes, defendantTypes, sectors, complaintStatusEnum } from '../../utils/complaints'
 import axios from 'axios'
 import { useRouter } from 'next/router'
+import Layout from '../../components/complaints/Layout'
 
 const Map = dynamic(() => import('../../components/Map'), {
   ssr: false
@@ -218,6 +219,14 @@ function CitizenFormPage () {
         </Stack>
       </form>
     </Box>
+  )
+}
+
+CitizenFormPage.getLayout = function getLayout (page) {
+  return (
+    <Layout>
+      {page}
+    </Layout>
   )
 }
 

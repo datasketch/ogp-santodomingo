@@ -1,19 +1,22 @@
-import { Box, Heading, Text } from '@chakra-ui/react'
-import useSWR from 'swr'
-// import Kanban from '../../components/Kanban'
-import KanbanBoard from '../../components/KanbanBoard'
-import groupBy from 'lodash.groupby'
-import { statusEnum } from '../../utils/orders/enum'
-import KanbanColumn from '../../components/KanbanColumn'
-import KanbanCard from '../../components/KanbanCard'
-import { dictionary } from '../../utils/orders/dictionary'
+import { Box, Heading, Text, useDisclosure } from '@chakra-ui/react'
 import axios from 'axios'
+import groupBy from 'lodash.groupby'
 import toast from 'react-hot-toast'
-import { mapOrder } from '../../utils/orders/mapper'
+import useSWR from 'swr'
+import KanbanBoard from '../../components/KanbanBoard'
+import KanbanCard from '../../components/KanbanCard'
+import KanbanColumn from '../../components/KanbanColumn'
 import OrderCardContent from '../../components/orders/OrderCardContent'
+import { dictionary } from '../../utils/orders/dictionary'
+import { mapOrder } from '../../utils/orders/mapper'
+import { statusEnum } from '../../utils/orders/enum'
+import { useState } from 'react'
+import OrderDialog from '../../components/orders/OrderDialog'
 
-export default function Home () {
+export default function PlantsHomePage () {
   const { data, error, mutate } = useSWR('/api/orders', (url) => axios.get(url).then(res => res.data))
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const [selectedData, setSelectedData] = useState()
 
   if (error) return <Text align="center" color="red">Se ha presentado un error</Text>
 
@@ -45,8 +48,18 @@ export default function Home () {
       })
   }
 
+  const handleClick = (data) => {
+    onOpen()
+    setSelectedData(data)
+  }
+
   return (
     <>
+      <OrderDialog
+        isOpen={isOpen}
+        onClose={onClose}
+        data={selectedData}
+      />
       <Box as="div" mt={4}>
         {data.length
           ? (
@@ -67,6 +80,7 @@ export default function Home () {
                         item={{ id: data.id, status: data[dictionary.status] }}
                         data={data}
                         mapper={mapOrder}
+                        onClick={() => handleClick(mapOrder(data))}
                       >
                         {(data) => (
                           <OrderCardContent data={data} />
