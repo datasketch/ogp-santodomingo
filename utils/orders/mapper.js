@@ -1,4 +1,4 @@
-import { dictionary as orderDictionary, orderDetailDictionary } from './dictionary'
+import { dictionary as orderDictionary, growingPlantsDictionary, orderDetailDictionary } from './dictionary'
 import { reverseDictionary } from '..'
 
 function mapOrder (order) {
@@ -30,4 +30,14 @@ function mapOrderDetail (details) {
   ))
 }
 
-export { mapOrder }
+function mapGrowingPlant (plant) {
+  const reversed = reverseDictionary(growingPlantsDictionary)
+  return Object.keys(plant).reduce((result, key) => {
+    return {
+      ...result,
+      [reversed[key]]: plant[key]
+    }
+  }, {})
+}
+
+export { mapOrder, mapGrowingPlant }

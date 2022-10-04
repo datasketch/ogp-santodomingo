@@ -27,3 +27,17 @@ export const orderDetailDictionary = {
   container: 'Contenedor',
   type: 'Tipo'
 }
+
+export const growingPlantsDictionary = {
+  order: 'Orden',
+  gardenStatus: 'Estado vivero',
+  qty: 'Cantidad',
+  transplantDate: 'Fecha transplante',
+  deliveryDate: 'Fecha de entrega',
+  plant: 'Planta',
+  container: 'Contenedor',
+  type: 'Tipo',
+  createdAt: 'created_at',
+  updatedAt: 'updated_at',
+  id: 'id'
+}

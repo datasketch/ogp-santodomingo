@@ -12,6 +12,7 @@ import { mapOrder } from '../../utils/orders/mapper'
 import { statusEnum } from '../../utils/orders/enum'
 import { useState } from 'react'
 import OrderDialog from '../../components/orders/OrderDialog'
+import Layout from '../../components/orders/Layout'
 
 export default function PlantsHomePage () {
   const { data, error, mutate } = useSWR('/api/orders', (url) => axios.get(url).then(res => res.data))
@@ -92,8 +93,16 @@ export default function PlantsHomePage () {
               </KanbanBoard>
             </>
             )
-          : <Text align="center">No hay denuncias a gestionar</Text>}
+          : <Text align="center">No hay pedidos a gestionar</Text>}
       </Box>
     </>
+  )
+}
+
+PlantsHomePage.getLayout = function getLayout (page) {
+  return (
+    <Layout>
+      {page}
+    </Layout>
   )
 }

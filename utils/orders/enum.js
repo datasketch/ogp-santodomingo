@@ -5,3 +5,9 @@ export const statusEnum = {
   REPORT: 'Informe',
   CANCELLED: 'Anulado'
 }
+
+export const gardenStatusEnum = {
+  GROWING: 'Creciendo',
+  TRANSPLANTED: 'Trasplantada',
+  READY: 'Lista para entrega'
+}
