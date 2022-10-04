@@ -10,7 +10,7 @@ function Navbar () {
       <NextLink href="/plantas/desarrollo" passHref>
         <Link p={[1, 2]}>Plantas en desarrollo</Link>
       </NextLink>
-      <NextLink href="/denuncias/inventario" passHref>
+      <NextLink href="/plantas/inventario" passHref>
         <Link p={[1, 2]}>Inventario</Link>
       </NextLink>
     </Flex>

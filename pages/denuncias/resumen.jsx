@@ -1,14 +1,13 @@
 import { Badge, Box, Heading, Stack, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from '@chakra-ui/react'
 import Layout from '../../components/complaints/Layout'
 import { Grid } from 'gridjs-react'
-import 'gridjs/dist/theme/mermaid.css'
 import useSWR from 'swr'
 import axios from 'axios'
 import { group } from 'd3-array'
 import { esES } from 'gridjs/l10n'
 import { dictionary } from '../../utils/complaints/dictionary'
 import { parseData } from '../../utils'
-
+import 'gridjs/dist/theme/mermaid.css'
 function Summary () {
   const { data, error } = useSWR('/api/complaints', (url) => axios.get(url).then(res => res.data))
 
