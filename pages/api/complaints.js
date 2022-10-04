@@ -19,7 +19,7 @@ export default async function handler (req, res) {
   try {
     let data = {}
     if (method === 'GET') {
-      data = await knex('denuncias').select()
+      data = await knex('denuncias').select().orderBy('id')
     }
 
     if (method === 'POST') {

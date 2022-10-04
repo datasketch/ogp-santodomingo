@@ -1,13 +1,14 @@
 import { Box, Button, Checkbox, FormControl, FormErrorMessage, FormHelperText, FormLabel, Heading, Input, Select, Stack, Textarea } from '@chakra-ui/react'
-import dynamic from 'next/dynamic'
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+import axios from 'axios'
+import dynamic from 'next/dynamic'
 import isEmail from 'validator/lib/isEmail'
 import toast from 'react-hot-toast'
-import { complainantTypes, complaintStatuses, complaintTypes, affectedComponents, dictionary, parishes, defendantTypes, sectors } from '../../utils/complaints'
-import axios from 'axios'
-import { useRouter } from 'next/router'
 import Layout from '../../components/complaints/Layout'
+import { complainantTypes, complaintStatuses, complaintTypes, affectedComponents, parishes, defendantTypes, sectors } from '../../utils/complaints'
+import { dictionary } from '../../utils/complaints/dictionary'
 
 const Map = dynamic(() => import('../../components/Map'), {
   ssr: false

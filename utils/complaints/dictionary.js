@@ -24,7 +24,3 @@ export const dictionary = {
   id: 'id',
   source: 'Fuente'
 }
-
-export const reverseDictionary = Object.entries(dictionary).reduce((result, [key, value]) => {
-  return { ...result, [value]: key }
-}, {})

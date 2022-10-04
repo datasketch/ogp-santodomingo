@@ -27,7 +27,3 @@ export const orderDetailDictionary = {
   container: 'Contenedor',
   type: 'Tipo'
 }
-
-export const reverseDictionary = Object.entries(dictionary).reduce((result, [key, value]) => {
-  return { ...result, [value]: key }
-}, {})

@@ -1,19 +1,23 @@
-import { Box, Heading, Text } from '@chakra-ui/react'
+import { Box, Heading, Text, useDisclosure } from '@chakra-ui/react'
+import { useState } from 'react'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import useSWR from 'swr'
 import KanbanBoard from '../../components/KanbanBoard'
 import KanbanColumn from '../../components/KanbanColumn'
-import { complaintStatusEnum } from '../../utils/complaints'
+import { complaintStatusEnum } from '../../utils/complaints/enum'
 import { dictionary } from '../../utils/complaints/dictionary'
 import groupBy from 'lodash.groupby'
 import KanbanCard from '../../components/KanbanCard'
 import Layout from '../../components/complaints/Layout'
 import ComplaintCardContent from '../../components/complaints/ComplaintCardContent'
 import { mapComplaint } from '../../utils/complaints/mapper'
+import ComplaintDialog from '../../components/complaints/ComplaintDialog'
 
 export default function ComplaintsHomePage () {
   const { data, error, mutate } = useSWR('/api/complaints', (url) => axios.get(url).then(res => res.data))
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const [selectedData, setSelectedData] = useState()
 
   if (error) return <Text align="center" color="red">Se ha presentado un error</Text>
 
@@ -44,8 +48,18 @@ export default function ComplaintsHomePage () {
       })
   }
 
+  const handleClick = (data) => {
+    onOpen()
+    setSelectedData(data)
+  }
+
   return (
     <>
+      <ComplaintDialog
+        isOpen={isOpen}
+        onClose={onClose}
+        data={selectedData}
+      />
       <Box as="div" mt={4}>
         {data.length
           ? (
@@ -66,6 +80,7 @@ export default function ComplaintsHomePage () {
                         item={{ id: data.id, status: data[dictionary.status] }}
                         data={data}
                         mapper={mapComplaint}
+                        onClick={() => handleClick(mapComplaint(data))}
                       >
                         {(data) => (
                           <ComplaintCardContent data={data} />

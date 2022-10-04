@@ -2,7 +2,7 @@ import { Badge, Box, Stack, Text } from '@chakra-ui/react'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import PropTypes from 'prop-types'
-import { sourceEnum } from '../../utils/complaints'
+import { sourceEnum } from '../../utils/complaints/enum'
 
 const colorScheme = {
   [sourceEnum.CITIZEN]: 'orange',
@@ -46,7 +46,7 @@ function ComplaintCardContent ({ data }) {
               </Box>
             )}
             {data.complaintType && (
-              <Box>
+              <Box textAlign={data.complaintDate ? 'end' : 'start'}>
                 <Text fontSize="xs" letterSpacing="wide">Tipo de denuncia</Text>
                 <Badge fontSize="xx-small" rounded="2xl" py={1} px={2}>
                   {data.complaintType}

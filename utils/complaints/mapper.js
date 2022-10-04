@@ -1,21 +1,24 @@
-import { reverseDictionary } from '.'
+import { dictionary } from './dictionary'
+import { reverseDictionary } from '..'
 
 function mapComplaints (data) {
+  const reversed = reverseDictionary(dictionary)
   return data.map(item => {
     return Object.keys(item).reduce((result, key) => {
       return {
         ...result,
-        [reverseDictionary[key]]: item[key]
+        [reversed[key]]: item[key]
       }
     }, {})
   })
 }
 
 function mapComplaint (complaint) {
+  const reversed = reverseDictionary(dictionary)
   return Object.keys(complaint).reduce((result, key) => {
     return {
       ...result,
-      [reverseDictionary[key]]: complaint[key]
+      [reversed[key]]: complaint[key]
     }
   }, {})
 }
