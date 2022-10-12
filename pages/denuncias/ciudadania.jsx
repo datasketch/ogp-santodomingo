@@ -57,7 +57,7 @@ function CitizenFormPage () {
       mx="auto"
     >
       <Toaster />
-      <Heading size="lg">Formulario de denuncias - Ciudadanos</Heading>
+      <Heading size="lg">Formulario de denuncias</Heading>
       <form action="" onSubmit={handleSubmit(onSubmit)}>
         <Stack dir="column" spacing={5} mt={5}>
           <FormControl isRequired>
