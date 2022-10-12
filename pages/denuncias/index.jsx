@@ -13,70 +13,26 @@ import Layout from '../../components/complaints/Layout'
 import ComplaintCardContent from '../../components/complaints/ComplaintCardContent'
 import { mapComplaint } from '../../utils/complaints/mapper'
 import ComplaintDialog from '../../components/complaints/ComplaintDialog'
-import { format } from 'date-fns'
+import { format, isBefore, isAfter, isEqual, addDays } from 'date-fns'
 
 export default function ComplaintsHomePage () {
   const { data, error, mutate } = useSWR('/api/complaints', (url) => axios.get(url).then(res => res.data))
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [selectedData, setSelectedData] = useState()
-  const [enteredFromDate, setEnteredFromDate] = useState('')
-  const [enteredToDate, setEnteredToDate] = useState('')
-  const currentDate = format(new Date(), 'yyyy-MM-dd')
 
-  const filterByRangeDate = (data, fromDate, toDate) => {
+  const filterByRangeDate = (data, startDate, endDate) => {
     // eslint-disable-next-line array-callback-return
     return data.filter(item => {
-      if (fromDate && !toDate) {
-        // Si desde tiene y hasta no, entonces se filtra desde la fecha desde hasta la fecha actual
-
-        // console.log('desde - 0')
-
-        // item
-        // 01 - 10 - 2022
-        // 02 - 10 - 2022
-        // 03 - 10 - 2022
-        // 04 - 10 - 2022
-        // 12 - 10 - 2022
-
-        // ejemplo
-        // entered from Date -> 03 - 10 - 2022
-        // current date -> 12 - 10 - 2022
-
-        return new Date(fromDate) <= new Date(item['Fecha de denuncia']) && new Date(currentDate) >= new Date(item['Fecha de denuncia'])
+      if (startDate && !endDate) {
+        return (isBefore(new Date(startDate), addDays(new Date(item[dictionary.complaintDate]), -1)) || (isEqual(new Date(startDate), addDays(new Date(item[dictionary.complaintDate]), -1)))) && (isAfter(new Date(currentDate), addDays(new Date(item[dictionary.complaintDate]), -1)) || (isEqual(new Date(currentDate), addDays(new Date(item[dictionary.complaintDate]), -1))))
       }
 
-      if (!fromDate && toDate) {
-        // Si desde no tiene y hasta sí, entonces se filtra desde el inicio de los tiempo hasta la fecha hasta
-
-        // console.log('0 - hasta')
-
-        // item
-        // 01 - 10 - 2022
-        // 02 - 10 - 2022
-        // 03 - 10 - 2022
-        // 04 - 10 - 2022
-        // 12 - 10 - 2022
-
-        // ejemplo
-        // entered to Date -> 04 - 10 - 2022
-        return new Date(toDate) >= new Date(item['Fecha de denuncia'])
+      if (!startDate && endDate) {
+        return isAfter(new Date(endDate), addDays(new Date(item[dictionary.complaintDate]), -1)) || isEqual(new Date(endDate), addDays(new Date(item[dictionary.complaintDate]), -1))
       }
 
-      if (fromDate && toDate) {
-        // console.log('desde - hasta')
-        // Si ambas tienen
-
-        // item
-        // 01 - 10 - 2022
-        // 02 - 10 - 2022
-        // 03 - 10 - 2022
-        // 04 - 10 - 2022
-        // 12 - 10 - 2022
-
-        // ejemplo
-        // entered from Date -> 01 - 10 - 2022
-        // entered to Date -> 03 - 10 - 2022
-        return new Date(fromDate) <= new Date(item['Fecha de denuncia']) && new Date(toDate) >= new Date(item['Fecha de denuncia'])
+      if (startDate && endDate) {
+        return (isBefore(new Date(startDate), addDays(new Date(item[dictionary.complaintDate]), -1)) || (isEqual(new Date(startDate), addDays(new Date(item[dictionary.complaintDate]), -1)))) && (isAfter(new Date(endDate), addDays(new Date(item[dictionary.complaintDate]), -1)) || (isEqual(new Date(endDate), addDays(new Date(item[dictionary.complaintDate]), -1))))
       }
     })
   }
@@ -85,15 +41,14 @@ export default function ComplaintsHomePage () {
 
   if (!data) return <Text align="center">Cargando tablero de gestión...</Text>
 
-  // Filtrar las denuncias según los estados a manipular
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
+  const currentDate = format(new Date(), 'yyyy-MM-dd')
+  const hasDateFilter = startDate || endDate
 
-  // Si los estados DESDE - HASTA de fechas esta vacio, tomo el valor por defecto de data
-
-  const isFilterDates = enteredFromDate || enteredToDate
-
-  const filteredData = !isFilterDates
+  const filteredData = !hasDateFilter
     ? data
-    : filterByRangeDate(data, enteredFromDate, enteredToDate)
+    : filterByRangeDate(data, startDate, endDate)
 
   const columns = groupBy(filteredData, dictionary.complaintStatus)
 
@@ -125,16 +80,14 @@ export default function ComplaintsHomePage () {
     setSelectedData(data)
   }
 
-  const fromDateChangeHandler = (event) => setEnteredFromDate(event.target.value)
+  const startDateChangeHandler = (event) => setStartDate(event.target.value)
 
-  const toDateChangeHandler = (event) => setEnteredToDate(event.target.value)
+  const endDateChangeHandler = (event) => setEndDate(event.target.value)
 
   const clearInputsClickHandler = () => {
-    setEnteredFromDate('')
-    setEnteredToDate('')
+    setStartDate('')
+    setEndDate('')
   }
-
-  // console.log(complaintStatusEnum)
 
   return (
     <>
@@ -149,16 +102,16 @@ export default function ComplaintsHomePage () {
             <>
               <Box display="flex" rowGap={6} flexDirection={{ base: 'column', lg: 'row' }} alignItems="center" justifyContent="space-between" mb={4}>
                 <Heading color="gray.700">Tablero de denuncias</Heading>
-                <Box display="flex" alignItems="center" columnGap={10}>
-                  <Box display="flex" alignItems="center" columnGap={1}>
+                <Box display="flex" alignItems="center" flexWrap="wrap" justifyContent="space-between" rowGap={4} columnGap={{ xl: 10 }}>
+                  <Box display="flex" width={{ base: '45%', lg: '30%', xl: 'auto' }} alignItems="center" columnGap={1}>
                     <Text flexShrink={0}>Desde :</Text>
-                    <Input type="date" value={enteredFromDate} max={currentDate} onChange={fromDateChangeHandler} />
+                    <Input type="date" value={startDate} max={currentDate} onChange={startDateChangeHandler} />
                   </Box>
-                  <Box display="flex" alignItems="center" columnGap={1}>
+                  <Box display="flex" width={{ base: '45%', lg: '30%', xl: 'auto' }} alignItems="center" columnGap={1}>
                     <Text flexShrink={0}>Hasta :</Text>
-                    <Input type="date" value={enteredToDate} max={currentDate} min={enteredFromDate} onChange={toDateChangeHandler} />
+                    <Input type="date" value={endDate} max={currentDate} min={startDate} onChange={endDateChangeHandler} />
                   </Box>
-                  <Button colorScheme='blackAlpha' variant='outline' onClick={clearInputsClickHandler}>
+                  <Button width={{ base: '100%', lg: '30%', xl: 'auto' }} colorScheme='blackAlpha' variant='outline' onClick={clearInputsClickHandler}>
                     Restablecer filtros
                   </Button>
                 </Box>
