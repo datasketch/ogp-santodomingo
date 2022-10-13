@@ -13,42 +13,25 @@ import Layout from '../../components/complaints/Layout'
 import ComplaintCardContent from '../../components/complaints/ComplaintCardContent'
 import { mapComplaint } from '../../utils/complaints/mapper'
 import ComplaintDialog from '../../components/complaints/ComplaintDialog'
-import { format, isBefore, isAfter, isEqual, addDays } from 'date-fns'
+import useFilterByDate from '../../hooks/use-filtered-data'
 
 export default function ComplaintsHomePage () {
   const { data, error, mutate } = useSWR('/api/complaints', (url) => axios.get(url).then(res => res.data))
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [selectedData, setSelectedData] = useState()
-
-  const filterByRangeDate = (data, startDate, endDate) => {
-    // eslint-disable-next-line array-callback-return
-    return data.filter(item => {
-      if (startDate && !endDate) {
-        return (isBefore(new Date(startDate), addDays(new Date(item[dictionary.complaintDate]), -1)) || (isEqual(new Date(startDate), addDays(new Date(item[dictionary.complaintDate]), -1)))) && (isAfter(new Date(currentDate), addDays(new Date(item[dictionary.complaintDate]), -1)) || (isEqual(new Date(currentDate), addDays(new Date(item[dictionary.complaintDate]), -1))))
-      }
-
-      if (!startDate && endDate) {
-        return isAfter(new Date(endDate), addDays(new Date(item[dictionary.complaintDate]), -1)) || isEqual(new Date(endDate), addDays(new Date(item[dictionary.complaintDate]), -1))
-      }
-
-      if (startDate && endDate) {
-        return (isBefore(new Date(startDate), addDays(new Date(item[dictionary.complaintDate]), -1)) || (isEqual(new Date(startDate), addDays(new Date(item[dictionary.complaintDate]), -1)))) && (isAfter(new Date(endDate), addDays(new Date(item[dictionary.complaintDate]), -1)) || (isEqual(new Date(endDate), addDays(new Date(item[dictionary.complaintDate]), -1))))
-      }
-    })
-  }
+  const {
+    startDate,
+    endDate,
+    currentDate,
+    startDateChangeHandler,
+    endDateChangeHandler,
+    clearInputsClickHandler,
+    filteredData
+  } = useFilterByDate(data)
 
   if (error) return <Text align="center" color="red">Se ha presentado un error</Text>
 
   if (!data) return <Text align="center">Cargando tablero de gestión...</Text>
-
-  const [startDate, setStartDate] = useState('')
-  const [endDate, setEndDate] = useState('')
-  const currentDate = format(new Date(), 'yyyy-MM-dd')
-  const hasDateFilter = startDate || endDate
-
-  const filteredData = !hasDateFilter
-    ? data
-    : filterByRangeDate(data, startDate, endDate)
 
   const columns = groupBy(filteredData, dictionary.complaintStatus)
 
@@ -78,15 +61,6 @@ export default function ComplaintsHomePage () {
   const handleClick = (data) => {
     onOpen()
     setSelectedData(data)
-  }
-
-  const startDateChangeHandler = (event) => setStartDate(event.target.value)
-
-  const endDateChangeHandler = (event) => setEndDate(event.target.value)
-
-  const clearInputsClickHandler = () => {
-    setStartDate('')
-    setEndDate('')
   }
 
   return (
