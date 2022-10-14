@@ -36,7 +36,6 @@ export default async function handler (req, res) {
           'plantas_en_desarrollo.id', 'plantas_en_desarrollo.Orden', 'plantas_en_desarrollo.Estado vivero', 'plantas_en_desarrollo.Cantidad', 'plantas_en_desarrollo.Fecha transplante', 'plantas_en_desarrollo.Fecha de entrega', 'plantas.Planta', 'plantas.Tipo', 'plantas.Contenedor'
         ])
     }
-
     await knex.destroy()
     return res.status(200).json(data)
   } catch (error) {

@@ -28,15 +28,47 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
-        <DrawerHeader>Detalle orden #{data.order}</DrawerHeader>
+        <DrawerHeader>
+          <Box display="flex" flexDirection={{ base: 'column', md: 'row' }} columnGap={10} alignItems="center">
+            <Box fontSize="md">
+              <Text letterSpacing="wide">Detalle orden #{data.order}</Text>
+            </Box>
+            {data.year && <Box fontSize="md">
+              <Text letterSpacing="wide">Año - {data.year}</Text>
+            </Box>}
+           {data.status && <Box fontSize="md">
+              <Text letterSpacing="wide">Estado - {data.status}</Text>
+            </Box>}
+          </Box>
+        </DrawerHeader>
         <DrawerBody>
           <Stack spacing={4}>
-            {data.name && (
-              <Box fontSize="md">
-                <Text letterSpacing="wide">Nombre beneficiario</Text>
-                <Text fontWeight="semibold">{data.name}</Text>
-              </Box>
-            )}
+            <Box display="flex" flexDirection={{ base: 'column', md: 'row' }} justifyContent="space-between" alignItems={{ lg: 'center' }} rowGap={4}>
+              {data.name && (
+                <Box fontSize="md">
+                  <Text letterSpacing="wide">Nombre beneficiario</Text>
+                  <Text fontWeight="semibold">{data.name}</Text>
+                </Box>
+              )}
+              {data.identifier && (
+                <Box fontSize="md">
+                  <Text letterSpacing="wide">Identificación</Text>
+                  <Text fontWeight="semibold">{data.identifier}</Text>
+                </Box>
+              )}
+              {data.address && (
+                <Box fontSize="md">
+                  <Text letterSpacing="wide">Dirección</Text>
+                  <Text fontWeight="semibold">{data.address}</Text>
+                </Box>
+              )}
+              {data.phoneNumber && (
+                <Box fontSize="md">
+                  <Text letterSpacing="wide">Contacto</Text>
+                  <Text fontWeight="semibold">{data.phoneNumber}</Text>
+                </Box>
+              )}
+            </Box>
             {data.canton && (
               <Box fontSize="md">
                 <Text letterSpacing="wide">Cantón</Text>

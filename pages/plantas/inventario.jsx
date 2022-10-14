@@ -17,7 +17,7 @@ function InventoryPage () {
   return (
     <Box position="relative">
       <Grid
-        {...parseData(data)}
+        {...parseData(data.filter(item => +item.Inventario > 0))}
         language={esES}
         height="800px"
         search
