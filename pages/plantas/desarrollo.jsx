@@ -99,7 +99,7 @@ function GrowingPlantsPage () {
             <Text align="center">No hay plantas en desarrollo</Text>
             )}
       </Box>
-      <AddPlant isOpen={isOpen} onClose={onClose} btnRef={btnRef} />
+      <AddPlant isOpen={isOpen} onClose={onClose} btnRef={btnRef} plantsDevData={data} />
     </>
   )
 }
