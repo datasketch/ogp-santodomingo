@@ -4,11 +4,13 @@ import useSWR from 'swr'
 
 // eslint-disable-next-line react/prop-types
 function AddPlant ({ isOpen, btnRef, onClose }) {
-  const { data, error } = useSWR('/api/plants', (url) => axios.get(url).then(res => res.data))
+  const { data, error } = useSWR('/api/plants-list', (url) => axios.get(url).then(res => res.data))
 
   if (error) return <Text align="center" color="red">Se ha presentado un error</Text>
 
   if (!data) return <Text align="center">Cargando las plantas...</Text>
+
+  console.log(data)
 
   const plants = [...new Set(data.map(item => item.Planta))]
 
