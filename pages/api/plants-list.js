@@ -2,7 +2,7 @@ import { getKnex } from '../../knex'
 
 export default async function handler (req, res) {
   const { method } = req
-  if (!(['GET', 'POST'].includes(method))) {
+  if (!(['GET'].includes(method))) {
     return res.status(405).json({
       error: true,
       message: 'Method Not Allowed'
@@ -14,11 +14,9 @@ export default async function handler (req, res) {
   try {
     let data = []
     if (method === 'GET') {
-      data = await knex('plantas')
+      data = await knex.select('id', 'Planta', 'Contenedor').from('plantas')
     }
-    if (method === 'POST') {
-      await knex.insert([req.body]).into('plantas')
-    }
+
     await knex.destroy()
     return res.status(200).json(data)
   } catch (error) {

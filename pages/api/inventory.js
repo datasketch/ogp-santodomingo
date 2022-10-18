@@ -14,25 +14,7 @@ export default async function handler (req, res) {
   try {
     let data = []
     if (method === 'GET') {
-      data = await knex.raw(`SELECT
-      ue. "Planta",
-      ue. "Tipo",
-      ue. "Contenedor",
-      ul. "Unidades listas para entrega",
-      ue. "Unidades entregadas",
-      (ul. "Unidades listas para entrega" - ue. "Unidades entregadas") "Inventario"
-    FROM
-      unidades_entregadas ue
-      JOIN unidades_listas_para_entrega ul ON (ue. "Planta" = ul. "Planta"
-          OR ue. "Planta" IS NULL
-          AND ul. "Planta" IS NULL)
-        AND(ue. "Tipo" = ul. "Tipo"
-          OR ue. "Tipo" IS NULL
-          AND ul. "Tipo" IS NULL)
-        AND(ue. "Contenedor" = ul. "Contenedor"
-          OR ue. "Contenedor" IS NULL
-          AND ul. "Contenedor" IS NULL);`)
-      data = data.rows
+      data = await knex('inventario').where('Inventario', '>', 0)
     }
 
     await knex.destroy()
