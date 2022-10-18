@@ -1,4 +1,4 @@
-import { Box, Heading, Text, useDisclosure } from '@chakra-ui/react'
+import { Box, Button, Heading, Text, useDisclosure } from '@chakra-ui/react'
 import axios from 'axios'
 import groupBy from 'lodash.groupby'
 import toast from 'react-hot-toast'
@@ -10,13 +10,16 @@ import OrderCardContent from '../../components/orders/OrderCardContent'
 import { dictionary } from '../../utils/orders/dictionary'
 import { mapOrder } from '../../utils/orders/mapper'
 import { statusEnum } from '../../utils/orders/enum'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import OrderDialog from '../../components/orders/OrderDialog'
 import Layout from '../../components/orders/Layout'
+import NewOrder from '../../components/orders/NewOrder'
 
 export default function PlantsHomePage () {
   const { data, error, mutate } = useSWR('/api/orders', (url) => axios.get(url).then(res => res.data))
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const { isOpen: isOpen2, onOpen: onOpen2, onClose: onClose2 } = useDisclosure()
+  const btnRef = useRef()
   const [selectedData, setSelectedData] = useState()
 
   if (error) return <Text align="center" color="red">Se ha presentado un error</Text>
@@ -65,7 +68,10 @@ export default function PlantsHomePage () {
         {data.length
           ? (
             <>
-              <Heading color="gray.700" mb={4}>Tablero de órdenes</Heading>
+              <Box display="flex" rowGap={6} alignItems="center" columnGap={10} mb={4}>
+                <Heading color="gray.700" mb={4}>Tablero de órdenes</Heading>
+                <Button onClick={() => onOpen2(true)}>+Agregar</Button>
+              </Box>
               <KanbanBoard>
                 {Object.entries(statusEnum).map(([key, status]) => (
                   <KanbanColumn
@@ -91,6 +97,7 @@ export default function PlantsHomePage () {
                   </KanbanColumn>
                 ))}
               </KanbanBoard>
+              <NewOrder isOpen={isOpen2} onClose={onClose2} btnRef={btnRef}/>
             </>
             )
           : <Text align="center">No hay pedidos a gestionar</Text>}
