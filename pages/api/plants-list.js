@@ -14,7 +14,7 @@ export default async function handler (req, res) {
   try {
     let data = []
     if (method === 'GET') {
-      data = await knex('plantas')
+      data = await knex.select('id', 'Planta', 'Contenedor').from('plantas')
     }
 
     await knex.destroy()

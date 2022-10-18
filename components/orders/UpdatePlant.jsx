@@ -1,27 +1,42 @@
-import { Button, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerHeader, DrawerOverlay, FormControl, FormLabel, Input, Select, Stack, Text } from '@chakra-ui/react'
+/* eslint-disable react/prop-types */
+import { Button, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerHeader, DrawerOverlay, FormControl, FormLabel, Input, Select, Stack } from '@chakra-ui/react'
+import { growingPlantsDictionary as d } from '../../utils/orders/dictionary'
+import useSWR, { mutate } from 'swr'
 import axios from 'axios'
 import { group } from 'd3-array'
-import { useState } from 'react'
-import { toast } from 'react-hot-toast'
-import useSWR, { mutate } from 'swr'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { growingPlantsDictionary as d } from '../../utils/orders/dictionary'
+import toast from 'react-hot-toast'
+import { format } from 'date-fns'
 
-// eslint-disable-next-line react/prop-types
-function AddPlant ({ isOpen, btnRef, onClose }) {
-  const { data, error } = useSWR('/api/plants-list', (url) => axios.get(url).then(res => res.data))
-  const { handleSubmit, register, reset } = useForm({
-    mode: 'onBlur'
-  })
+function UpdatePlant ({ isOpen, btnRef, onClose, data = {}, setData }) {
+  const { data: dataApiPlantsList, error } = useSWR('/api/plants-list', (url) => axios.get(url).then(res => res.data))
   const [showContainerInput, setShowContainerInput] = useState(false)
-  const [containerData, setContainerData] = useState([])
+  const [containerData, setContainerData] = useState()
+  const { handleSubmit, register, reset } = useForm({
+    mode: 'onBlur',
+    defaultValues: {
+      [d.transplantDate]: data.transplantDate ? format(new Date(data.transplantDate), 'yyyy-MM-dd') : null,
+      [d.deliveryDate]: data.deliveryDate ? format(new Date(data.deliveryDate), 'yyyy-MM-dd') : null,
+      [d.plant]: data.plant,
+      [d.qty]: data.qty,
+      [d.container]: data.container
+    }
+  })
+  const newFormatData = {
+    [d.id]: data?.id,
+    [d.plant]: data?.plant,
+    [d.gardenStatus]: data?.gardenStatus,
+    [d.qty]: data?.qty,
+    [d.container]: data?.container,
+    [d.transplantDate]: data?.transplantDate,
+    [d.deliveryDate]: data?.deliveryDate
+  }
 
-  if (error) return <Text align="center" color="red">Se ha presentado un error</Text>
-
-  if (!data) return <Text align="center">Cargando las plantas...</Text>
+  if (error) return <div>Se ha presentado un error...</div>
 
   // VARIABLES
-  const groupedByName = Array.from(group(data, (d) => d.Planta))
+  const groupedByName = Array.from(group(dataApiPlantsList || [], (d) => d.Planta))
   const plantsNames = groupedByName.map(([name]) => name)
   const plantsData = groupedByName.map(item => item[1]).flat()
 
@@ -30,6 +45,9 @@ function AddPlant ({ isOpen, btnRef, onClose }) {
     const hasContainer = filtered.length > 1
     setShowContainerInput(hasContainer)
     setContainerData(filtered)
+    if (!hasContainer) {
+      reset({ [d.container]: null })
+    }
   }
 
   const onSubmit = (data) => {
@@ -37,12 +55,14 @@ function AddPlant ({ isOpen, btnRef, onClose }) {
       if (!data.Contenedor) return item.Planta === data.Planta
       return item.Planta === data.Planta && item.Contenedor === data.Contenedor
     })
+    console.log(plantObject)
     if (!plantObject) {
       alert('Algo salió muy mal. Contacte a soporte')
       return
     }
     const input = {
       ...data,
+      id: newFormatData[d.id],
       'Estado vivero': 'Creciendo',
       Planta: plantObject.id,
       [d.transplantDate]: data[d.transplantDate] || null,
@@ -51,13 +71,13 @@ function AddPlant ({ isOpen, btnRef, onClose }) {
 
     delete input.Contenedor
 
-    const op = axios.post('/api/plants', input)
+    const op = axios.patch('/api/plants', input)
 
     mutate(
       '/api/plants',
       () => toast.promise(op, {
         loading: 'Enviando...',
-        success: 'Éxito',
+        success: 'Datos actualizados',
         error: error => {
           console.log(error)
           return 'Se ha presentado un error'
@@ -69,20 +89,33 @@ function AddPlant ({ isOpen, btnRef, onClose }) {
     ).then(() => {
       onClose()
       reset()
+      setData()
     })
   }
+
+  useEffect(() => {
+    const containerData = plantsData.filter(({ Planta }) => newFormatData[d.plant] === Planta)
+    if (containerData.length > 1) {
+      setShowContainerInput(true)
+      setContainerData(containerData)
+    }
+  }, [])
 
   return (
     <Drawer
       isOpen={isOpen}
       placement='right'
-      onClose={onClose}
+      onClose={() => {
+        reset()
+        onClose()
+        setData()
+      }}
       finalFocusRef={btnRef}
     >
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
-        <DrawerHeader>Agregar</DrawerHeader>
+        <DrawerHeader>Actualizar</DrawerHeader>
         <DrawerBody>
           <form action="" onSubmit={handleSubmit(onSubmit)}>
             <Stack dir="column" spacing={5}>
@@ -90,8 +123,7 @@ function AddPlant ({ isOpen, btnRef, onClose }) {
                 <FormLabel>Planta</FormLabel>
                 <Select
                   mt={1}
-                  placeholder='Select option'
-                  {...register('Planta', {
+                  {...register(d.plant, {
                     onChange: validateContainer
                   })}
                 >
@@ -109,7 +141,7 @@ function AddPlant ({ isOpen, btnRef, onClose }) {
                   <FormControl isRequired>
                     <FormLabel>Contenedor</FormLabel>
                     <Select
-                      mt={1} placeholder='Select option'
+                      mt={1}
                       {...register('Contenedor')}
                     >
                       {
@@ -127,7 +159,7 @@ function AddPlant ({ isOpen, btnRef, onClose }) {
                 <FormLabel>Cantidad</FormLabel>
                 <Input
                   type='number'
-                  {...register('Cantidad', {
+                  {...register(d.qty, {
                     required: true,
                     min: 1,
                     valueAsNumber: true
@@ -138,14 +170,14 @@ function AddPlant ({ isOpen, btnRef, onClose }) {
                 <FormLabel>Fecha transplante</FormLabel>
                 <Input
                   type="date"
-                  {...register('Fecha transplante') }
+                  {...register(d.transplantDate)}
                 />
               </FormControl>
               <FormControl>
                 <FormLabel>Fecha entrega</FormLabel>
                 <Input
                   type="date"
-                  {...register('Fecha de entrega')}
+                  {...register(d.deliveryDate)}
                 />
               </FormControl>
               <Button
@@ -162,4 +194,4 @@ function AddPlant ({ isOpen, btnRef, onClose }) {
   )
 }
 
-export default AddPlant
+export default UpdatePlant

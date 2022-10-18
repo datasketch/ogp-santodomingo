@@ -4,13 +4,14 @@ import {
 
 import axios from 'axios'
 import groupBy from 'lodash.groupby'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import useSWR from 'swr'
 import KanbanBoard from '../../components/KanbanBoard'
 import KanbanCard from '../../components/KanbanCard'
 import KanbanColumn from '../../components/KanbanColumn'
 import AddPlant from '../../components/orders/AddPlant'
+import UpdatePlant from '../../components/orders/UpdatePlant'
 import Layout from '../../components/orders/Layout'
 import PlantCardContent from '../../components/orders/PlantCardContent'
 import { growingPlantsDictionary as dict } from '../../utils/orders/dictionary'
@@ -19,8 +20,11 @@ import { mapGrowingPlant } from '../../utils/orders/mapper'
 
 function GrowingPlantsPage () {
   const { data, error, mutate } = useSWR('/api/plants', (url) => axios.get(url).then(res => res.data))
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const btnRef = useRef()
+  const { isOpen: isOpenAddPlant, onOpen: onOpenAddPlant, onClose: onCloseAddPlant } = useDisclosure()
+  const { isOpen: isOpenUpdatePlant, onOpen: onOpenUpdatePlant, onClose: onCloseUpdatePlant } = useDisclosure()
+  const addPlant = useRef()
+  const updatePlant = useRef()
+  const [selectedData, setSelectedData] = useState()
 
   if (error) return <Text align="center" color="red">Se ha presentado un error</Text>
 
@@ -53,7 +57,8 @@ function GrowingPlantsPage () {
   }
 
   const handleClick = (data) => {
-    console.log(data)
+    setSelectedData(data)
+    onOpenUpdatePlant()
   }
 
   return (
@@ -64,7 +69,10 @@ function GrowingPlantsPage () {
             <>
               <Box display="flex" rowGap={6} alignItems="center" columnGap={10} mb={4}>
                 <Heading color="gray.700">Plantas en desarrollo</Heading>
-                <Button width={{ base: '100%', lg: '30%', xl: 'auto' }} colorScheme='blackAlpha' variant='outline' ref={btnRef} onClick={() => onOpen(true)}>
+                <Button width={{ base: '100%', lg: '30%', xl: 'auto' }} colorScheme='blackAlpha' variant='outline' ref={addPlant} onClick={() => {
+                  onOpenAddPlant(true)
+                  setSelectedData()
+                }}>
                   + Agregar
                 </Button>
               </Box>
@@ -84,6 +92,7 @@ function GrowingPlantsPage () {
                         data={data}
                         mapper={mapGrowingPlant}
                         onClick={() => handleClick(mapGrowingPlant(data))}
+                        ref={updatePlant}
                       >
                         {(data) => (
                           <PlantCardContent data={data} />
@@ -99,7 +108,20 @@ function GrowingPlantsPage () {
             <Text align="center">No hay plantas en desarrollo</Text>
             )}
       </Box>
-      <AddPlant isOpen={isOpen} onClose={onClose} btnRef={btnRef} plantsDevData={data} />
+      <AddPlant
+        isOpen={isOpenAddPlant}
+        onClose={onCloseAddPlant}
+        btnRef={addPlant}
+      />
+      {selectedData && (
+        <UpdatePlant
+          isOpen={isOpenUpdatePlant}
+          onClose={onCloseUpdatePlant}
+          btnRef={updatePlant}
+          data={selectedData}
+          setData={setSelectedData}
+        />
+      )}
     </>
   )
 }
