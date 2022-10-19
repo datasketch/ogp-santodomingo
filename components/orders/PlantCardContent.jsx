@@ -30,16 +30,16 @@ function PlantCardContent ({ data = {} }) {
           <Text fontSize="small" fontWeight="semibold">{data.container}</Text>
         </Box>
       )}
+      {data.transplantDate && (
+        <Box>
+          <Text fontSize="xs" letterSpacing="wide">Fecha de transplante</Text>
+          <Text fontSize="small" fontWeight="semibold">{format(new Date(data.transplantDate), 'MMMM dd, yyyy', { locale: es })}</Text>
+        </Box>
+      )}
       {data.deliveryDate && (
         <Box>
           <Text fontSize="xs" letterSpacing="wide">Fecha de entrega</Text>
           <Text fontSize="small" fontWeight="semibold">{format(new Date(data.deliveryDate), 'MMMM dd, yyyy', { locale: es })}</Text>
-        </Box>
-      )}
-      {data.transplantDate && (
-        <Box>
-          <Text fontSize="xs" letterSpacing="wide">Fecha de entrega</Text>
-          <Text fontSize="small" fontWeight="semibold">{format(new Date(data.transplantDate), 'MMMM dd, yyyy', { locale: es })}</Text>
         </Box>
       )}
     </Stack>

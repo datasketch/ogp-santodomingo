@@ -5,10 +5,12 @@ export const reverseDictionary = (dictionary) => Object.entries(dictionary).redu
 }, {})
 
 export const parseData = (input, config = { omit: [] }) => {
-  const columns = Array.from(difference(Object.keys(input.at(0)), config.omit))
-  const data = input.map(item => (
-    Array.from(difference(Object.keys(item), config.omit)).map(key => item[key])
-  ))
+  const columns = input.length > 0 ? Array.from(difference(Object.keys(input.at(0)), config.omit)) : []
+  const data = input.length > 0
+    ? input.map(item => (
+      Array.from(difference(Object.keys(item), config.omit)).map(key => item[key])
+    ))
+    : []
   return {
     data,
     columns

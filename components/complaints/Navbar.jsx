@@ -14,8 +14,8 @@ function Navbar () {
       <NextLink href="/denuncias/resumen" passHref>
         <Link p={[1, 2]} _hover={hover} borderBottom="4px" borderColor="transparent">Reportes</Link>
       </NextLink>
-      <NextLink href="/denuncias/ciudadanos" passHref>
-        <Link p={[1, 2]} _hover={hover} borderBottom="4px" borderColor="orange">Ciudadanos</Link>
+      <NextLink href="/denuncias/ciudadania" passHref>
+        <Link p={[1, 2]} _hover={hover} borderBottom="4px" borderColor="orange">Ciudadanía</Link>
       </NextLink>
       <NextLink href="/denuncias/funcionarios" passHref>
         <Link p={[1, 2]} _hover={hover} borderBottom="4px" borderColor="pink">Funcionarios</Link>

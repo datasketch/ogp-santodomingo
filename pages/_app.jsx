@@ -1,6 +1,7 @@
 import { Box, ChakraProvider } from '@chakra-ui/react'
 import { Toaster } from 'react-hot-toast'
 import 'leaflet/dist/leaflet.css'
+import '../styles.css'
 
 // eslint-disable-next-line react/prop-types
 function App ({ Component, pageProps }) {

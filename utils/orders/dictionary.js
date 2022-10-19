@@ -41,3 +41,9 @@ export const growingPlantsDictionary = {
   updatedAt: 'updated_at',
   id: 'id'
 }
+
+export const inventoryDictionary = {
+  unitsReadyForDelivery: 'Unidades listas para entrega',
+  unitsDelivered: 'Unidades entregadas',
+  type: 'Tipo'
+}

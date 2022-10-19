@@ -1,8 +1,8 @@
 export const statusEnum = {
   RECEIVED: 'Recibido',
-  DELIVERED: 'Entregado',
   INSPECTION: 'Inspección',
   REPORT: 'Informe',
+  DELIVERED: 'Entregado',
   CANCELLED: 'Anulado'
 }
 

@@ -1,4 +1,4 @@
-import { Box, Heading, Text, useDisclosure } from '@chakra-ui/react'
+import { Box, Button, Heading, Input, Text, useDisclosure } from '@chakra-ui/react'
 import { useState } from 'react'
 import axios from 'axios'
 import toast from 'react-hot-toast'
@@ -13,17 +13,27 @@ import Layout from '../../components/complaints/Layout'
 import ComplaintCardContent from '../../components/complaints/ComplaintCardContent'
 import { mapComplaint } from '../../utils/complaints/mapper'
 import ComplaintDialog from '../../components/complaints/ComplaintDialog'
+import useFilterByDate from '../../hooks/use-filtered-data'
 
 export default function ComplaintsHomePage () {
   const { data, error, mutate } = useSWR('/api/complaints', (url) => axios.get(url).then(res => res.data))
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [selectedData, setSelectedData] = useState()
+  const {
+    startDate,
+    endDate,
+    currentDate,
+    startDateChangeHandler,
+    endDateChangeHandler,
+    clearInputsClickHandler,
+    filteredData
+  } = useFilterByDate(data)
 
   if (error) return <Text align="center" color="red">Se ha presentado un error</Text>
 
   if (!data) return <Text align="center">Cargando tablero de gestión...</Text>
 
-  const columns = groupBy(data, dictionary.complaintStatus)
+  const columns = groupBy(filteredData, dictionary.complaintStatus)
 
   const handleDrop = async (id, target) => {
     const index = data.findIndex(item => item.id === id)
@@ -60,11 +70,26 @@ export default function ComplaintsHomePage () {
         onClose={onClose}
         data={selectedData}
       />
-      <Box as="div" mt={4}>
+      <Box as="div" mt={6}>
         {data.length
           ? (
             <>
-              <Heading color="gray.700" mb={4}>Tablero de denuncias</Heading>
+              <Box display="flex" rowGap={6} flexDirection={{ base: 'column', lg: 'row' }} alignItems="center" justifyContent="space-between" mb={4}>
+                <Heading color="gray.700">Tablero de denuncias</Heading>
+                <Box display="flex" alignItems="center" flexWrap="wrap" justifyContent="space-between" rowGap={4} columnGap={{ xl: 10 }}>
+                  <Box display="flex" width={{ base: '45%', lg: '30%', xl: 'auto' }} alignItems="center" columnGap={1}>
+                    <Text flexShrink={0}>Desde :</Text>
+                    <Input type="date" value={startDate} max={currentDate} onChange={startDateChangeHandler} />
+                  </Box>
+                  <Box display="flex" width={{ base: '45%', lg: '30%', xl: 'auto' }} alignItems="center" columnGap={1}>
+                    <Text flexShrink={0}>Hasta :</Text>
+                    <Input type="date" value={endDate} max={currentDate} min={startDate} onChange={endDateChangeHandler} />
+                  </Box>
+                  <Button width={{ base: '100%', lg: '30%', xl: 'auto' }} colorScheme='blackAlpha' variant='outline' onClick={clearInputsClickHandler}>
+                    Restablecer filtros
+                  </Button>
+                </Box>
+              </Box>
               <KanbanBoard>
                 {Object.entries(complaintStatusEnum).map(([key, status]) => (
                   <KanbanColumn
