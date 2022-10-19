@@ -26,7 +26,7 @@ function Summary () {
 
   if (error) return <Text align="center" color="red">Se ha presentado un error</Text>
 
-  if (!data) return <Text align="center">Cargando resumenes...</Text>
+  if (!data) return <Text align="center">Cargando...</Text>
 
   const dataTable = Array.from(group(filteredData, d => d[dictionary.parish])).map(([parish, data]) => {
     return {
@@ -52,14 +52,14 @@ function Summary () {
     <>
       <Box mt={6}>
         <Box display="flex" rowGap={6} flexDirection={{ base: 'column', lg: 'row' }} alignItems="center" justifyContent="space-between" mb={4}>
-          <Heading color="gray.700">Tablero de denuncias</Heading>
+          <Heading color="gray.700">Reporte</Heading>
           <Box display="flex" alignItems="center" flexWrap="wrap" justifyContent="space-between" rowGap={4} columnGap={{ xl: 10 }}>
             <Box display="flex" width={{ base: '45%', lg: '30%', xl: 'auto' }} alignItems="center" columnGap={1}>
-              <Text flexShrink={0}>Desde :</Text>
+              <Text flexShrink={0}>Desde: </Text>
               <Input type="date" value={startDate} max={currentDate} onChange={startDateChangeHandler} />
             </Box>
             <Box display="flex" width={{ base: '45%', lg: '30%', xl: 'auto' }} alignItems="center" columnGap={1}>
-              <Text flexShrink={0}>Hasta :</Text>
+              <Text flexShrink={0}>Hasta: </Text>
               <Input type="date" value={endDate} max={currentDate} min={startDate} onChange={endDateChangeHandler} />
             </Box>
             <Button width={{ base: '100%', lg: '30%', xl: 'auto' }} colorScheme='blackAlpha' variant='outline' onClick={clearInputsClickHandler}>

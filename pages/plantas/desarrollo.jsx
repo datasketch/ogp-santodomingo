@@ -1,5 +1,5 @@
 import {
-  Box, Button, Heading, Text, useDisclosure
+  Box, Button, Heading, Stack, Text, useDisclosure
 } from '@chakra-ui/react'
 
 import axios from 'axios'
@@ -67,15 +67,26 @@ function GrowingPlantsPage () {
         {data.length
           ? (
             <>
-              <Box display="flex" rowGap={6} alignItems="center" columnGap={10} mb={4}>
+              <Stack
+                direction={{ base: 'column', md: 'row' }}
+                alignItems="center"
+                spacing={3}
+                mb={4}
+              >
                 <Heading color="gray.700">Plantas en desarrollo</Heading>
-                <Button width={{ base: '100%', lg: '30%', xl: 'auto' }} colorScheme='blackAlpha' variant='outline' ref={addPlant} onClick={() => {
-                  onOpenAddPlant(true)
-                  setSelectedData()
-                }}>
+                <Button
+                  size={'sm'}
+                  colorScheme='blackAlpha'
+                  variant='outline'
+                  ref={addPlant}
+                  onClick={() => {
+                    onOpenAddPlant(true)
+                    setSelectedData()
+                  }}
+                >
                   + Agregar
                 </Button>
-              </Box>
+              </Stack>
               <KanbanBoard>
                 {Object.entries(gardenStatusEnum).map(([key, status]) => (
                   <KanbanColumn

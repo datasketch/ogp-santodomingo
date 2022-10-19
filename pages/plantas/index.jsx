@@ -1,4 +1,4 @@
-import { Box, Button, Heading, Text, useDisclosure } from '@chakra-ui/react'
+import { Box, Button, Heading, Stack, Text, useDisclosure } from '@chakra-ui/react'
 import axios from 'axios'
 import groupBy from 'lodash.groupby'
 import toast from 'react-hot-toast'
@@ -59,7 +59,7 @@ export default function PlantsHomePage () {
 
   return (
     <>
-     {selectedData && <OrderDialog
+      {selectedData && <OrderDialog
         isOpen={isOpen}
         onClose={onClose}
         data={selectedData}
@@ -68,10 +68,22 @@ export default function PlantsHomePage () {
         {data.length
           ? (
             <>
-              <Box display="flex" rowGap={6} alignItems="center" columnGap={10} mb={4}>
-                <Heading color="gray.700" mb={4}>Tablero de órdenes</Heading>
-                <Button onClick={() => onOpen2(true)}>+Agregar</Button>
-              </Box>
+              <Stack
+                direction={{ base: 'column', md: 'row' }}
+                alignItems="center"
+                spacing={3}
+                mb={4}
+              >
+                <Heading color="gray.700">Tablero de órdenes</Heading>
+                <Button
+                  size={'sm'}
+                  colorScheme='blackAlpha'
+                  variant='outline'
+                  onClick={() => onOpen2(true)}
+                >
+                  +Agregar
+                </Button>
+              </Stack>
               <KanbanBoard>
                 {Object.entries(statusEnum).map(([key, status]) => (
                   <KanbanColumn
@@ -97,7 +109,7 @@ export default function PlantsHomePage () {
                   </KanbanColumn>
                 ))}
               </KanbanBoard>
-              <NewOrder isOpen={isOpen2} onClose={onClose2} btnRef={btnRef}/>
+              <NewOrder isOpen={isOpen2} onClose={onClose2} btnRef={btnRef} />
             </>
             )
           : <Text align="center">No hay pedidos a gestionar</Text>}

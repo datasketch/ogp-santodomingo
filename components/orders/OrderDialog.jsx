@@ -144,11 +144,19 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
     setEnableSave(false)
   }
 
+  const handleClose = () => {
+    setAddPlantRow(false)
+    setAddedPlant({})
+    setSelectedPlant({})
+    setEnableSave(false)
+    onClose()
+  }
+
   return (
     <Drawer
       isOpen={isOpen}
       placement='right'
-      onClose={onClose}
+      onClose={handleClose}
       size="xl"
     >
       <DrawerOverlay />
@@ -236,10 +244,10 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                       <Td>
                         <Stack direction={'row'}>
                           <Button aria-label='Cancelar' title='Cancelar' onClick={handleCancel} size="xs" colorScheme={'red'}>
-                            <XMarkIcon width={20} height={20} />
+                            <XMarkIcon width={16} height={16} />
                           </Button>
                           <Button aria-label='Guardar' title='Guardar' disabled={!enableSave} size="xs" colorScheme={'green'} onClick={saveDetails}>
-                            <CheckIcon width={20} height={20} />
+                            <CheckIcon width={16} height={16} />
                           </Button>
                         </Stack>
                       </Td>
@@ -306,7 +314,7 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
           </form>
         </DrawerBody>
         <DrawerFooter>
-          <Button variant='outline' mr={3} onClick={onClose}>
+          <Button variant='outline' mr={3} onClick={handleClose}>
             Cancelar
           </Button>
           <Button form="edit-order" colorScheme='blue' type="submit">Guardar</Button>

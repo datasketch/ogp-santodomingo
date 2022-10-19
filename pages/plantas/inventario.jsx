@@ -1,4 +1,4 @@
-import { Box, Text } from '@chakra-ui/react'
+import { Box, Heading, Text } from '@chakra-ui/react'
 import axios from 'axios'
 import { Grid } from 'gridjs-react'
 import useSWR from 'swr'
@@ -16,6 +16,7 @@ function InventoryPage () {
 
   return (
     <Box position="relative">
+      <Heading color="gray.700">Inventario</Heading>
       <Grid
         {...parseData(data)}
         language={esES}
