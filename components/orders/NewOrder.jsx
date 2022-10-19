@@ -33,7 +33,6 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
       Plantas: details
     }
 
-    console.log(input)
     const op = axios.post('/api/orders', input)
     mutate(
       '/api/orders',

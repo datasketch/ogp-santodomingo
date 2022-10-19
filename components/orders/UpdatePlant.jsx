@@ -55,7 +55,7 @@ function UpdatePlant ({ isOpen, btnRef, onClose, data = {}, setData }) {
       if (!data.Contenedor) return item.Planta === data.Planta
       return item.Planta === data.Planta && item.Contenedor === data.Contenedor
     })
-    console.log(plantObject)
+
     if (!plantObject) {
       alert('Algo salió muy mal. Contacte a soporte')
       return
