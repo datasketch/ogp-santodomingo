@@ -11,6 +11,7 @@ import { toast } from 'react-hot-toast'
 import { group } from 'd3-array'
 import { CheckIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import validator from 'validator'
+import { statusEnum } from '../../utils/orders/enum'
 
 function OrderDialog ({ isOpen, onClose, data = {} }) {
   const [headers, setHeaders] = useState([])
@@ -31,9 +32,11 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
       [dictionary.address]: data.address,
       [dictionary.phoneNumber]: data.phoneNumber,
       [dictionary.canton]: data.canton,
-      [dictionary.parish]: data.parish
+      [dictionary.parish]: data.parish,
+      [dictionary.status]: data.status
     }
   })
+  console.log(data)
 
   useEffect(() => {
     if (!data || isEmpty(data) || !data.details?.length) return
@@ -178,6 +181,16 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
         <DrawerBody>
           <form id="edit-order" onSubmit={handleSubmit(onSubmit)}>
             <Stack spacing={4}>
+              <Box fontSize="md">
+                <Text letterSpacing="wide">Estado</Text>
+                <Select
+                  {...register(dictionary.status)}
+                >
+                  {Object.values(statusEnum).map(value => (
+                    <option key={value} value={value}>{value}</option>
+                  ))}
+                </Select>
+              </Box>
               {data.name && (
                 <Box fontSize="md">
                   <Text letterSpacing="wide">Nombre beneficiario</Text>
