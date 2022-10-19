@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { format } from 'date-fns'
+import { gardenStatusEnum } from '../../utils/orders/enum'
 
 function UpdatePlant ({ isOpen, btnRef, onClose, data = {}, setData }) {
   const { data: dataApiPlantsList, error } = useSWR('/api/plants-list', (url) => axios.get(url).then(res => res.data))
@@ -30,7 +31,8 @@ function UpdatePlant ({ isOpen, btnRef, onClose, data = {}, setData }) {
     [d.qty]: data?.qty,
     [d.container]: data?.container,
     [d.transplantDate]: data?.transplantDate,
-    [d.deliveryDate]: data?.deliveryDate
+    [d.deliveryDate]: data?.deliveryDate,
+    [d.gardenStatus]: data?.gardenStatus
   }
 
   if (error) return <div>Se ha presentado un error...</div>
@@ -63,7 +65,6 @@ function UpdatePlant ({ isOpen, btnRef, onClose, data = {}, setData }) {
     const input = {
       ...data,
       id: newFormatData[d.id],
-      'Estado vivero': 'Creciendo',
       Planta: plantObject.id,
       [d.transplantDate]: data[d.transplantDate] || null,
       [d.deliveryDate]: data[d.deliveryDate] || null
@@ -119,6 +120,16 @@ function UpdatePlant ({ isOpen, btnRef, onClose, data = {}, setData }) {
         <DrawerBody>
           <form action="" onSubmit={handleSubmit(onSubmit)}>
             <Stack dir="column" spacing={5}>
+              <FormControl isRequired>
+                <FormLabel>Estado</FormLabel>
+                <Select
+                  {...register(d.gardenStatus)}
+                >
+                  {Object.values(gardenStatusEnum).map(status => (
+                    <option key={status} value={status}>{status}</option>
+                  ))}
+                </Select>
+              </FormControl>
               <FormControl isRequired>
                 <FormLabel>Planta</FormLabel>
                 <Select
