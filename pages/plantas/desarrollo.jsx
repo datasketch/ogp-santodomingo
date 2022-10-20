@@ -19,7 +19,7 @@ import { gardenStatusEnum } from '../../utils/orders/enum'
 import { mapGrowingPlant } from '../../utils/orders/mapper'
 import useFilterByDate from '../../hooks/use-filtered-data'
 
-function GrowingPlantsPage() {
+function GrowingPlantsPage () {
   const { data, error, mutate } = useSWR('/api/plants', (url) => axios.get(url).then(res => res.data))
   const { isOpen: isOpenAddPlant, onOpen: onOpenAddPlant, onClose: onCloseAddPlant } = useDisclosure()
   const { isOpen: isOpenUpdatePlant, onOpen: onOpenUpdatePlant, onClose: onCloseUpdatePlant } = useDisclosure()
@@ -85,7 +85,7 @@ function GrowingPlantsPage() {
                     colorScheme='blackAlpha'
                     variant='outline'
                     alignSelf="self-end"
-                    onClick={() => onOpen2(true)}
+                    onClick={() => onOpenAddPlant(true)}
                   >
                     +Agregar
                   </Button>
@@ -131,10 +131,10 @@ function GrowingPlantsPage() {
                 ))}
               </KanbanBoard>
             </>
-          )
+            )
           : (
             <Text align="center">No hay plantas en desarrollo</Text>
-          )}
+            )}
       </Box>
       <AddPlant
         isOpen={isOpenAddPlant}
@@ -154,7 +154,7 @@ function GrowingPlantsPage() {
   )
 }
 
-GrowingPlantsPage.getLayout = function getLayout(page) {
+GrowingPlantsPage.getLayout = function getLayout (page) {
   return (
     <Layout>
       {page}

@@ -16,7 +16,7 @@ import Layout from '../../components/orders/Layout'
 import NewOrder from '../../components/orders/NewOrder'
 import useFilterByDate from '../../hooks/use-filtered-data'
 
-export default function PlantsHomePage() {
+export default function PlantsHomePage () {
   const { data, error, mutate } = useSWR('/api/orders', (url) => axios.get(url).then(res => res.data))
   const { isOpen, onOpen, onClose } = useDisclosure()
   const { isOpen: isOpen2, onOpen: onOpen2, onClose: onClose2 } = useDisclosure()
@@ -132,14 +132,14 @@ export default function PlantsHomePage() {
               </KanbanBoard>
               <NewOrder isOpen={isOpen2} onClose={onClose2} btnRef={btnRef} />
             </>
-          )
+            )
           : <Text align="center">No hay pedidos a gestionar</Text>}
       </Box>
     </>
   )
 }
 
-PlantsHomePage.getLayout = function getLayout(page) {
+PlantsHomePage.getLayout = function getLayout (page) {
   return (
     <Layout>
       {page}

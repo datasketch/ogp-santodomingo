@@ -8,7 +8,6 @@ import { esES } from 'gridjs/l10n'
 import { dictionary } from '../../utils/complaints/dictionary'
 import { parseData } from '../../utils'
 import 'gridjs/dist/theme/mermaid.css'
-import { reduce } from 'lodash'
 import useFilterByDate from '../../hooks/use-filtered-data'
 
 function Summary () {
