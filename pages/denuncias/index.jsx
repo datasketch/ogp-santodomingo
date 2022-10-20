@@ -27,7 +27,7 @@ export default function ComplaintsHomePage () {
     endDateChangeHandler,
     clearInputsClickHandler,
     filteredData
-  } = useFilterByDate(data)
+  } = useFilterByDate(data, dictionary.complaintDate)
 
   if (error) return <Text align="center" color="red">Se ha presentado un error</Text>
 

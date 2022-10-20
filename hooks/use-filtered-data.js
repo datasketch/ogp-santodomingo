@@ -1,9 +1,8 @@
 import { useState } from 'react'
 import { addDays, format, isAfter, isBefore } from 'date-fns'
 import { isEqual } from 'lodash'
-import { dictionary } from '../utils/complaints/dictionary'
 
-function useFilterByDate (data) {
+function useFilterByDate(data, type) {
   // STATES
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
@@ -25,7 +24,7 @@ function useFilterByDate (data) {
   const filterByRangeDate = (data, startDate, endDate) => {
     // eslint-disable-next-line array-callback-return
     return data.filter(item => {
-      const yesterday = addDays(new Date(item[dictionary.complaintDate]), -1)
+      const yesterday = addDays(new Date(item[type]), -1)
       if (startDate && !endDate) {
         return (isBefore(new Date(startDate), yesterday) || (isEqual(new Date(startDate), yesterday))) && (isAfter(new Date(currentDate), yesterday) || (isEqual(new Date(currentDate), yesterday)))
       }

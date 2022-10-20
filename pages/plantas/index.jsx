@@ -1,4 +1,4 @@
-import { Box, Button, Heading, Stack, Text, useDisclosure } from '@chakra-ui/react'
+import { Box, Button, Heading, Input, Stack, Text, useDisclosure } from '@chakra-ui/react'
 import axios from 'axios'
 import groupBy from 'lodash.groupby'
 import toast from 'react-hot-toast'
@@ -14,19 +14,29 @@ import { useRef, useState } from 'react'
 import OrderDialog from '../../components/orders/OrderDialog'
 import Layout from '../../components/orders/Layout'
 import NewOrder from '../../components/orders/NewOrder'
+import useFilterByDate from '../../hooks/use-filtered-data'
 
-export default function PlantsHomePage () {
+export default function PlantsHomePage() {
   const { data, error, mutate } = useSWR('/api/orders', (url) => axios.get(url).then(res => res.data))
   const { isOpen, onOpen, onClose } = useDisclosure()
   const { isOpen: isOpen2, onOpen: onOpen2, onClose: onClose2 } = useDisclosure()
   const btnRef = useRef()
   const [selectedData, setSelectedData] = useState()
+  const {
+    startDate,
+    endDate,
+    currentDate,
+    startDateChangeHandler,
+    endDateChangeHandler,
+    clearInputsClickHandler,
+    filteredData
+  } = useFilterByDate(data, dictionary.date)
 
   if (error) return <Text align="center" color="red">Se ha presentado un error</Text>
 
   if (!data) return <Text align="center">Cargando tablero de gestión...</Text>
 
-  const columns = groupBy(data, dictionary.status)
+  const columns = groupBy(filteredData, dictionary.status)
 
   const handleDrop = async (id, target) => {
     const update = [...data]
@@ -68,21 +78,32 @@ export default function PlantsHomePage () {
         {data.length
           ? (
             <>
-              <Stack
-                direction={{ base: 'column', md: 'row' }}
-                alignItems="center"
-                spacing={3}
-                mb={4}
-              >
-                <Heading color="gray.700">Tablero de órdenes</Heading>
-                <Button
-                  size={'sm'}
-                  colorScheme='blackAlpha'
-                  variant='outline'
-                  onClick={() => onOpen2(true)}
-                >
-                  +Agregar
-                </Button>
+              <Stack display="flex" flexDir={{ base: 'column', lg: 'row' }} justifyContent={{ lg: 'space-between' }} spacing={{ base: 4, lg: 0 }} mb={8}>
+                <Box display="flex" columnGap={4} alignItems="center" justifyContent={{ base: 'space-between', lg: 'start' }} alignSelf={{ lg: 'self-end' }}>
+                  <Heading color="gray.700">Tablero de órdenes</Heading>
+                  <Button
+                    size={'sm'}
+                    colorScheme='blackAlpha'
+                    variant='outline'
+                    alignSelf="self-end"
+                    onClick={() => onOpen2(true)}
+                  >
+                    +Agregar
+                  </Button>
+                </Box>
+                <Box display="flex" gap={4} flexDirection={{ base: 'column', lg: 'row' }}>
+                  <Box>
+                    <Text flexShrink={0}>Desde :</Text>
+                    <Input type="date" value={startDate} max={currentDate} onChange={startDateChangeHandler} />
+                  </Box>
+                  <Box>
+                    <Text flexShrink={0}>Hasta :</Text>
+                    <Input type="date" value={endDate} max={currentDate} min={startDate} onChange={endDateChangeHandler} />
+                  </Box>
+                  <Button width={{ base: '100%', lg: '30%', xl: 'auto' }} colorScheme='blackAlpha' variant='outline' alignSelf={{ lg: 'self-end' }} onClick={clearInputsClickHandler}>
+                    Restablecer filtros
+                  </Button>
+                </Box>
               </Stack>
               <KanbanBoard>
                 {Object.entries(statusEnum).map(([key, status]) => (
@@ -111,14 +132,14 @@ export default function PlantsHomePage () {
               </KanbanBoard>
               <NewOrder isOpen={isOpen2} onClose={onClose2} btnRef={btnRef} />
             </>
-            )
+          )
           : <Text align="center">No hay pedidos a gestionar</Text>}
       </Box>
     </>
   )
 }
 
-PlantsHomePage.getLayout = function getLayout (page) {
+PlantsHomePage.getLayout = function getLayout(page) {
   return (
     <Layout>
       {page}

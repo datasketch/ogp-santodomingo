@@ -1,5 +1,5 @@
 import {
-  Box, Button, Heading, Stack, Text, useDisclosure
+  Box, Button, Heading, Input, Stack, Text, useDisclosure
 } from '@chakra-ui/react'
 
 import axios from 'axios'
@@ -17,20 +17,30 @@ import PlantCardContent from '../../components/orders/PlantCardContent'
 import { growingPlantsDictionary as dict } from '../../utils/orders/dictionary'
 import { gardenStatusEnum } from '../../utils/orders/enum'
 import { mapGrowingPlant } from '../../utils/orders/mapper'
+import useFilterByDate from '../../hooks/use-filtered-data'
 
-function GrowingPlantsPage () {
+function GrowingPlantsPage() {
   const { data, error, mutate } = useSWR('/api/plants', (url) => axios.get(url).then(res => res.data))
   const { isOpen: isOpenAddPlant, onOpen: onOpenAddPlant, onClose: onCloseAddPlant } = useDisclosure()
   const { isOpen: isOpenUpdatePlant, onOpen: onOpenUpdatePlant, onClose: onCloseUpdatePlant } = useDisclosure()
   const addPlant = useRef()
   const updatePlant = useRef()
   const [selectedData, setSelectedData] = useState()
+  const {
+    startDate,
+    endDate,
+    currentDate,
+    startDateChangeHandler,
+    endDateChangeHandler,
+    clearInputsClickHandler,
+    filteredData
+  } = useFilterByDate(data, dict.transplantDate)
 
   if (error) return <Text align="center" color="red">Se ha presentado un error</Text>
 
   if (!data) return <Text align="center">Cargando tablero de gestión...</Text>
 
-  const columns = groupBy(data, dict.gardenStatus)
+  const columns = groupBy(filteredData, dict.gardenStatus)
 
   const handleDrop = async (id, target) => {
     const update = [...data]
@@ -67,25 +77,32 @@ function GrowingPlantsPage () {
         {data.length
           ? (
             <>
-              <Stack
-                direction={{ base: 'column', md: 'row' }}
-                alignItems="center"
-                spacing={3}
-                mb={4}
-              >
-                <Heading color="gray.700">Plantas en desarrollo</Heading>
-                <Button
-                  size={'sm'}
-                  colorScheme='blackAlpha'
-                  variant='outline'
-                  ref={addPlant}
-                  onClick={() => {
-                    onOpenAddPlant(true)
-                    setSelectedData()
-                  }}
-                >
-                  + Agregar
-                </Button>
+              <Stack display="flex" flexDir={{ base: 'column', lg: 'row' }} justifyContent={{ lg: 'space-between' }} spacing={{ base: 4, lg: 0 }} mb={8}>
+                <Box display="flex" columnGap={4} alignItems="center" justifyContent={{ base: 'space-between', lg: 'start' }} alignSelf={{ lg: 'self-end' }}>
+                  <Heading color="gray.700">Plantas en desarrollo</Heading>
+                  <Button
+                    size={'sm'}
+                    colorScheme='blackAlpha'
+                    variant='outline'
+                    alignSelf="self-end"
+                    onClick={() => onOpen2(true)}
+                  >
+                    +Agregar
+                  </Button>
+                </Box>
+                <Box display="flex" gap={4} flexDirection={{ base: 'column', lg: 'row' }}>
+                  <Box>
+                    <Text flexShrink={0}>Desde :</Text>
+                    <Input type="date" value={startDate} max={currentDate} onChange={startDateChangeHandler} />
+                  </Box>
+                  <Box>
+                    <Text flexShrink={0}>Hasta :</Text>
+                    <Input type="date" value={endDate} max={currentDate} min={startDate} onChange={endDateChangeHandler} />
+                  </Box>
+                  <Button width={{ base: '100%', lg: '30%', xl: 'auto' }} colorScheme='blackAlpha' variant='outline' alignSelf={{ lg: 'self-end' }} onClick={clearInputsClickHandler}>
+                    Restablecer filtros
+                  </Button>
+                </Box>
               </Stack>
               <KanbanBoard>
                 {Object.entries(gardenStatusEnum).map(([key, status]) => (
@@ -114,10 +131,10 @@ function GrowingPlantsPage () {
                 ))}
               </KanbanBoard>
             </>
-            )
+          )
           : (
             <Text align="center">No hay plantas en desarrollo</Text>
-            )}
+          )}
       </Box>
       <AddPlant
         isOpen={isOpenAddPlant}
@@ -137,7 +154,7 @@ function GrowingPlantsPage () {
   )
 }
 
-GrowingPlantsPage.getLayout = function getLayout (page) {
+GrowingPlantsPage.getLayout = function getLayout(page) {
   return (
     <Layout>
       {page}

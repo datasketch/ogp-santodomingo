@@ -22,7 +22,7 @@ function OrderCardContent ({ data }) {
         <Stack w="full" direction={{ base: 'column', lg: 'row' }} justify="space-between" align="flex-start">
           {data.date && (
             <Box>
-              <Text fontSize="xs" letterSpacing="wide">Fecha de denuncia</Text>
+              <Text fontSize="xs" letterSpacing="wide">Fecha</Text>
               <Text fontSize="small" fontWeight="semibold">{format(new Date(data.date), 'MMMM dd, yyyy', { locale: es })}</Text>
             </Box>
           )}

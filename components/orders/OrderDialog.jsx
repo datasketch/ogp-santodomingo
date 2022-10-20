@@ -36,7 +36,6 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
       [dictionary.status]: data.status
     }
   })
-  console.log(data)
 
   useEffect(() => {
     if (!data || isEmpty(data) || !data.details?.length) return
@@ -135,7 +134,6 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
         ...prevState,
         ['', selectedPlant.Planta, addedPlant.Cantidad, selectedPlant.Contenedor, selectedPlant.Tipo]
       ]))
-      console.log(selectedPlant)
       handleCancel()
     })
   }
