@@ -1,8 +1,7 @@
 import { useState } from 'react'
-import { addDays, format, isAfter, isBefore } from 'date-fns'
-import { isEqual } from 'lodash'
+import { addDays, format, isAfter, isBefore, isEqual } from 'date-fns'
 
-function useFilterByDate(data, type) {
+function useFilterByDate (data, type) {
   // STATES
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
@@ -23,18 +22,22 @@ function useFilterByDate(data, type) {
 
   const filterByRangeDate = (data, startDate, endDate) => {
     // eslint-disable-next-line array-callback-return
+    const startDateFormat = startDate ? format(addDays(new Date(startDate), 1), 'yyyy-MM-dd') : null
+    const endDateFormat = endDate ? format(addDays(new Date(endDate), 1), 'yyyy-MM-dd') : null
+
     return data.filter(item => {
-      const yesterday = addDays(new Date(item[type]), -1)
-      if (startDate && !endDate) {
-        return (isBefore(new Date(startDate), yesterday) || (isEqual(new Date(startDate), yesterday))) && (isAfter(new Date(currentDate), yesterday) || (isEqual(new Date(currentDate), yesterday)))
+      const dateType = format(new Date(item[type]), 'yyyy-MM-dd')
+
+      if (startDateFormat && !endDateFormat) {
+        return (isBefore(new Date(startDateFormat), new Date(dateType)) || (isEqual(new Date(startDateFormat), new Date(dateType)))) && (isAfter(new Date(currentDate), new Date(dateType)) || (isEqual(new Date(currentDate), new Date(dateType))))
       }
 
-      if (!startDate && endDate) {
-        return isAfter(new Date(endDate), yesterday) || isEqual(new Date(endDate), yesterday)
+      if (!startDateFormat && endDateFormat) {
+        return isAfter(new Date(endDateFormat), new Date(dateType)) || isEqual(new Date(endDateFormat), new Date(dateType))
       }
 
-      if (startDate && endDate) {
-        return (isBefore(new Date(startDate), yesterday) || (isEqual(new Date(startDate), yesterday))) && (isAfter(new Date(endDate), yesterday) || (isEqual(new Date(endDate), yesterday)))
+      if (startDateFormat && endDateFormat) {
+        return (isBefore(new Date(startDateFormat), new Date(dateType)) || (isEqual(new Date(startDateFormat), new Date(dateType)))) && (isAfter(new Date(endDateFormat), new Date(dateType)) || (isEqual(new Date(endDateFormat), new Date(dateType))))
       }
     })
   }

@@ -7,7 +7,7 @@ export const statusEnum = {
 }
 
 export const gardenStatusEnum = {
-  GROWING: 'Creciendo',
   TRANSPLANTED: 'Trasplantada',
+  GROWING: 'Creciendo',
   READY: 'Lista para entrega'
 }
