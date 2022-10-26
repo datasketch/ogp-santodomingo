@@ -33,9 +33,7 @@ export default async function handler (req, res) {
       const order = omit(req.body, 'Plantas')
       const result = await knex.insert([order], ['id']).into('pedidos')
       const { id } = result[0]
-      console.log(req.body.Plantas)
       const details = req.body.Plantas.map(plant => ({ ...plant, Pedido: id }))
-      console.log(details)
       await knex.insert(details).into('detalle_pedidos')
     }
 

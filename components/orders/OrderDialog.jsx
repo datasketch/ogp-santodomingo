@@ -1,26 +1,36 @@
-import { Box, Button, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerFooter, DrawerHeader, DrawerOverlay, FormControl, FormHelperText, Input, Select, Stack, Table, TableContainer, Tbody, Td, Text, Tfoot, Th, Thead, Tr } from '@chakra-ui/react'
+/* eslint-disable no-unused-vars */
+import { Box, Button, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerFooter, DrawerHeader, DrawerOverlay, FormControl, FormHelperText, Input, Select, Stack, Tab, Table, TableContainer, TabList, TabPanel, TabPanels, Tabs, Tbody, Td, Text, Th, Thead, Tr } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import isEmpty from 'lodash.isempty'
 import PropTypes from 'prop-types'
-import { orderDetailDictionary, dictionary } from '../../utils/orders/dictionary'
+import { orderDetailDictionary, dictionary, inventoryDictionary } from '../../utils/orders/dictionary'
 import { useForm } from 'react-hook-form'
 import { parishes } from '../../utils/complaints'
 import useSWR, { mutate } from 'swr'
 import axios from 'axios'
 import { toast } from 'react-hot-toast'
-import { group } from 'd3-array'
-import { CheckIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import validator from 'validator'
 import { statusEnum } from '../../utils/orders/enum'
+import { parseData } from '../../utils'
+import dynamic from 'next/dist/shared/lib/dynamic'
+
+const Map = dynamic(() => import('../../components/Map'), {
+  ssr: false
+})
 
 function OrderDialog ({ isOpen, onClose, data = {} }) {
   const [headers, setHeaders] = useState([])
   const [rows, setRows] = useState([])
-  const [addPlantRow, setAddPlantRow] = useState(false)
   const [addedPlant, setAddedPlant] = useState({})
-  const [container, setContainer] = useState([])
-  const [selectedPlant, setSelectedPlant] = useState({})
+  const [addPlantRow, setAddPlantRow] = useState(false)
   const [enableSave, setEnableSave] = useState(false)
+  const [coordinates, setCoordinates] = useState('-0.254167, -79.1719')
+  const [position, setPosition] = useState([])
+
+  const [selectedPlant, setSelectedPlant] = useState({})
+  const [plants, setPlants] = useState([])
+  const [newPlant, setNewPlant] = useState([])
+  const [previousPlants, setPreviousPlants] = useState([])
+
   const { data: inventory, error } = useSWR('/api/inventory', (url) => axios.get(url).then(res => res.data))
   const { data: allPlants, error: plantsError } = useSWR('/api/plants-list')
 
@@ -32,11 +42,23 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
       [dictionary.address]: data.address,
       [dictionary.phoneNumber]: data.phoneNumber,
       [dictionary.canton]: data.canton,
+      [dictionary.subsidy]: data.subsidy,
+      [dictionary.collaborators]: data.collaborators,
+      [dictionary.survival]: data.survival,
+      [dictionary.measurementDate]: data.measurementDate,
+      [dictionary.location]: data.location,
+      [dictionary.actor]: data.actor,
       [dictionary.parish]: data.parish,
       [dictionary.status]: data.status
     }
   })
-  console.log(data)
+  const parsedData = parseData((inventory || []), {
+    omit: [
+      inventoryDictionary.unitsReadyForDelivery,
+      inventoryDictionary.unitsDelivered,
+      inventoryDictionary.type
+    ]
+  })
 
   useEffect(() => {
     if (!data || isEmpty(data) || !data.details?.length) return
@@ -46,21 +68,32 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
     }, [])
     setHeaders(headers)
     setRows(rows)
+    setPlants(data.details)
+    setPreviousPlants(data.details.map(plant => {
+      const match = allPlants.find(pl => plant.plant === pl.Planta && plant.container === pl.Contenedor)
+      return {
+        id: plant.id,
+        Planta: match.id,
+        Cantidad: plant.qty
+      }
+    }))
+    setCoordinates(prev => data.location || prev)
+    setPosition(data?.location?.split(',').map(el => +el))
   }, [data])
 
   if (error || plantsError) return <p>Se ha presentado un error</p>
   if (!inventory) return null
 
-  const groupedByName = Array.from(group(inventory, d => d.Planta))
-  const names = groupedByName.map(([name]) => name)
+  // const groupedByName = Array.from(group(inventory, d => d.Planta))
+  // const names = groupedByName.map(([name]) => name)
 
-  const onSubmit = (formData) => {
+  const onSubmit = (formData, coordinates) => {
     const input = {
       ...formData,
+      [dictionary.location]: coordinates,
       id: data.id
     }
     const op = axios.patch('/api/orders', input)
-
     mutate(
       '/api/orders',
       () => toast.promise(op, {
@@ -73,47 +106,40 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
       }).then(() => {
       onClose()
     })
+    const plants = { previousPlants, newPlant }
+    updateDetails(plants)
   }
 
-  const handleSelectPlant = (e) => {
-    setAddedPlant({ Planta: e.target.value })
-    setSelectedPlant({})
-    setEnableSave(false)
-    const match = inventory.filter(plant => plant.Planta === e.target.value)
-    const containers = (match || []).map(item => item.Contenedor)
-    setContainer(containers)
+  const calculateDefaultValue = (plant, container, array) => {
+    const defaultValue = array.filter(pl => pl.plant === plant && pl.container === container)[0]
+    return defaultValue?.qty || null
   }
 
-  const handleSelectContainer = (e) => {
-    setAddedPlant(prevState => ({
-      ...prevState,
-      Contenedor: e.target.value
-    }))
-    const match = inventory.find(item => item.Planta === addedPlant.Planta && e.target.value === item.Contenedor)
-    setSelectedPlant(match)
-  }
-
-  const handleSelectQty = e => {
-    const value = e.target.valueAsNumber || 0
-    const isValid = validator.isInt(e.target.value, {
-      min: 1,
-      max: +selectedPlant.Inventario
-    })
-    setAddedPlant(prevState => ({
-      ...prevState,
-      Cantidad: value
-    }))
-    setEnableSave(isValid)
-  }
-
-  const saveDetails = () => {
-    const match = allPlants.find(plant => addedPlant.Planta === plant.Planta && addedPlant.Contenedor === plant.Contenedor)
-    const input = {
-      Planta: match.id,
-      Cantidad: addedPlant.Cantidad,
-      Pedido: data.id
+  const handlePlantsSelect = (event, index, plant, container) => {
+    const { value } = event.target
+    const previous = plants.find(pl => plant === pl.plant && container === pl.container)
+    const match = allPlants.find(pl => plant === pl.Planta && container === pl.Contenedor)
+    if (!previous) {
+      const input = {
+        Planta: match.id,
+        Cantidad: +value,
+        Pedido: data.id
+      }
+      updateState(newPlant, input, setNewPlant)
+      return
     }
-    const op = axios.post('/api/details', input)
+
+    const input = {
+      id: previous.id,
+      Planta: match.id,
+      Cantidad: +value
+    }
+
+    updateState(previousPlants, input, setPreviousPlants)
+  }
+
+  const updateDetails = (input) => {
+    const op = axios.patch('/api/details', input)
     mutate(
       '/api/orders',
       () => (
@@ -135,11 +161,25 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
         ...prevState,
         ['', selectedPlant.Planta, addedPlant.Cantidad, selectedPlant.Contenedor, selectedPlant.Tipo]
       ]))
-      console.log(selectedPlant)
-      handleCancel()
+      handleClose()
     })
   }
 
+  const updateState = (previousData = [], input = {}, setData) => {
+    const matchIndex = previousData.findIndex(plant => plant.Planta === input.Planta)
+    if (matchIndex === -1) {
+      setData(prevState => (
+        [...prevState, input]
+      ))
+      return
+    }
+    const state = [
+      ...previousPlants.slice(0, matchIndex),
+      input,
+      ...previousPlants.slice(matchIndex + 1)
+    ]
+    setData(state)
+  }
   const handleCancel = () => {
     setAddPlantRow(false)
     setAddedPlant({})
@@ -152,6 +192,8 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
     setAddedPlant({})
     setSelectedPlant({})
     setEnableSave(false)
+    setNewPlant([])
+    setPreviousPlants([])
     onClose()
   }
 
@@ -163,7 +205,7 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
       size="xl"
     >
       <DrawerOverlay />
-      <DrawerContent>
+      <DrawerContent overflowY='scroll'>
         <DrawerCloseButton />
         <DrawerHeader>
           <Box display="flex" flexDirection={{ base: 'column', md: 'row' }} columnGap={10} alignItems="center">
@@ -178,160 +220,252 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
             </Box>}
           </Box>
         </DrawerHeader>
-        <DrawerBody>
-          <form id="edit-order" onSubmit={handleSubmit(onSubmit)}>
-            <Stack spacing={4}>
-              <Box fontSize="md">
-                <Text letterSpacing="wide">Estado</Text>
-                <Select
-                  {...register(dictionary.status)}
-                >
-                  {Object.values(statusEnum).map(value => (
-                    <option key={value} value={value}>{value}</option>
-                  ))}
-                </Select>
-              </Box>
-              {data.name && (
-                <Box fontSize="md">
-                  <Text letterSpacing="wide">Nombre beneficiario</Text>
-                  <Input type='text' {...register(dictionary.name)} />
-                </Box>
-              )}
-              {data.identifier && (
-                <Box fontSize="md">
-                  <Text letterSpacing="wide">Identificación</Text>
-                  <Input type='text' {...register(dictionary.identifier)} />
-                </Box>
-              )}
-              {data.address && (
-                <Box fontSize="md">
-                  <Text letterSpacing="wide">Dirección</Text>
-                  <Input type='text' {...register(dictionary.address)} />
-                </Box>
-              )}
-              {data.phoneNumber && (
-                <Box fontSize="md">
-                  <Text letterSpacing="wide">Contacto</Text>
-                  <Input {...register(dictionary.phoneNumber)} />
-                </Box>
-              )}
-              {data.canton && (
-                <Box fontSize="md">
-                  <Text letterSpacing="wide">Cantón</Text>
-                  <Select {...register(dictionary.canton)}>
-                    {['Santo Domingo', 'La Concordia'].map(el =>
-                      <option key={el} value={el}>{el}</option>
+        <Tabs variant='enclosed'>
+          <TabList>
+            <Tab>Información General</Tab>
+            <Tab>Actualizar Pedido</Tab>
+          </TabList>
+          <form id="edit-order" onSubmit={handleSubmit((data) => onSubmit(data, coordinates))}>
+            <TabPanels>
+              <TabPanel>
+                <DrawerBody>
+                  <Stack spacing={4}>
+                    <Box fontSize="md">
+                      <Text letterSpacing="wide">Estado</Text>
+                      <Select
+                        {...register(dictionary.status)}
+                      >
+                        {Object.values(statusEnum).map(value => (
+                          <option key={value} value={value}>{value}</option>
+                        ))}
+                      </Select>
+                    </Box>
+                    {data.name && (
+                      <Box fontSize="md">
+                        <Text letterSpacing="wide">Nombre beneficiario</Text>
+                        <Input type='text' {...register(dictionary.name)} />
+                      </Box>
                     )}
-                  </Select>
-                </Box>
-              )}
-              {data.parish && (
-                <Box fontSize="md">
-                  <Text letterSpacing="wide">Parroquia</Text>
-                  <Select {...register(dictionary.parish)}>
-                    {parishes.map(el =>
-                      <option key={el} value={el}>{el}</option>
+                    {data.identifier && (
+                      <Box fontSize="md">
+                        <Text letterSpacing="wide">Identificación</Text>
+                        <Input type='text' {...register(dictionary.identifier)} />
+                      </Box>
                     )}
-                  </Select>
-                </Box>
-              )}
-            </Stack>
-            <Text fontSize="md" mt={6}>Plantas</Text>
-            <TableContainer mt={4}>
-              <Table>
-                <Thead>
-                  <Tr>
-                    {headers.map(header => <Th key={header}>{header}</Th>)}
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {rows.map((row, trIndex) => (
-                    <Tr key={`row-${trIndex}`}>
-                      {row.map((value, tdIndex) => (
-                        <Td key={`row-${trIndex}-${tdIndex}`}>{value}</Td>
-                      ))}
-                    </Tr>
-                  ))}
-                  {addPlantRow && (
-                    <Tr>
-                      <Td>
-                        <Stack direction={'row'}>
-                          <Button aria-label='Cancelar' title='Cancelar' onClick={handleCancel} size="xs" colorScheme={'red'}>
-                            <XMarkIcon width={16} height={16} />
-                          </Button>
-                          <Button aria-label='Guardar' title='Guardar' disabled={!enableSave} size="xs" colorScheme={'green'} onClick={saveDetails}>
-                            <CheckIcon width={16} height={16} />
-                          </Button>
-                        </Stack>
-                      </Td>
-                      <Td>
-                        <Select
-                          onChange={handleSelectPlant}
-                          name='Planta'
-                          placeholder='Seleccione una opción'
-                          isRequired
-                        >
-                          {names.map(name => (
-                            <option key={name} value={name}>{name}</option>
-                          ))}
+                    {data.address && (
+                      <Box fontSize="md">
+                        <Text letterSpacing="wide">Dirección</Text>
+                        <Input type='text' {...register(dictionary.address)} />
+                      </Box>
+                    )}
+                    {data.phoneNumber && (
+                      <Box fontSize="md">
+                        <Text letterSpacing="wide">Contacto</Text>
+                        <Input {...register(dictionary.phoneNumber)} />
+                      </Box>
+                    )}
+
+                    {data.subsidy && <Box fontSize="md">
+                      <Text letterSpacing="wide">Subsidio o venta</Text>
+                      <Input type='text' {...register(dictionary.subsidy)} />
+                    </Box>
+                    }
+                    {data.collaborators && <Box fontSize="md">
+                      <Text letterSpacing="wide">Colaboradores</Text>
+                      <Input type='text' {...register(dictionary.collaborators)} />
+                    </Box>
+                    }
+                    {data.survival && <Box fontSize="md">
+                      <Text letterSpacing="wide">Supervivencia individuos</Text>
+                      <Input type='number' {...register(dictionary.survival, {
+                        valueAsNumber: true
+                      })} />
+                    </Box>
+                    }
+                    {data.measurementDate && <Box fontSize="md">
+                      <Text letterSpacing="wide">Fecha de medición</Text>
+                      <Input type='date' {...register(dictionary.measurementDate, { value: data.measurementDate, valueAsDate: true })} defaultValue={new Date(data?.measurementDate)} />
+                    </Box>
+                    }
+                    {data.actor && <Box fontSize="md">
+                      <Text letterSpacing="wide">Actor</Text>
+                      <Input type='text' {...register(dictionary.actor)} />
+                    </Box>
+                    }
+
+                    {data.canton && (
+                      <Box fontSize="md">
+                        <Text letterSpacing="wide">Cantón</Text>
+                        <Select {...register(dictionary.canton)}>
+                          {['Santo Domingo', 'La Concordia'].map(el =>
+                            <option key={el} value={el}>{el}</option>
+                          )}
                         </Select>
-                      </Td>
-                      <Td>
-                        {selectedPlant.Inventario && (
-                          <FormControl>
-                            <Input
-                              type="number"
-                              min={1}
-                              max={+selectedPlant.Inventario}
-                              placeholder={selectedPlant.Inventario}
-                              onChange={handleSelectQty}
-                            />
-                            <FormHelperText fontSize={'x-small'}>
-                              <p>Hay {selectedPlant.Inventario} unidades disponibles</p>
-                            </FormHelperText>
-                          </FormControl>
-                        )}
-                      </Td>
-                      <Td>
-                        {container.length > 0 && addedPlant.Planta && (
-                          <Select
-                            onChange={handleSelectContainer}
-                            name='Contenedor'
-                            placeholder='Seleccione una opción'
-                          >
-                            {container.map(item => (
-                              <option key={item} value={item}>{item}</option>
+                      </Box>
+                    )}
+                    {data.parish && (
+                      <Box fontSize="md">
+                        <Text letterSpacing="wide">Parroquia</Text>
+                        <Select {...register(dictionary.parish)}>
+                          {parishes.map(el =>
+                            <option key={el} value={el}>{el}</option>
+                          )}
+                        </Select>
+                      </Box>
+                    )}
+                    {data.location && (
+                      <Box fontSize="md">
+                        <Text letterSpacing="wide">Ubicación</Text>
+                        <Map
+                          center={position}
+                          onMarkerMove={(coords) => {
+                            const { lat, lng } = coords
+                            setCoordinates(`${lat}, ${lng}`)
+                          }}
+                        />
+                      </Box>
+                    )}
+                  </Stack>
+
+                  <Text fontSize="md" mt={6} fontWeight='bold'>Resumen de pedido</Text>
+                  <TableContainer mt={4}>
+                    <Table>
+                      <Thead>
+                        <Tr>
+                          {headers.map(header => <Th key={header}>{header}</Th>)}
+                        </Tr>
+                      </Thead>
+                      <Tbody>
+                        {rows.map((row, trIndex) => (
+                          <Tr key={`row-${trIndex}`}>
+                            {row.map((value, tdIndex) => (
+                              <Td key={`row-${trIndex}-${tdIndex}`}>{value}</Td>
                             ))}
-                          </Select>
-                        )}
-                      </Td>
-                      <Td>
-                        {selectedPlant.Tipo && <p>{selectedPlant.Tipo}</p>}
-                      </Td>
-                    </Tr>
-                  )}
-                </Tbody>
-                <Tfoot>
-                  {!addPlantRow && (
-                    <Tr>
-                      <Td colSpan="5">
-                        <Button variant={'link'} onClick={() => setAddPlantRow(true)}>
-                          + Agregar
-                        </Button>
-                      </Td>
-                    </Tr>
-                  )}
-                </Tfoot>
-              </Table>
-            </TableContainer>
+                          </Tr>
+                        ))}
+
+                      </Tbody>
+
+                    </Table>
+                  </TableContainer>
+
+                </DrawerBody>
+                <DrawerFooter>
+                  <Button variant='outline' mr={3} onClick={handleClose}>
+                    Cancelar
+                  </Button>
+                  <Button form="edit-order" colorScheme='blue' type="submit">Guardar</Button>
+                </DrawerFooter>
+              </TabPanel>
+              <TabPanel>
+
+                <DrawerBody>
+
+                  {/* <Stack spacing={4}>
+                    <Box fontSize="md">
+                      <Text letterSpacing="wide">Estado</Text>
+                      <Select
+                        {...register(dictionary.status)}
+                      >
+                        {Object.values(statusEnum).map(value => (
+                          <option key={value} value={value}>{value}</option>
+                        ))}
+                      </Select>
+                    </Box>
+                    {data.name && (
+                      <Box fontSize="md">
+                        <Text letterSpacing="wide">Nombre beneficiario</Text>
+                        <Input type='text' {...register(dictionary.name)} />
+                      </Box>
+                    )}
+                    {data.identifier && (
+                      <Box fontSize="md">
+                        <Text letterSpacing="wide">Identificación</Text>
+                        <Input type='text' {...register(dictionary.identifier)} />
+                      </Box>
+                    )}
+                    {data.address && (
+                      <Box fontSize="md">
+                        <Text letterSpacing="wide">Dirección</Text>
+                        <Input type='text' {...register(dictionary.address)} />
+                      </Box>
+                    )}
+                    {data.phoneNumber && (
+                      <Box fontSize="md">
+                        <Text letterSpacing="wide">Contacto</Text>
+                        <Input {...register(dictionary.phoneNumber)} />
+                      </Box>
+                    )}
+                    {data.canton && (
+                      <Box fontSize="md">
+                        <Text letterSpacing="wide">Cantón</Text>
+                        <Select {...register(dictionary.canton)}>
+                          {['Santo Domingo', 'La Concordia'].map(el =>
+                            <option key={el} value={el}>{el}</option>
+                          )}
+                        </Select>
+                      </Box>
+                    )}
+                    {data.parish && (
+                      <Box fontSize="md">
+                        <Text letterSpacing="wide">Parroquia</Text>
+                        <Select {...register(dictionary.parish)}>
+                          {parishes.map(el =>
+                            <option key={el} value={el}>{el}</option>
+                          )}
+                        </Select>
+                      </Box>
+                    )}
+                  </Stack> */}
+                  <Text fontSize="md" mt={6}>Plantas</Text>
+                  <TableContainer>
+                    <Table >
+                      <Thead>
+                        <Tr>
+                          {parsedData.columns.map(column => (
+                            <th key={column}>{column === 'Inventario' ? 'Cantidad' : column}</th>
+                          ))}
+                        </Tr>
+                      </Thead>
+                      <Tbody style={{ overflowY: 'scroll' }}>
+                        {parsedData.data.map(([plant, container, inventory], index) => (
+                          <Tr key={index}>
+                            <Td>
+                              {plant}
+                            </Td>
+                            <Td>
+                              {container}
+                            </Td>
+                            <Td>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  defaultValue={calculateDefaultValue(plant, container, data?.details) || 0}
+                                  max={inventory}
+                                  min={0}
+                                  onChange={event => handlePlantsSelect(event, index, plant, container)}
+                                />
+                                <FormHelperText>
+                                  Hay {inventory} unidades disponibles
+                                </FormHelperText>
+                              </FormControl>
+                            </Td>
+                          </Tr>
+                        ))}
+                      </Tbody>
+                    </Table>
+                  </TableContainer>
+                </DrawerBody>
+                <DrawerFooter>
+                  <Button variant='outline' mr={3} onClick={handleClose}>
+                    Cancelar
+                  </Button>
+                  <Button form="edit-order" colorScheme='blue' type="submit">Guardar</Button>
+                </DrawerFooter>
+              </TabPanel>
+            </TabPanels>
           </form>
-        </DrawerBody>
-        <DrawerFooter>
-          <Button variant='outline' mr={3} onClick={handleClose}>
-            Cancelar
-          </Button>
-          <Button form="edit-order" colorScheme='blue' type="submit">Guardar</Button>
-        </DrawerFooter>
+        </Tabs>
       </DrawerContent>
     </Drawer>
   )
