@@ -8,7 +8,6 @@ import { esES } from 'gridjs/l10n'
 import { dictionary } from '../../utils/complaints/dictionary'
 import { parseData } from '../../utils'
 import 'gridjs/dist/theme/mermaid.css'
-import { reduce } from 'lodash'
 import useFilterByDate from '../../hooks/use-filtered-data'
 
 function Summary () {
@@ -41,11 +40,11 @@ function Summary () {
 
   dataTable.length > 1 && dataTable.push({
     Parroquia: 'TOTAL',
-    Denuncias: reduce(dataTable, (prev, curr) => prev.Denuncias + curr.Denuncias),
-    Agua: reduce(dataTable, (prev, curr) => prev.Agua + curr.Agua),
-    Aire: reduce(dataTable, (prev, curr) => prev.Aire + curr.Aire),
-    Suelo: reduce(dataTable, (prev, curr) => prev.Suelo + curr.Suelo),
-    Ruido: reduce(dataTable, (prev, curr) => prev.Ruido + curr.Ruido)
+    Denuncias: dataTable.map(item => item.Denuncias).reduce((prev, curr) => prev + curr, 0),
+    Agua: dataTable.map(item => item.Agua).reduce((prev, curr) => prev + curr, 0),
+    Aire: dataTable.map(item => item.Aire).reduce((prev, curr) => prev + curr, 0),
+    Suelo: dataTable.map(item => item.Suelo).reduce((prev, curr) => prev + curr, 0),
+    Ruido: dataTable.map(item => item.Ruido).reduce((prev, curr) => prev + curr, 0)
   })
 
   return (
