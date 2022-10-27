@@ -220,15 +220,15 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
             </Box>}
           </Box>
         </DrawerHeader>
-        <Tabs variant='enclosed'>
-          <TabList>
-            <Tab>Información General</Tab>
-            <Tab>Actualizar Pedido</Tab>
-          </TabList>
-          <form id="edit-order" onSubmit={handleSubmit((data) => onSubmit(data, coordinates))}>
-            <TabPanels>
-              <TabPanel>
-                <DrawerBody>
+        <DrawerBody>
+          <Tabs>
+            <TabList>
+              <Tab>Información General</Tab>
+              <Tab>Actualizar Pedido</Tab>
+            </TabList>
+            <form id="edit-order" onSubmit={handleSubmit((data) => onSubmit(data, coordinates))}>
+              <TabPanels>
+                <TabPanel>
                   <Stack spacing={4}>
                     <Box fontSize="md">
                       <Text letterSpacing="wide">Estado</Text>
@@ -264,7 +264,6 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                         <Input {...register(dictionary.phoneNumber)} />
                       </Box>
                     )}
-
                     {data.subsidy && <Box fontSize="md">
                       <Text letterSpacing="wide">Subsidio o venta</Text>
                       <Input type='text' {...register(dictionary.subsidy)} />
@@ -292,7 +291,6 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                       <Input type='text' {...register(dictionary.actor)} />
                     </Box>
                     }
-
                     {data.canton && (
                       <Box fontSize="md">
                         <Text letterSpacing="wide">Cantón</Text>
@@ -326,7 +324,6 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                       </Box>
                     )}
                   </Stack>
-
                   <Text fontSize="md" mt={6} fontWeight='bold'>Resumen de pedido</Text>
                   <TableContainer mt={4}>
                     <Table>
@@ -343,87 +340,25 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                             ))}
                           </Tr>
                         ))}
-
                       </Tbody>
-
                     </Table>
                   </TableContainer>
-
-                </DrawerBody>
-                <DrawerFooter>
-                  <Button variant='outline' mr={3} onClick={handleClose}>
-                    Cancelar
-                  </Button>
-                  <Button form="edit-order" colorScheme='blue' type="submit">Guardar</Button>
-                </DrawerFooter>
-              </TabPanel>
-              <TabPanel>
-
-                <DrawerBody>
-
-                  {/* <Stack spacing={4}>
-                    <Box fontSize="md">
-                      <Text letterSpacing="wide">Estado</Text>
-                      <Select
-                        {...register(dictionary.status)}
-                      >
-                        {Object.values(statusEnum).map(value => (
-                          <option key={value} value={value}>{value}</option>
-                        ))}
-                      </Select>
-                    </Box>
-                    {data.name && (
-                      <Box fontSize="md">
-                        <Text letterSpacing="wide">Nombre beneficiario</Text>
-                        <Input type='text' {...register(dictionary.name)} />
-                      </Box>
-                    )}
-                    {data.identifier && (
-                      <Box fontSize="md">
-                        <Text letterSpacing="wide">Identificación</Text>
-                        <Input type='text' {...register(dictionary.identifier)} />
-                      </Box>
-                    )}
-                    {data.address && (
-                      <Box fontSize="md">
-                        <Text letterSpacing="wide">Dirección</Text>
-                        <Input type='text' {...register(dictionary.address)} />
-                      </Box>
-                    )}
-                    {data.phoneNumber && (
-                      <Box fontSize="md">
-                        <Text letterSpacing="wide">Contacto</Text>
-                        <Input {...register(dictionary.phoneNumber)} />
-                      </Box>
-                    )}
-                    {data.canton && (
-                      <Box fontSize="md">
-                        <Text letterSpacing="wide">Cantón</Text>
-                        <Select {...register(dictionary.canton)}>
-                          {['Santo Domingo', 'La Concordia'].map(el =>
-                            <option key={el} value={el}>{el}</option>
-                          )}
-                        </Select>
-                      </Box>
-                    )}
-                    {data.parish && (
-                      <Box fontSize="md">
-                        <Text letterSpacing="wide">Parroquia</Text>
-                        <Select {...register(dictionary.parish)}>
-                          {parishes.map(el =>
-                            <option key={el} value={el}>{el}</option>
-                          )}
-                        </Select>
-                      </Box>
-                    )}
-                  </Stack> */}
-                  <Text fontSize="md" mt={6}>Plantas</Text>
+                  <DrawerFooter>
+                    <Button variant='outline' mr={3} onClick={handleClose}>
+                      Cancelar
+                    </Button>
+                    <Button form="edit-order" colorScheme='blue' type="submit">Guardar</Button>
+                  </DrawerFooter>
+                </TabPanel>
+                <TabPanel>
                   <TableContainer>
-                    <Table >
+                    <Table>
                       <Thead>
                         <Tr>
                           {parsedData.columns.map(column => (
-                            <th key={column}>{column === 'Inventario' ? 'Cantidad' : column}</th>
+                            <th key={column}>
+                              {column === 'Inventario' ? 'Cantidad' : column}
+                            </th>
                           ))}
                         </Tr>
                       </Thead>
@@ -455,17 +390,17 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                       </Tbody>
                     </Table>
                   </TableContainer>
-                </DrawerBody>
-                <DrawerFooter>
-                  <Button variant='outline' mr={3} onClick={handleClose}>
-                    Cancelar
-                  </Button>
-                  <Button form="edit-order" colorScheme='blue' type="submit">Guardar</Button>
-                </DrawerFooter>
-              </TabPanel>
-            </TabPanels>
-          </form>
-        </Tabs>
+                  <DrawerFooter>
+                    <Button variant='outline' mr={3} onClick={handleClose}>
+                      Cancelar
+                    </Button>
+                    <Button form="edit-order" colorScheme='blue' type="submit">Guardar</Button>
+                  </DrawerFooter>
+                </TabPanel>
+              </TabPanels>
+            </form>
+          </Tabs>
+        </DrawerBody>
       </DrawerContent>
     </Drawer>
   )

@@ -51,7 +51,6 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
         error: () => 'Se ha presentado un error'
       }),
       {
-
         revalidate: true
       })
   }
@@ -102,12 +101,11 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
         <DrawerCloseButton />
         <DrawerHeader>Nueva Orden</DrawerHeader>
         <DrawerBody>
-          <Tabs variant='enclosed'>
+          <Tabs>
             <TabList>
               <Tab><Text as='b' >Información General</Text></Tab>
               <Tab><Text as='b' >Pedido</Text></Tab>
             </TabList>
-
             <form style={{ display: 'flex', flexDirection: 'column', rowGap: '10px' }} onSubmit={handleSubmit((data) => handleAddNewOrder(data, coordinates))}>
               <TabPanels>
                 <TabPanel>
@@ -119,7 +117,6 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
                           valueAsNumber: true
                         })} value={orderNumber} hidden />
                       </FormControl>
-
                       <FormControl >
                         <FormLabel>Fecha</FormLabel>
                         <Input type="date" {...register('Fecha')} defaultValue={format(new Date(), 'yyyy-MM-dd')} />
@@ -129,9 +126,7 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
                       <FormLabel>Nombre beneficiario</FormLabel>
                       <Input type='text' {...register(dictionary.name)} />
                     </FormControl>
-
                     <Box display="flex" gap={6} alignItems="center">
-
                       <FormControl isRequired>
                         <FormLabel>Cédula</FormLabel>
                         <Input type='number' {...register(dictionary.identifier)} />
@@ -141,7 +136,6 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
                         <Input type='tel' {...register(dictionary.phoneNumber)} />
                       </FormControl>
                     </Box>
-
                     <FormControl isRequired>
                       <FormLabel >Dirección</FormLabel>
                       <Input type='text' {...register(dictionary.address)} />
@@ -246,7 +240,7 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
                     colorScheme='teal'
                     type='submit'
                   >
-                    Submit
+                    Enviar
                   </Button>
                 </TabPanel>
               </TabPanels>
@@ -254,6 +248,6 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
           </Tabs>
         </DrawerBody>
       </DrawerContent>
-    </Drawer >
+    </Drawer>
   )
 }
