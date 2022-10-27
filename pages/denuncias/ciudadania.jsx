@@ -6,7 +6,6 @@ import axios from 'axios'
 import dynamic from 'next/dynamic'
 import isEmail from 'validator/lib/isEmail'
 import toast, { Toaster } from 'react-hot-toast'
-import Layout from '../../components/complaints/Layout'
 import { complainantTypes, complaintTypes, affectedComponents, parishes, defendantTypes, sectors, complaintStatusEnum } from '../../utils/complaints'
 import { dictionary } from '../../utils/complaints/dictionary'
 
@@ -220,14 +219,6 @@ function CitizenFormPage () {
         </Stack>
       </form>
     </Box>
-  )
-}
-
-CitizenFormPage.getLayout = function getLayout (page) {
-  return (
-    <Layout>
-      {page}
-    </Layout>
   )
 }
 
