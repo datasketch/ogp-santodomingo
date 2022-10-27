@@ -24,7 +24,7 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
   const [addPlantRow, setAddPlantRow] = useState(false)
   const [enableSave, setEnableSave] = useState(false)
   const [coordinates, setCoordinates] = useState('-0.254167, -79.1719')
-  const [position, setPosition] = useState([])
+  const [position, setPosition] = useState([-0.254167, -79.1719])
 
   const [selectedPlant, setSelectedPlant] = useState({})
   const [plants, setPlants] = useState([])
@@ -77,8 +77,10 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
         Cantidad: plant.qty
       }
     }))
-    setCoordinates(prev => data.location || prev)
-    setPosition(data?.location?.split(',').map(el => +el))
+    if (data.location) {
+      setCoordinates(prev => data.location || prev)
+      setPosition(data?.location?.split(',').map(el => +el))
+    }
   }, [data])
 
   if (error || plantsError) return <p>Se ha presentado un error</p>
@@ -240,89 +242,79 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                         ))}
                       </Select>
                     </Box>
-                    {data.name && (
-                      <Box fontSize="md">
-                        <Text letterSpacing="wide">Nombre beneficiario</Text>
-                        <Input type='text' {...register(dictionary.name)} />
-                      </Box>
-                    )}
-                    {data.identifier && (
-                      <Box fontSize="md">
-                        <Text letterSpacing="wide">Identificación</Text>
-                        <Input type='text' {...register(dictionary.identifier)} />
-                      </Box>
-                    )}
-                    {data.address && (
-                      <Box fontSize="md">
-                        <Text letterSpacing="wide">Dirección</Text>
-                        <Input type='text' {...register(dictionary.address)} />
-                      </Box>
-                    )}
-                    {data.phoneNumber && (
-                      <Box fontSize="md">
-                        <Text letterSpacing="wide">Contacto</Text>
-                        <Input {...register(dictionary.phoneNumber)} />
-                      </Box>
-                    )}
-                    {data.subsidy && <Box fontSize="md">
+
+                    <Box fontSize="md">
+                      <Text letterSpacing="wide">Nombre beneficiario</Text>
+                      <Input type='text' {...register(dictionary.name)} />
+                    </Box>
+
+                    <Box fontSize="md">
+                      <Text letterSpacing="wide">Identificación</Text>
+                      <Input type='text' {...register(dictionary.identifier)} />
+                    </Box>
+
+                    <Box fontSize="md">
+                      <Text letterSpacing="wide">Dirección</Text>
+                      <Input type='text' {...register(dictionary.address)} />
+                    </Box>
+
+                    <Box fontSize="md">
+                      <Text letterSpacing="wide">Contacto</Text>
+                      <Input {...register(dictionary.phoneNumber)} />
+                    </Box>
+                    <Box fontSize="md">
                       <Text letterSpacing="wide">Subsidio o venta</Text>
                       <Input type='text' {...register(dictionary.subsidy)} />
                     </Box>
-                    }
-                    {data.collaborators && <Box fontSize="md">
+                    <Box fontSize="md">
                       <Text letterSpacing="wide">Colaboradores</Text>
                       <Input type='text' {...register(dictionary.collaborators)} />
                     </Box>
-                    }
-                    {data.survival && <Box fontSize="md">
+                    <Box fontSize="md">
                       <Text letterSpacing="wide">Supervivencia individuos</Text>
                       <Input type='number' {...register(dictionary.survival, {
                         valueAsNumber: true
                       })} />
                     </Box>
-                    }
-                    {data.measurementDate && <Box fontSize="md">
+                    <Box fontSize="md">
                       <Text letterSpacing="wide">Fecha de medición</Text>
                       <Input type='date' {...register(dictionary.measurementDate, { value: data.measurementDate, valueAsDate: true })} defaultValue={new Date(data?.measurementDate)} />
                     </Box>
-                    }
-                    {data.actor && <Box fontSize="md">
+                    <Box fontSize="md">
                       <Text letterSpacing="wide">Actor</Text>
                       <Input type='text' {...register(dictionary.actor)} />
                     </Box>
-                    }
-                    {data.canton && (
-                      <Box fontSize="md">
-                        <Text letterSpacing="wide">Cantón</Text>
-                        <Select {...register(dictionary.canton)}>
-                          {['Santo Domingo', 'La Concordia'].map(el =>
-                            <option key={el} value={el}>{el}</option>
-                          )}
-                        </Select>
-                      </Box>
-                    )}
-                    {data.parish && (
-                      <Box fontSize="md">
-                        <Text letterSpacing="wide">Parroquia</Text>
-                        <Select {...register(dictionary.parish)}>
-                          {parishes.map(el =>
-                            <option key={el} value={el}>{el}</option>
-                          )}
-                        </Select>
-                      </Box>
-                    )}
-                    {data.location && (
-                      <Box fontSize="md">
-                        <Text letterSpacing="wide">Ubicación</Text>
-                        <Map
-                          center={position}
-                          onMarkerMove={(coords) => {
-                            const { lat, lng } = coords
-                            setCoordinates(`${lat}, ${lng}`)
-                          }}
-                        />
-                      </Box>
-                    )}
+                    (
+                    <Box fontSize="md">
+                      <Text letterSpacing="wide">Cantón</Text>
+                      <Select {...register(dictionary.canton)}>
+                        {['Santo Domingo', 'La Concordia'].map(el =>
+                          <option key={el} value={el}>{el}</option>
+                        )}
+                      </Select>
+                    </Box>
+                    (
+                    <Box fontSize="md">
+                      <Text letterSpacing="wide">Parroquia</Text>
+                      <Select {...register(dictionary.parish)}>
+                        {parishes.map(el =>
+                          <option key={el} value={el}>{el}</option>
+                        )}
+                      </Select>
+                    </Box>
+
+                    (
+                    <Box fontSize="md">
+                      <Text letterSpacing="wide">Ubicación</Text>
+                      <Map
+                        center={position}
+                        onMarkerMove={(coords) => {
+                          const { lat, lng } = coords
+                          setCoordinates(`${lat}, ${lng}`)
+                        }}
+                      />
+                    </Box>
+
                   </Stack>
                   <Text fontSize="md" mt={6} fontWeight='bold'>Resumen de pedido</Text>
                   <TableContainer mt={4}>
