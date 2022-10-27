@@ -287,6 +287,17 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                       </Select>
                     </Box>
 
+                    <Box fontSize="md">
+                      <Text letterSpacing="wide">Ubicación</Text>
+                      <Map
+                        center={position}
+                        onMarkerMove={(coords) => {
+                          const { lat, lng } = coords
+                          setCoordinates(`${lat}, ${lng}`)
+                        }}
+                      />
+                    </Box>
+
                   </Stack>
                   <Text fontSize="md" mt={6} fontWeight='bold'>Resumen de pedido</Text>
                   <TableContainer mt={4}>
@@ -320,6 +331,7 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                       <Text letterSpacing="wide">Subsidio o venta</Text>
                       <Input type='text' {...register(dictionary.subsidy)} />
                     </Box>
+
                     <Box fontSize="md">
                       <Text letterSpacing="wide">Informe</Text>
                       <Textarea {...register(dictionary.report)} resize='none' />
@@ -329,6 +341,7 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                       <Text letterSpacing="wide">Colaboradores</Text>
                       <Input type='text' {...register(dictionary.collaborators)} />
                     </Box>
+
                     <Box fontSize="md">
                       <Text letterSpacing="wide">Arboles sembrados</Text>
                       <Input type='text' {...register(dictionary.plantedTrees)} />
@@ -340,25 +353,16 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                         valueAsNumber: true
                       })} />
                     </Box>
+
                     <Box fontSize="md">
                       <Text letterSpacing="wide">Fecha de medición</Text>
                       <Input type='date' {...register(dictionary.measurementDate, { value: data.measurementDate, valueAsDate: true })} value={format(new Date(data.measurementDate).getTime(), 'yyyy-MM-dd')} />
                     </Box>
+
                     <Box fontSize="md">
                       <Text letterSpacing="wide">Actor</Text>
                       <Input type='text' {...register(dictionary.actor)} />
                     </Box>
-                    <Box fontSize="md">
-                      <Text letterSpacing="wide">Ubicación</Text>
-                      <Map
-                        center={position}
-                        onMarkerMove={(coords) => {
-                          const { lat, lng } = coords
-                          setCoordinates(`${lat}, ${lng}`)
-                        }}
-                      />
-                    </Box>
-
                   </Stack>
                   {/* <Text fontSize="md" mt={6} fontWeight='bold'>Resumen de pedido</Text>
                   <TableContainer mt={4}>

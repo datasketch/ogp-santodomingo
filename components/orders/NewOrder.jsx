@@ -157,7 +157,17 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
                           <option key={el} value={el}>{el}</option>
                         )}
                       </Select>
+                    </FormControl>
 
+                    <FormControl>
+                      <FormLabel>Ubicación</FormLabel>
+                      <Map
+                        center={center}
+                        onMarkerMove={(coords) => {
+                          const { lat, lng } = coords
+                          setCoordinates(`${lat}, ${lng}`)
+                        }}
+                      />
                     </FormControl>
 
                   </Stack>
@@ -200,16 +210,6 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
                       <Input type='text' {...register(dictionary.actor)} />
                     </FormControl>
 
-                    <FormControl>
-                      <FormLabel>Ubicación</FormLabel>
-                      <Map
-                        center={center}
-                        onMarkerMove={(coords) => {
-                          const { lat, lng } = coords
-                          setCoordinates(`${lat}, ${lng}`)
-                        }}
-                      />
-                    </FormControl>
                   </Stack>
                 </TabPanel>
                 <TabPanel>
