@@ -1,5 +1,5 @@
 import {
-  Button, Text, Drawer, DrawerBody, DrawerContent, DrawerHeader, DrawerOverlay, FormControl, Input, TableContainer, Table, Thead, Tbody, Tr, Td, FormHelperText, FormLabel, Stack, Select, DrawerCloseButton, Box, TabPanels, TabPanel, Tabs, TabList, Tab
+  Button, Text, Drawer, DrawerBody, DrawerContent, DrawerHeader, DrawerOverlay, FormControl, Input, TableContainer, Table, Thead, Tbody, Tr, Td, FormHelperText, FormLabel, Stack, Select, DrawerCloseButton, Box, TabPanels, TabPanel, Tabs, TabList, Tab, Textarea
 } from '@chakra-ui/react'
 import axios from 'axios'
 import { useState } from 'react'
@@ -104,6 +104,7 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
           <Tabs>
             <TabList>
               <Tab><Text as='b' >Información General</Text></Tab>
+              <Tab><Text as='b'>Informes</Text></Tab>
               <Tab><Text as='b' >Pedido</Text></Tab>
             </TabList>
             <form style={{ display: 'flex', flexDirection: 'column', rowGap: '10px' }} onSubmit={handleSubmit((data) => handleAddNewOrder(data, coordinates))}>
@@ -141,33 +142,6 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
                       <Input type='text' {...register(dictionary.address)} />
                     </FormControl>
 
-                    <FormControl isRequired>
-                      <FormLabel >Subsidio o venta</FormLabel>
-                      <Input type='text' {...register(dictionary.subsidy)} />
-                    </FormControl>
-                    <FormControl isRequired>
-                      <FormLabel >Colaboradores</FormLabel>
-                      <Input type='text' {...register(dictionary.collaborators)} />
-                    </FormControl>
-
-                    <FormControl isRequired>
-                      <FormLabel >Supervivencia individuos</FormLabel>
-                      <Input type='number' {...register(dictionary.survival, {
-                        min: 0,
-                        valueAsNumber: true
-                      })}
-                      min={0}/>
-                    </FormControl>
-                    <FormControl isRequired>
-                      <FormLabel >Fecha de medición</FormLabel>
-                      <Input type='date' {...register(dictionary.measurementDate, { valueAsDate: true })} />
-                    </FormControl>
-
-                    <FormControl isRequired>
-                      <FormLabel >Actor</FormLabel>
-                      <Input type='text' {...register(dictionary.actor)} />
-                    </FormControl>
-
                     <FormControl>
                       <FormLabel>Parroquia</FormLabel>
                       <Select {...register(dictionary.parish)}>
@@ -185,6 +159,47 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
                       </Select>
 
                     </FormControl>
+
+                  </Stack>
+                </TabPanel>
+                <TabPanel>
+                  <Stack dir="column" spacing={5} m={5}>
+
+                    <FormControl >
+                      <FormLabel >Subsidio o venta</FormLabel>
+                      <Input type='text' {...register(dictionary.subsidy)} />
+                    </FormControl>
+                    <FormControl >
+                      <FormLabel >Informe</FormLabel>
+                      <Textarea resize='none' {...register(dictionary.report)} />
+                    </FormControl>
+                    <FormControl >
+                      <FormLabel >Colaboradores</FormLabel>
+                      <Input type='text' {...register(dictionary.collaborators)} />
+                    </FormControl>
+
+                    <FormControl >
+                      <FormLabel >Arboles sembrados</FormLabel>
+                      <Input type='text' {...register(dictionary.plantedTrees)} />
+                    </FormControl>
+                    <FormControl >
+                      <FormLabel >Supervivencia individuos</FormLabel>
+                      <Input type='number' {...register(dictionary.survival, {
+                        min: 0,
+                        valueAsNumber: true
+                      })}
+                      min={0}/>
+                    </FormControl>
+                    <FormControl >
+                      <FormLabel >Fecha de medición</FormLabel>
+                      <Input type='date' {...register(dictionary.measurementDate, { valueAsDate: true })} />
+                    </FormControl>
+
+                    <FormControl >
+                      <FormLabel >Actor</FormLabel>
+                      <Input type='text' {...register(dictionary.actor)} />
+                    </FormControl>
+
                     <FormControl>
                       <FormLabel>Ubicación</FormLabel>
                       <Map

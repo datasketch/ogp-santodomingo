@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { Box, Button, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerFooter, DrawerHeader, DrawerOverlay, FormControl, FormHelperText, Input, Select, Stack, Tab, Table, TableContainer, TabList, TabPanel, TabPanels, Tabs, Tbody, Td, Text, Th, Thead, Tr } from '@chakra-ui/react'
+import { Box, Button, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerFooter, DrawerHeader, DrawerOverlay, FormControl, FormHelperText, Input, Select, Stack, Tab, Table, TableContainer, TabList, TabPanel, TabPanels, Tabs, Tbody, Td, Text, Textarea, Th, Thead, Tr } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import isEmpty from 'lodash.isempty'
 import PropTypes from 'prop-types'
@@ -11,6 +11,7 @@ import axios from 'axios'
 import { toast } from 'react-hot-toast'
 import { statusEnum } from '../../utils/orders/enum'
 import { parseData } from '../../utils'
+import { format } from 'date-fns'
 import dynamic from 'next/dist/shared/lib/dynamic'
 
 const Map = dynamic(() => import('../../components/Map'), {
@@ -225,8 +226,9 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
         <DrawerBody>
           <Tabs>
             <TabList>
-              <Tab>Información General</Tab>
-              <Tab>Actualizar Pedido</Tab>
+              <Tab><Text as='b'>Información General</Text></Tab>
+              <Tab><Text as='b'>Informes</Text></Tab>
+              <Tab><Text as='b'>Actualizar Pedido</Text></Tab>
             </TabList>
             <form id="edit-order" onSubmit={handleSubmit((data) => onSubmit(data, coordinates))}>
               <TabPanels>
@@ -247,6 +249,10 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                       <Text letterSpacing="wide">Nombre beneficiario</Text>
                       <Input type='text' {...register(dictionary.name)} />
                     </Box>
+                    <Box fontSize="md">
+                      <Text letterSpacing="wide">Nombre beneficiario</Text>
+                      <Input type='date' {...register(dictionary.date)} value={format(new Date(data.date).getTime(), 'yyyy-MM-dd')}/>
+                    </Box>
 
                     <Box fontSize="md">
                       <Text letterSpacing="wide">Identificación</Text>
@@ -254,46 +260,15 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                     </Box>
 
                     <Box fontSize="md">
+                      <Text letterSpacing="wide">Contacto</Text>
+                      <Input {...register(dictionary.phoneNumber)} />
+                    </Box>
+
+                    <Box fontSize="md">
                       <Text letterSpacing="wide">Dirección</Text>
                       <Input type='text' {...register(dictionary.address)} />
                     </Box>
 
-                    <Box fontSize="md">
-                      <Text letterSpacing="wide">Contacto</Text>
-                      <Input {...register(dictionary.phoneNumber)} />
-                    </Box>
-                    <Box fontSize="md">
-                      <Text letterSpacing="wide">Subsidio o venta</Text>
-                      <Input type='text' {...register(dictionary.subsidy)} />
-                    </Box>
-                    <Box fontSize="md">
-                      <Text letterSpacing="wide">Colaboradores</Text>
-                      <Input type='text' {...register(dictionary.collaborators)} />
-                    </Box>
-                    <Box fontSize="md">
-                      <Text letterSpacing="wide">Supervivencia individuos</Text>
-                      <Input type='number' {...register(dictionary.survival, {
-                        valueAsNumber: true
-                      })} />
-                    </Box>
-                    <Box fontSize="md">
-                      <Text letterSpacing="wide">Fecha de medición</Text>
-                      <Input type='date' {...register(dictionary.measurementDate, { value: data.measurementDate, valueAsDate: true })} defaultValue={new Date(data?.measurementDate)} />
-                    </Box>
-                    <Box fontSize="md">
-                      <Text letterSpacing="wide">Actor</Text>
-                      <Input type='text' {...register(dictionary.actor)} />
-                    </Box>
-                    (
-                    <Box fontSize="md">
-                      <Text letterSpacing="wide">Cantón</Text>
-                      <Select {...register(dictionary.canton)}>
-                        {['Santo Domingo', 'La Concordia'].map(el =>
-                          <option key={el} value={el}>{el}</option>
-                        )}
-                      </Select>
-                    </Box>
-                    (
                     <Box fontSize="md">
                       <Text letterSpacing="wide">Parroquia</Text>
                       <Select {...register(dictionary.parish)}>
@@ -303,16 +278,13 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                       </Select>
                     </Box>
 
-                    (
                     <Box fontSize="md">
-                      <Text letterSpacing="wide">Ubicación</Text>
-                      <Map
-                        center={position}
-                        onMarkerMove={(coords) => {
-                          const { lat, lng } = coords
-                          setCoordinates(`${lat}, ${lng}`)
-                        }}
-                      />
+                      <Text letterSpacing="wide">Cantón</Text>
+                      <Select {...register(dictionary.canton)}>
+                        {['Santo Domingo', 'La Concordia'].map(el =>
+                          <option key={el} value={el}>{el}</option>
+                        )}
+                      </Select>
                     </Box>
 
                   </Stack>
@@ -335,6 +307,78 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                       </Tbody>
                     </Table>
                   </TableContainer>
+                  <DrawerFooter>
+                    <Button variant='outline' mr={3} onClick={handleClose}>
+                      Cancelar
+                    </Button>
+                    <Button form="edit-order" colorScheme='blue' type="submit">Guardar</Button>
+                  </DrawerFooter>
+                </TabPanel>
+                <TabPanel>
+                  <Stack spacing={4}>
+                    <Box fontSize="md">
+                      <Text letterSpacing="wide">Subsidio o venta</Text>
+                      <Input type='text' {...register(dictionary.subsidy)} />
+                    </Box>
+                    <Box fontSize="md">
+                      <Text letterSpacing="wide">Informe</Text>
+                      <Textarea {...register(dictionary.report)} resize='none' />
+                    </Box>
+
+                    <Box fontSize="md">
+                      <Text letterSpacing="wide">Colaboradores</Text>
+                      <Input type='text' {...register(dictionary.collaborators)} />
+                    </Box>
+                    <Box fontSize="md">
+                      <Text letterSpacing="wide">Arboles sembrados</Text>
+                      <Input type='text' {...register(dictionary.plantedTrees)} />
+                    </Box>
+
+                    <Box fontSize="md">
+                      <Text letterSpacing="wide">Supervivencia individuos</Text>
+                      <Input type='number' {...register(dictionary.survival, {
+                        valueAsNumber: true
+                      })} />
+                    </Box>
+                    <Box fontSize="md">
+                      <Text letterSpacing="wide">Fecha de medición</Text>
+                      <Input type='date' {...register(dictionary.measurementDate, { value: data.measurementDate, valueAsDate: true })} value={format(new Date(data.measurementDate).getTime(), 'yyyy-MM-dd')} />
+                    </Box>
+                    <Box fontSize="md">
+                      <Text letterSpacing="wide">Actor</Text>
+                      <Input type='text' {...register(dictionary.actor)} />
+                    </Box>
+                    <Box fontSize="md">
+                      <Text letterSpacing="wide">Ubicación</Text>
+                      <Map
+                        center={position}
+                        onMarkerMove={(coords) => {
+                          const { lat, lng } = coords
+                          setCoordinates(`${lat}, ${lng}`)
+                        }}
+                      />
+                    </Box>
+
+                  </Stack>
+                  {/* <Text fontSize="md" mt={6} fontWeight='bold'>Resumen de pedido</Text>
+                  <TableContainer mt={4}>
+                    <Table>
+                      <Thead>
+                        <Tr>
+                          {headers.map(header => <Th key={header}>{header}</Th>)}
+                        </Tr>
+                      </Thead>
+                      <Tbody>
+                        {rows.map((row, trIndex) => (
+                          <Tr key={`row-${trIndex}`}>
+                            {row.map((value, tdIndex) => (
+                              <Td key={`row-${trIndex}-${tdIndex}`}>{value}</Td>
+                            ))}
+                          </Tr>
+                        ))}
+                      </Tbody>
+                    </Table>
+                  </TableContainer> */}
                   <DrawerFooter>
                     <Button variant='outline' mr={3} onClick={handleClose}>
                       Cancelar
