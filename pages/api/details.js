@@ -3,14 +3,14 @@ import omit from 'lodash.omit'
 
 export default async function handler (req, res) {
   const { method, body } = req
-  if (!(['POST'].includes(method))) {
+  if (!(['POST', 'PATCH'].includes(method))) {
     return res.status(405).json({
       error: true,
       message: 'Method Not Allowed'
     })
   }
 
-  if (['POST'].includes(method) && !body) {
+  if (['POST', 'PATCH'].includes(method) && !body) {
     return res.status(400).json({ error: true, reason: 'Bad Request' })
   }
 
@@ -30,6 +30,34 @@ export default async function handler (req, res) {
         ])
         .groupBy('pedidos.id', 'pedidos.Orden')
         .orderBy('pedidos.Orden', 'desc')
+    }
+
+    if (method === 'PATCH') {
+      const { previousPlants, newPlant } = body
+      await knex.transaction((trx) => {
+        const queriesPreviousPlants = previousPlants.map(plant => {
+          const { id } = plant
+          const update = omit(plant, 'id')
+
+          return trx('detalle_pedidos')
+            .where('id', '=', id)
+            .update(update)
+            .transacting(trx)
+        })
+
+        const queriesNewPlants = newPlant.map(plant => {
+          const update = omit(plant, 'id')
+
+          return trx('detalle_pedidos')
+            .insert([update])
+            .transacting(trx)
+        })
+        const queries = [...queriesPreviousPlants, ...queriesNewPlants]
+
+        Promise.all(queries)
+          .then(trx.commit)
+          .catch(trx.rollback)
+      })
     }
 
     await knex.destroy()

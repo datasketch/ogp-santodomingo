@@ -22,7 +22,7 @@ function Map ({ center, onMarkerMove }) {
         }
       }
     }),
-    [onMarkerMove]
+    [onMarkerMove, position]
   )
   return (
     <MapContainer center={center} zoom={15} scrollWheelZoom={false} style={{ height: '500px' }}>

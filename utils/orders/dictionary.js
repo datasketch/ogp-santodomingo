@@ -15,6 +15,8 @@ export const dictionary = {
   survival: 'Supervivencia individuos',
   measurementDate: 'Fecha medición',
   actor: 'Actor',
+  report: 'Informe',
+  plantedTrees: 'Arboles sembrados',
   createdAt: 'created_at',
   updatedAt: 'updated_at',
   id: 'id'
