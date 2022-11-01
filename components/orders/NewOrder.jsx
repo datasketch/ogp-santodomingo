@@ -21,6 +21,7 @@ const Map = dynamic(() => import('../../components/Map'), {
 // eslint-disable-next-line react/prop-types
 export default function NewOrder ({ isOpen, onClose, btnRef }) {
   const [plants, setPlants] = useState([])
+
   const { data/* , error */ } = useSWR('/api/inventory', (url) => axios.get(url).then(res => res.data))
   const { data: dataPlants/* , error */ } = useSWR('/api/plants-list', (url) => axios.get(url).then(res => res.data))
 
@@ -84,6 +85,7 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
     ]
     setPlants(state)
   }
+  const [canton, setCanton] = useState('')
 
   const orderNumber = Math.floor(1000 + Math.random() * 9000)
 
@@ -143,17 +145,24 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
                     </FormControl>
 
                     <FormControl>
-                      <FormLabel>Parroquia</FormLabel>
-                      <Select {...register(dictionary.parish)}>
-                        {parishes.map(el =>
+                      <FormLabel>Cantón</FormLabel>
+                      <Select
+                        placeholder='Seleccione una opción'
+                        onInput={e => setCanton(e.target.value)}
+                        {...register(dictionary.canton)}
+                      >
+                        {['Santo Domingo', 'La Concordia'].map(el =>
                           <option key={el} value={el}>{el}</option>
                         )}
                       </Select>
                     </FormControl>
+
                     <FormControl>
-                      <FormLabel>Canton</FormLabel>
-                      <Select {...register(dictionary.canton)}>
-                        {['Santo Domingo', 'La Concordia'].map(el =>
+                      <FormLabel>Parroquia</FormLabel>
+                      <Select
+                        placeholder='Seleccione una opción'
+                        {...register(dictionary.parish)}>
+                        {parishes[canton]?.map(el =>
                           <option key={el} value={el}>{el}</option>
                         )}
                       </Select>
@@ -198,7 +207,7 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
                         min: 0,
                         valueAsNumber: true
                       })}
-                      min={0}/>
+                        min={0} />
                     </FormControl>
                     <FormControl >
                       <FormLabel >Fecha de medición</FormLabel>

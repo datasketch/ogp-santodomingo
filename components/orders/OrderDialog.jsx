@@ -26,6 +26,7 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
   const [enableSave, setEnableSave] = useState(false)
   const [coordinates, setCoordinates] = useState('-0.254167, -79.1719')
   const [position, setPosition] = useState([-0.254167, -79.1719])
+  const [canton, setCanton] = useState('')
 
   const [selectedPlant, setSelectedPlant] = useState({})
   const [plants, setPlants] = useState([])
@@ -82,6 +83,7 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
       setCoordinates(prev => data.location || prev)
       setPosition(data?.location?.split(',').map(el => +el))
     }
+    setCanton(data.canton || '')
   }, [data])
 
   if (error || plantsError) return <p>Se ha presentado un error</p>
@@ -251,7 +253,7 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                     </Box>
                     <Box fontSize="md">
                       <Text letterSpacing="wide">Nombre beneficiario</Text>
-                      <Input type='date' {...register(dictionary.date)} value={format(new Date(data.date).getTime(), 'yyyy-MM-dd')}/>
+                      <Input type='date' {...register(dictionary.date)} value={format(new Date(data.date).getTime(), 'yyyy-MM-dd')} />
                     </Box>
 
                     <Box fontSize="md">
@@ -270,18 +272,25 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                     </Box>
 
                     <Box fontSize="md">
-                      <Text letterSpacing="wide">Parroquia</Text>
-                      <Select {...register(dictionary.parish)}>
-                        {parishes.map(el =>
+                      <Text letterSpacing="wide">Cantón</Text>
+                      <Select
+                        placeholder='Seleccione una opción'
+                        {...register(dictionary.canton)}
+                        onChange={(e) => setCanton(e.target.value)}
+                        defaultChecked={data.canton}
+                        >
+                        {['Santo Domingo', 'La Concordia'].map(el =>
                           <option key={el} value={el}>{el}</option>
                         )}
                       </Select>
                     </Box>
 
                     <Box fontSize="md">
-                      <Text letterSpacing="wide">Cantón</Text>
-                      <Select {...register(dictionary.canton)}>
-                        {['Santo Domingo', 'La Concordia'].map(el =>
+                      <Text letterSpacing="wide">Parroquia</Text>
+                      <Select
+                        placeholder='Seleccione una opción'
+                        {...register(dictionary.parish)}>
+                        {parishes[canton]?.map(el =>
                           <option key={el} value={el}>{el}</option>
                         )}
                       </Select>
