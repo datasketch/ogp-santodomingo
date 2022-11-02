@@ -10,7 +10,7 @@ import { toast } from 'react-hot-toast'
 
 import { parseData } from '../../utils'
 import { inventoryDictionary, dictionary } from '../../utils/orders/dictionary'
-import { parishes } from '../../utils/complaints'
+import { parishesPlants } from '../../utils/complaints'
 import dynamic from 'next/dynamic'
 import { useComplaintForm } from '../../hooks/use-complaint-form'
 
@@ -160,7 +160,7 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
                       <Select
                         placeholder='Seleccione una opción'
                         {...register(dictionary.parish)}>
-                        {parishes[canton]?.map(el =>
+                        {parishesPlants[canton]?.map(el =>
                           <option key={el} value={el}>{el}</option>
                         )}
                       </Select>

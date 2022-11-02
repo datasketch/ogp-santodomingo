@@ -25,8 +25,6 @@ function CitizenFormPage () {
   const [canton, setCanton] = useState('')
   const [coordinates, setCoordinates] = useState(`${center.lat}, ${center.lng}`)
 
-  console.log(canton)
-
   const onSubmit = data => {
     const info = {
       ...data,

@@ -5,7 +5,7 @@ import isEmpty from 'lodash.isempty'
 import PropTypes from 'prop-types'
 import { orderDetailDictionary, dictionary, inventoryDictionary } from '../../utils/orders/dictionary'
 import { useForm } from 'react-hook-form'
-import { parishes } from '../../utils/complaints'
+import { parishesPlants } from '../../utils/complaints'
 import useSWR, { mutate } from 'swr'
 import axios from 'axios'
 import { toast } from 'react-hot-toast'
@@ -290,7 +290,7 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                       <Select
                         placeholder='Seleccione una opción'
                         {...register(dictionary.parish)}>
-                        {parishes[canton]?.map(el =>
+                        {parishesPlants[canton]?.map(el =>
                           <option key={el} value={el}>{el}</option>
                         )}
                       </Select>
