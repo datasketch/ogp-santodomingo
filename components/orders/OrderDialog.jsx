@@ -278,7 +278,7 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                         {...register(dictionary.canton)}
                         onChange={(e) => setCanton(e.target.value)}
                         defaultChecked={data.canton}
-                        >
+                      >
                         {['Santo Domingo', 'La Concordia'].map(el =>
                           <option key={el} value={el}>{el}</option>
                         )}
@@ -373,25 +373,6 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                       <Input type='text' {...register(dictionary.actor)} />
                     </Box>
                   </Stack>
-                  {/* <Text fontSize="md" mt={6} fontWeight='bold'>Resumen de pedido</Text>
-                  <TableContainer mt={4}>
-                    <Table>
-                      <Thead>
-                        <Tr>
-                          {headers.map(header => <Th key={header}>{header}</Th>)}
-                        </Tr>
-                      </Thead>
-                      <Tbody>
-                        {rows.map((row, trIndex) => (
-                          <Tr key={`row-${trIndex}`}>
-                            {row.map((value, tdIndex) => (
-                              <Td key={`row-${trIndex}-${tdIndex}`}>{value}</Td>
-                            ))}
-                          </Tr>
-                        ))}
-                      </Tbody>
-                    </Table>
-                  </TableContainer> */}
                   <DrawerFooter>
                     <Button variant='outline' mr={3} onClick={handleClose}>
                       Cancelar

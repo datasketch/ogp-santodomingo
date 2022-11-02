@@ -176,21 +176,7 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
                         }}
                       />
                     </FormControl>
-                    {/* <FormControl>
-                      <FormLabel>Ubicación</FormLabel>
-                      <FormHelperText>lat,lng</FormHelperText>
-                      <Input value={coordinates} onChange={(e) => setCoordinates(e.target.value)} />
-                    </FormControl> */}
-                   {/*  <Box display='flex' gap={10} alignItems="center" >
-                      <FormControl>
-                        <FormHelperText>Latitud</FormHelperText>
-                        <Input value={coordinates?.split(',')[0]} onInput={(e) => handlePosition({ lat: +e.target.value })} autoComplete='off' />
-                      </FormControl>
-                      <FormControl>
-                        <FormHelperText>Longitud</FormHelperText>
-                        <Input value={coordinates?.split(',')[1]} onInput={(e) => handlePosition({ lng: +e.target.value })} autoComplete='off' />
-                      </FormControl>
-                    </Box> */}
+
                   </Stack>
                 </TabPanel>
                 <TabPanel>
