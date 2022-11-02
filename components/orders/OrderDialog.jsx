@@ -25,7 +25,7 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
   const [addPlantRow, setAddPlantRow] = useState(false)
   const [enableSave, setEnableSave] = useState(false)
   const [coordinates, setCoordinates] = useState('-0.254167, -79.1719')
-  const [position, setPosition] = useState([-0.254167, -79.1719])
+  const [position, setPosition] = useState({ lat: -0.254167, lng: -79.1719 })
   const [canton, setCanton] = useState('')
 
   const [selectedPlant, setSelectedPlant] = useState({})
@@ -81,7 +81,7 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
     }))
     if (data.location) {
       setCoordinates(prev => data.location || prev)
-      setPosition(data?.location?.split(',').map(el => +el))
+      setPosition({ lat: data.location?.split(',')[0], lng: data.location?.split(',')[1] })
     }
     setCanton(data.canton || '')
   }, [data])

@@ -27,7 +27,6 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
 
   const { handleSubmit, register } = useForm({ mode: 'onBlur' })
   const { center, coordinates, setCoordinates } = useComplaintForm(data)
-
   const handleAddNewOrder = (data, coordinate) => {
     const details = plants.reduce((acc, plant) => {
       const match = dataPlants.find(p => p.Planta === plant.Planta && p.Contenedor === plant.Contenedor)
@@ -86,7 +85,6 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
     setPlants(state)
   }
   const [canton, setCanton] = useState('')
-
   const orderNumber = Math.floor(1000 + Math.random() * 9000)
 
   return (
@@ -178,7 +176,21 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
                         }}
                       />
                     </FormControl>
-
+                    {/* <FormControl>
+                      <FormLabel>Ubicación</FormLabel>
+                      <FormHelperText>lat,lng</FormHelperText>
+                      <Input value={coordinates} onChange={(e) => setCoordinates(e.target.value)} />
+                    </FormControl> */}
+                   {/*  <Box display='flex' gap={10} alignItems="center" >
+                      <FormControl>
+                        <FormHelperText>Latitud</FormHelperText>
+                        <Input value={coordinates?.split(',')[0]} onInput={(e) => handlePosition({ lat: +e.target.value })} autoComplete='off' />
+                      </FormControl>
+                      <FormControl>
+                        <FormHelperText>Longitud</FormHelperText>
+                        <Input value={coordinates?.split(',')[1]} onInput={(e) => handlePosition({ lng: +e.target.value })} autoComplete='off' />
+                      </FormControl>
+                    </Box> */}
                   </Stack>
                 </TabPanel>
                 <TabPanel>
