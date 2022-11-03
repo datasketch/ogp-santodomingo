@@ -5,7 +5,7 @@ import isEmpty from 'lodash.isempty'
 import PropTypes from 'prop-types'
 import { orderDetailDictionary, dictionary, inventoryDictionary } from '../../utils/orders/dictionary'
 import { useForm } from 'react-hook-form'
-import { parishes } from '../../utils/complaints'
+
 import useSWR, { mutate } from 'swr'
 import axios from 'axios'
 import { toast } from 'react-hot-toast'
@@ -13,6 +13,7 @@ import { statusEnum } from '../../utils/orders/enum'
 import { parseData } from '../../utils'
 import { format } from 'date-fns'
 import dynamic from 'next/dist/shared/lib/dynamic'
+import { parishesPlants } from '../../utils/orders'
 
 const Map = dynamic(() => import('../../components/Map'), {
   ssr: false
@@ -25,7 +26,8 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
   const [addPlantRow, setAddPlantRow] = useState(false)
   const [enableSave, setEnableSave] = useState(false)
   const [coordinates, setCoordinates] = useState('-0.254167, -79.1719')
-  const [position, setPosition] = useState([-0.254167, -79.1719])
+  const [position, setPosition] = useState({ lat: -0.254167, lng: -79.1719 })
+  const [canton, setCanton] = useState('')
 
   const [selectedPlant, setSelectedPlant] = useState({})
   const [plants, setPlants] = useState([])
@@ -80,8 +82,9 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
     }))
     if (data.location) {
       setCoordinates(prev => data.location || prev)
-      setPosition(data?.location?.split(',').map(el => +el))
+      setPosition({ lat: data.location?.split(',')[0], lng: data.location?.split(',')[1] })
     }
+    setCanton(data.canton || '')
   }, [data])
 
   if (error || plantsError) return <p>Se ha presentado un error</p>
@@ -251,7 +254,7 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                     </Box>
                     <Box fontSize="md">
                       <Text letterSpacing="wide">Nombre beneficiario</Text>
-                      <Input type='date' {...register(dictionary.date)} value={format(new Date(data.date).getTime(), 'yyyy-MM-dd')}/>
+                      <Input type='date' {...register(dictionary.date)} value={format(new Date(data.date).getTime(), 'yyyy-MM-dd')} />
                     </Box>
 
                     <Box fontSize="md">
@@ -270,18 +273,25 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                     </Box>
 
                     <Box fontSize="md">
-                      <Text letterSpacing="wide">Parroquia</Text>
-                      <Select {...register(dictionary.parish)}>
-                        {parishes.map(el =>
+                      <Text letterSpacing="wide">Cantón</Text>
+                      <Select
+                        placeholder='Seleccione una opción'
+                        {...register(dictionary.canton)}
+                        onChange={(e) => setCanton(e.target.value)}
+                        defaultChecked={data.canton}
+                      >
+                        {['Santo Domingo', 'La Concordia'].map(el =>
                           <option key={el} value={el}>{el}</option>
                         )}
                       </Select>
                     </Box>
 
                     <Box fontSize="md">
-                      <Text letterSpacing="wide">Cantón</Text>
-                      <Select {...register(dictionary.canton)}>
-                        {['Santo Domingo', 'La Concordia'].map(el =>
+                      <Text letterSpacing="wide">Parroquia</Text>
+                      <Select
+                        placeholder='Seleccione una opción'
+                        {...register(dictionary.parish)}>
+                        {parishesPlants[canton]?.map(el =>
                           <option key={el} value={el}>{el}</option>
                         )}
                       </Select>
@@ -364,25 +374,6 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                       <Input type='text' {...register(dictionary.actor)} />
                     </Box>
                   </Stack>
-                  {/* <Text fontSize="md" mt={6} fontWeight='bold'>Resumen de pedido</Text>
-                  <TableContainer mt={4}>
-                    <Table>
-                      <Thead>
-                        <Tr>
-                          {headers.map(header => <Th key={header}>{header}</Th>)}
-                        </Tr>
-                      </Thead>
-                      <Tbody>
-                        {rows.map((row, trIndex) => (
-                          <Tr key={`row-${trIndex}`}>
-                            {row.map((value, tdIndex) => (
-                              <Td key={`row-${trIndex}-${tdIndex}`}>{value}</Td>
-                            ))}
-                          </Tr>
-                        ))}
-                      </Tbody>
-                    </Table>
-                  </TableContainer> */}
                   <DrawerFooter>
                     <Button variant='outline' mr={3} onClick={handleClose}>
                       Cancelar

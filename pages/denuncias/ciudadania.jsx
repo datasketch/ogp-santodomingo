@@ -22,6 +22,7 @@ function CitizenFormPage () {
   })
 
   const [complainantType, setcomplainantType] = useState('')
+  const [canton, setCanton] = useState('')
   const [coordinates, setCoordinates] = useState(`${center.lat}, ${center.lng}`)
 
   const onSubmit = data => {
@@ -152,6 +153,7 @@ function CitizenFormPage () {
             <Select
               placeholder='Seleccione una opción'
               {...register(dictionary.canton)}
+              onChange={(e) => setCanton(e.target.value)}
             >
               {['Santo Domingo', 'La Concordia'].map(option => (
                 <option value={option} key={option}>{option}</option>
@@ -164,7 +166,7 @@ function CitizenFormPage () {
               placeholder='Seleccione una opción'
               {...register(dictionary.parish)}
             >
-              {parishes.map(option => (
+              {parishes[canton]?.map(option => (
                 <option value={option} key={option}>{option}</option>
               ))}
             </Select>

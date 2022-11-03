@@ -19,7 +19,7 @@ function useComplaintForm (data = {}) {
   useEffect(() => {
     if (!data.location) return
     setCoordinates(data.location)
-  }, [data.location])
+  }, [data.location, coordinates])
 
   return {
     center,

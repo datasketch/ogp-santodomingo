@@ -21,6 +21,7 @@ function PublicServantForm ({ id, data = {}, onSubmit }) {
   })
 
   const [complainantType, setcomplainantType] = useState(data.complainantType || '')
+  const [canton, setCanton] = useState(defaultValues.Canton || '')
 
   return (
     <form id={id} onSubmit={handleSubmit((data) => onSubmit(data, coordinates))}>
@@ -135,6 +136,7 @@ function PublicServantForm ({ id, data = {}, onSubmit }) {
           <Select
             placeholder='Seleccione una opción'
             {...register(dictionary.canton)}
+            onChange={(e) => setCanton(e.target.value)}
           >
             {['Santo Domingo', 'La Concordia'].map(option => (
               <option value={option} key={option}>{option}</option>
@@ -147,7 +149,7 @@ function PublicServantForm ({ id, data = {}, onSubmit }) {
             placeholder='Seleccione una opción'
             {...register(dictionary.parish)}
           >
-            {parishes.map(option => (
+            {parishes[canton]?.map(option => (
               <option value={option} key={option}>{option}</option>
             ))}
           </Select>

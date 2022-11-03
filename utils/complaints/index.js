@@ -4,7 +4,10 @@ export const complaintTypes = ['Verbal', 'Escrita', 'Red social', 'Online']
 
 export const complaintStatuses = ['Denuncia recibida', 'Denuncia atendida', 'Denuncia archivada']
 
-export const parishes = ['Abraham Calazacón', 'Bombolí', 'Chiguilpe', 'Río Toachi', 'Río Verde', 'Santo Domingo', 'Zaracay', 'Alluriquin', 'Puerto Limón', 'Luz de América', 'San Jacinto del Bua', 'Valle Hermoso', 'El Esfuerzo', 'Santa María del Toachi', 'La Concordia', 'Monterrey', 'La Villegas', 'Plan Piloto']
+export const parishes = {
+  'Santo Domingo': ['Alluriquín', 'Puerto Limón', 'Luz de América', 'San Jacinto Del Búa', 'Valle Hermoso', 'El Esfuerzo', 'Santa María Del Toachi', 'Z1: San Gabriel - Julio Moreno', 'Z2: Nuevo Israel - Las Delicias', 'Z3: El Placer del Toachi', 'Z4: Las Mercedes', 'Abraham Calazacón', 'Bombolí', 'Chiguilpe', 'Río Toachi', 'Río Verde', 'Santo Domingo', 'Zaracay'],
+  'La Concordia': ['La Concordia', 'Monterrey', 'La Villegas', 'Plan Piloto', 'Z5: La Concordia - Flor del Valle']
+}
 
 export const sectors = ['Urbano', 'Rural']
 

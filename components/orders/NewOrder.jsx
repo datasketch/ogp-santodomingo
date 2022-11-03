@@ -10,9 +10,10 @@ import { toast } from 'react-hot-toast'
 
 import { parseData } from '../../utils'
 import { inventoryDictionary, dictionary } from '../../utils/orders/dictionary'
-import { parishes } from '../../utils/complaints'
+
 import dynamic from 'next/dynamic'
 import { useComplaintForm } from '../../hooks/use-complaint-form'
+import { parishesPlants } from '../../utils/orders'
 
 const Map = dynamic(() => import('../../components/Map'), {
   ssr: false
@@ -21,12 +22,12 @@ const Map = dynamic(() => import('../../components/Map'), {
 // eslint-disable-next-line react/prop-types
 export default function NewOrder ({ isOpen, onClose, btnRef }) {
   const [plants, setPlants] = useState([])
+
   const { data/* , error */ } = useSWR('/api/inventory', (url) => axios.get(url).then(res => res.data))
   const { data: dataPlants/* , error */ } = useSWR('/api/plants-list', (url) => axios.get(url).then(res => res.data))
 
   const { handleSubmit, register } = useForm({ mode: 'onBlur' })
   const { center, coordinates, setCoordinates } = useComplaintForm(data)
-
   const handleAddNewOrder = (data, coordinate) => {
     const details = plants.reduce((acc, plant) => {
       const match = dataPlants.find(p => p.Planta === plant.Planta && p.Contenedor === plant.Contenedor)
@@ -84,7 +85,7 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
     ]
     setPlants(state)
   }
-
+  const [canton, setCanton] = useState('')
   const orderNumber = Math.floor(1000 + Math.random() * 9000)
 
   return (
@@ -143,17 +144,24 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
                     </FormControl>
 
                     <FormControl>
-                      <FormLabel>Parroquia</FormLabel>
-                      <Select {...register(dictionary.parish)}>
-                        {parishes.map(el =>
+                      <FormLabel>Cantón</FormLabel>
+                      <Select
+                        placeholder='Seleccione una opción'
+                        onInput={e => setCanton(e.target.value)}
+                        {...register(dictionary.canton)}
+                      >
+                        {['Santo Domingo', 'La Concordia'].map(el =>
                           <option key={el} value={el}>{el}</option>
                         )}
                       </Select>
                     </FormControl>
+
                     <FormControl>
-                      <FormLabel>Canton</FormLabel>
-                      <Select {...register(dictionary.canton)}>
-                        {['Santo Domingo', 'La Concordia'].map(el =>
+                      <FormLabel>Parroquia</FormLabel>
+                      <Select
+                        placeholder='Seleccione una opción'
+                        {...register(dictionary.parish)}>
+                        {parishesPlants[canton]?.map(el =>
                           <option key={el} value={el}>{el}</option>
                         )}
                       </Select>
@@ -198,7 +206,7 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
                         min: 0,
                         valueAsNumber: true
                       })}
-                      min={0}/>
+                        min={0} />
                     </FormControl>
                     <FormControl >
                       <FormLabel >Fecha de medición</FormLabel>
