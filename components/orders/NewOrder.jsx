@@ -10,9 +10,10 @@ import { toast } from 'react-hot-toast'
 
 import { parseData } from '../../utils'
 import { inventoryDictionary, dictionary } from '../../utils/orders/dictionary'
-import { parishesPlants } from '../../utils/complaints'
+
 import dynamic from 'next/dynamic'
 import { useComplaintForm } from '../../hooks/use-complaint-form'
+import { parishesPlants } from '../../utils/orders'
 
 const Map = dynamic(() => import('../../components/Map'), {
   ssr: false

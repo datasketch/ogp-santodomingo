@@ -5,7 +5,7 @@ import isEmpty from 'lodash.isempty'
 import PropTypes from 'prop-types'
 import { orderDetailDictionary, dictionary, inventoryDictionary } from '../../utils/orders/dictionary'
 import { useForm } from 'react-hook-form'
-import { parishesPlants } from '../../utils/complaints'
+
 import useSWR, { mutate } from 'swr'
 import axios from 'axios'
 import { toast } from 'react-hot-toast'
@@ -13,6 +13,7 @@ import { statusEnum } from '../../utils/orders/enum'
 import { parseData } from '../../utils'
 import { format } from 'date-fns'
 import dynamic from 'next/dist/shared/lib/dynamic'
+import { parishesPlants } from '../../utils/orders'
 
 const Map = dynamic(() => import('../../components/Map'), {
   ssr: false
