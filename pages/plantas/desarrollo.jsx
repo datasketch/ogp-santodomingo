@@ -76,10 +76,9 @@ function GrowingPlantsPage () {
     setSelectedData(data)
     onOpenUpdatePlant()
   }
-  console.log(filteredPlants)
+
   const handleSearch = ({ target }) => {
     const { value } = target
-    console.log(value)
     setSearch(value)
   }
 

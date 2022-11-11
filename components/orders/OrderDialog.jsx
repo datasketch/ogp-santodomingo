@@ -32,7 +32,7 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
   const [newPlant, setNewPlant] = useState([])
   const [previousPlants, setPreviousPlants] = useState([])
 
-  const { register, handleSubmit, reset } = useForm({
+  const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm({
     mode: 'onBlur',
     defaultValues: {
       [dictionary.name]: data.name,
@@ -184,13 +184,13 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
   }
 
   const handleClose = () => {
+    onClose()
     setAddedPlant({})
     setSelectedPlant({})
     setNewPlant([])
     setPreviousPlants([])
     reset()
     setSelectedData()
-    onClose()
   }
 
   return (
@@ -324,12 +324,6 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
                       </Tbody>
                     </Table>
                   </TableContainer>
-                  <DrawerFooter>
-                    <Button variant='outline' mr={3} onClick={handleClose}>
-                      Cancelar
-                    </Button>
-                    <Button form="edit-order" colorScheme='blue' type="submit">Guardar</Button>
-                  </DrawerFooter>
                 </TabPanel>
                 <TabPanel>
                   <Stack spacing={4}>
@@ -351,7 +345,7 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
 
                     <Box fontSize="md">
                       <Text letterSpacing="wide">Fecha de medición</Text>
-                      <Input type='date' {...register(dictionary.measurementDate, { value: data.measurementDate, valueAsDate: true })} value={format(new Date(data.measurementDate).getTime(), 'yyyy-MM-dd')} />
+                      <Input type='date' {...register(dictionary.measurementDate, { value: data.measurementDate, valueAsDate: true })} defaultValue={format(new Date(data.measurementDate).getTime(), 'yyyy-MM-dd')} />
                     </Box>
 
                     <Box fontSize="md">
@@ -359,12 +353,7 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
                       <Input type='text' {...register(dictionary.actor)} />
                     </Box>
                   </Stack>
-                  <DrawerFooter>
-                    <Button variant='outline' mr={3} onClick={handleClose}>
-                      Cancelar
-                    </Button>
-                    <Button form="edit-order" colorScheme='blue' type="submit">Guardar</Button>
-                  </DrawerFooter>
+
                 </TabPanel>
                 <TabPanel>
                   <TableContainer>
@@ -380,7 +369,7 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
                       </Thead>
                       <Tbody style={{ overflowY: 'scroll' }}>
                         {parsedData.data.map(([plant, container, inventory], index) => (
-                          <Tr key={index}>
+                          <Tr key={plant + '-' + index}>
                             <Td>
                               {plant}
                             </Td>
@@ -391,10 +380,10 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
                               <FormControl>
                                 <Input
                                   type="number"
-                                  value={calculateDefaultValue(plant, container, data?.details) || 0}
+                                  defaultValue={calculateDefaultValue(plant, container, data?.details) || 0}
                                   max={inventory + calculateDefaultValue(plant, container, data?.details)}
                                   min={0}
-                                  onChange={event => handlePlantsSelect(event, index, plant, container)}
+                                  onInput={event => handlePlantsSelect(event, index, plant, container)}
                                 />
                                 <FormHelperText>
                                   Hay {inventory} unidades disponibles
@@ -410,7 +399,7 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
                     <Button variant='outline' mr={3} onClick={handleClose}>
                       Cancelar
                     </Button>
-                    <Button form="edit-order" colorScheme='blue' type="submit">Guardar</Button>
+                    <Button form="edit-order" colorScheme='blue' type="submit" disabled={isSubmitting}>Guardar</Button>
                   </DrawerFooter>
                 </TabPanel>
               </TabPanels>

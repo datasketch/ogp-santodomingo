@@ -2,7 +2,6 @@ import { Box, Button, Checkbox, FormControl, FormErrorMessage, FormHelperText, F
 import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { ArrowLeftIcon } from '@heroicons/react/24/outline'
 import axios from 'axios'
 import dynamic from 'next/dynamic'
 import isEmail from 'validator/lib/isEmail'
@@ -61,20 +60,6 @@ function CitizenFormPage () {
     >
 
       <Toaster />
-      <Box >
-        <Button
-          type='button'
-          colorScheme={'gray'}
-          alignItems={'center'}
-          display='flex'
-          gap={2}
-          mb={2}
-          onClick={() => router.push('/denuncias')}
-        >
-          <ArrowLeftIcon fill='#000' width={18} height={18}/>
-          Volver
-        </Button>
-      </Box>
       <Heading size="lg">Formulario de denuncias</Heading>
       <form action="" onSubmit={handleSubmit(onSubmit)}>
         <Stack dir="column" spacing={5} mt={5}>
