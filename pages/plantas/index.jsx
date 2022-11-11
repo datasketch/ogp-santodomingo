@@ -69,10 +69,11 @@ export default function PlantsHomePage () {
 
   return (
     <>
-      {selectedData && <OrderDialog
+      {/* selectedData  && */<OrderDialog
         isOpen={isOpen}
         onClose={onClose}
         data={selectedData}
+        key={selectedData}
       />}
       <Box as="div" mt={4}>
         {data.length

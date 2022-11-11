@@ -18,7 +18,7 @@ function PublicServantFormPage () {
   const router = useRouter()
   const center = { lat: -0.254167, lng: -79.1719 }
 
-  const { handleSubmit, register, formState: { errors, isSubmitting } } = useForm({
+  const { handleSubmit, register, reset, formState: { errors, isSubmitting } } = useForm({
     mode: 'onBlur'
   })
 
@@ -33,7 +33,6 @@ function PublicServantFormPage () {
       [dictionary.affectedComponent]: data[dictionary.affectedComponent].join(', '),
       [dictionary.source]: 'Funcionario'
     }
-
     const op = axios.post('/api/complaints', info)
 
     toast.promise(op, {
@@ -44,7 +43,8 @@ function PublicServantFormPage () {
         return 'Se ha presentado un error'
       }
     }).then(() => {
-      router.push('/')
+      router.push('/denuncias/funcionarios')
+      reset()
     })
   }
 

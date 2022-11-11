@@ -1,6 +1,7 @@
 import { Box, Button, Heading, Input, Text } from '@chakra-ui/react'
 import Layout from '../../components/complaints/Layout'
 import { Grid } from 'gridjs-react'
+
 import useSWR from 'swr'
 import axios from 'axios'
 import { group } from 'd3-array'
@@ -9,6 +10,7 @@ import { dictionary } from '../../utils/complaints/dictionary'
 import { parseData } from '../../utils'
 import 'gridjs/dist/theme/mermaid.css'
 import useFilterByDate from '../../hooks/use-filtered-data'
+import DownloadCSV from '../../components/DownloadCSV'
 
 function Summary () {
   const { data, error } = useSWR('/api/complaints', (url) => axios.get(url).then(res => res.data))
@@ -49,10 +51,12 @@ function Summary () {
 
   return (
     <>
+
       <Box mt={6}>
         <Box display="flex" rowGap={6} flexDirection={{ base: 'column', lg: 'row' }} alignItems="center" justifyContent="space-between" mb={4}>
           <Heading color="gray.700">Reporte</Heading>
           <Box display="flex" alignItems="center" flexWrap="wrap" justifyContent="space-between" rowGap={4} columnGap={{ xl: 10 }}>
+            <DownloadCSV data={dataTable} label='reporte_denuncias'/>
             <Box display="flex" width={{ base: '45%', lg: '30%', xl: 'auto' }} alignItems="center" columnGap={1}>
               <Text flexShrink={0}>Desde: </Text>
               <Input type="date" value={startDate} max={currentDate} onChange={startDateChangeHandler} />
@@ -66,6 +70,7 @@ function Summary () {
             </Button>
           </Box>
         </Box>
+
         <Grid
           {...parseData(dataTable, {
             omit: []
@@ -75,6 +80,7 @@ function Summary () {
           sort
           autoWidth
         />
+
       </Box>
     </>
   )

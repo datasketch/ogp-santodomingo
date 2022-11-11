@@ -2,11 +2,13 @@ import { Box, Button, Checkbox, FormControl, FormErrorMessage, FormHelperText, F
 import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import { ArrowLeftIcon } from '@heroicons/react/24/outline'
 import axios from 'axios'
 import dynamic from 'next/dynamic'
 import isEmail from 'validator/lib/isEmail'
 import toast, { Toaster } from 'react-hot-toast'
-import { complainantTypes, complaintTypes, affectedComponents, parishes, defendantTypes, sectors, complaintStatusEnum } from '../../utils/complaints'
+import { complainantTypes, complaintTypes, affectedComponents, parishes, defendantTypes, sectors } from '../../utils/complaints'
+import { complaintStatusEnum } from '../../utils/complaints/enum'
 import { dictionary } from '../../utils/complaints/dictionary'
 
 const Map = dynamic(() => import('../../components/Map'), {
@@ -17,7 +19,7 @@ function CitizenFormPage () {
   const router = useRouter()
   const center = { lat: -0.254167, lng: -79.1719 }
 
-  const { handleSubmit, register, formState: { errors, isSubmitting } } = useForm({
+  const { handleSubmit, register, reset, formState: { errors, isSubmitting } } = useForm({
     mode: 'onBlur'
   })
 
@@ -44,7 +46,8 @@ function CitizenFormPage () {
         return 'Se ha presentado un error'
       }
     }).then(() => {
-      router.push('/')
+      router.push('/denuncias/ciudadania')
+      reset()
     })
   }
 
@@ -56,7 +59,22 @@ function CitizenFormPage () {
       py={4}
       mx="auto"
     >
+
       <Toaster />
+      <Box >
+        <Button
+          type='button'
+          colorScheme={'gray'}
+          alignItems={'center'}
+          display='flex'
+          gap={2}
+          mb={2}
+          onClick={() => router.push('/denuncias')}
+        >
+          <ArrowLeftIcon fill='#000' width={18} height={18}/>
+          Volver
+        </Button>
+      </Box>
       <Heading size="lg">Formulario de denuncias</Heading>
       <form action="" onSubmit={handleSubmit(onSubmit)}>
         <Stack dir="column" spacing={5} mt={5}>
@@ -141,9 +159,9 @@ function CitizenFormPage () {
             </Stack>
             {errors && errors[dictionary.affectedComponent]
               ? (
-              <FormErrorMessage>
-                {errors[dictionary.affectedComponent].message || errors[dictionary.affectedComponent].root.message}
-              </FormErrorMessage>
+                <FormErrorMessage>
+                  {errors[dictionary.affectedComponent].message || errors[dictionary.affectedComponent].root.message}
+                </FormErrorMessage>
                 )
               : <FormHelperText>Seleccione al menos un componente</FormHelperText>
             }

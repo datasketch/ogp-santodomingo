@@ -52,11 +52,11 @@ function Map ({ center, onMarkerMove }) {
       <Box display='flex' gap={10} alignItems="center" >
         <FormControl>
           <FormHelperText>Latitud</FormHelperText>
-          <Input type='number' value={position?.lat} defaultValue={position?.lat} onChange={(e) => handlePosition({ lat: +e.target.value })} autoComplete='off' />
+          <Input type='text' value={position?.lat} defaultValue={position?.lat} onChange={(e) => handlePosition({ lat: +e.target.value })} autoComplete='off' />
         </FormControl>
         <FormControl>
           <FormHelperText>Longitud</FormHelperText>
-          <Input type='number' value={position?.lng} defaultValue={position?.lng} onInput={(e) => handlePosition({ lng: +e.target.value })} autoComplete='off' />
+          <Input type='text' value={position?.lng} defaultValue={position?.lng} onChange={(e) => handlePosition({ lng: +e.target.value })} autoComplete='off' />
         </FormControl>
       </Box>
     </>

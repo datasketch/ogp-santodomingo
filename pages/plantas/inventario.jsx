@@ -6,6 +6,7 @@ import Layout from '../../components/orders/Layout'
 import { esES } from 'gridjs/l10n'
 import 'gridjs/dist/theme/mermaid.css'
 import { parseData } from '../../utils'
+import DownloadCSV from '../../components/DownloadCSV'
 
 function InventoryPage () {
   const { data, error } = useSWR('/api/inventory', (url) => axios.get(url).then(res => res.data))
@@ -16,7 +17,12 @@ function InventoryPage () {
 
   return (
     <Box position="relative">
-      <Heading color="gray.700">Inventario</Heading>
+      <Box display={'flex'} justifyContent='space-between'>
+
+      <Heading color="gray.700" >Inventario
+      </Heading>
+        <DownloadCSV data={data} label='inventario' />
+      </Box>
       <Grid
         {...parseData(data)}
         language={esES}

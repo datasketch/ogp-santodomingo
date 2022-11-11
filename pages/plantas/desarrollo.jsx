@@ -18,6 +18,7 @@ import { growingPlantsDictionary as dict } from '../../utils/orders/dictionary'
 import { gardenStatusEnum } from '../../utils/orders/enum'
 import { mapGrowingPlant } from '../../utils/orders/mapper'
 import useFilterByDate from '../../hooks/use-filtered-data'
+import { removeAccents } from '../../utils/orders'
 
 function GrowingPlantsPage () {
   const { data, error, mutate } = useSWR('/api/plants', (url) => axios.get(url).then(res => res.data))
@@ -26,6 +27,11 @@ function GrowingPlantsPage () {
   const addPlant = useRef()
   const updatePlant = useRef()
   const [selectedData, setSelectedData] = useState()
+  const [search, setSearch] = useState('')
+  const filteredPlants = data?.filter(({ Planta }) => {
+    const normalized = removeAccents(Planta).toLowerCase()
+    return normalized.includes(removeAccents(search).toLowerCase())
+  })
   const {
     startDate,
     endDate,
@@ -34,7 +40,7 @@ function GrowingPlantsPage () {
     endDateChangeHandler,
     clearInputsClickHandler,
     filteredData
-  } = useFilterByDate(data, dict.transplantDate)
+  } = useFilterByDate(filteredPlants, dict.transplantDate)
 
   if (error) return <Text align="center" color="red">Se ha presentado un error</Text>
 
@@ -43,8 +49,8 @@ function GrowingPlantsPage () {
   const columns = groupBy(filteredData, dict.gardenStatus)
 
   const handleDrop = async (id, target) => {
-    const update = [...data]
-    const index = data.findIndex(item => item.id === id)
+    const update = [...filteredPlants]
+    const index = filteredPlants.findIndex(item => item.id === id)
 
     update[index][dict.gardenStatus] = target
 
@@ -70,11 +76,17 @@ function GrowingPlantsPage () {
     setSelectedData(data)
     onOpenUpdatePlant()
   }
+  console.log(filteredPlants)
+  const handleSearch = ({ target }) => {
+    const { value } = target
+    console.log(value)
+    setSearch(value)
+  }
 
   return (
     <>
       <Box as="div" mt={4}>
-        {data.length
+        {filteredPlants.length
           ? (
             <>
               <Stack display="flex" flexDir={{ base: 'column', lg: 'row' }} justifyContent={{ lg: 'space-between' }} spacing={{ base: 4, lg: 0 }} mb={8}>
@@ -90,7 +102,11 @@ function GrowingPlantsPage () {
                     +Agregar
                   </Button>
                 </Box>
-                <Box display="flex" gap={4} flexDirection={{ base: 'column', lg: 'row' }}>
+                <Box display="flex" alignContent={'center'} gap={4} flexDirection={{ base: 'column', lg: 'row' }}>
+                  <Box>
+                    <div style={{ height: '24px' }}></div>
+                    <Input type="text" placeholder='Buscar planta...' onChange={handleSearch} />
+                  </Box>
                   <Box>
                     <Text flexShrink={0}>Desde :</Text>
                     <Input type="date" value={startDate} max={currentDate} onChange={startDateChangeHandler} />
@@ -113,17 +129,17 @@ function GrowingPlantsPage () {
                     cards={columns[status] || []}
                     onDrop={handleDrop}
                   >
-                    {(columns[status] || []).map(data => (
+                    {(columns[status] || []).map(filteredPlants => (
                       <KanbanCard
-                        key={data.id}
-                        item={{ id: data.id, status: data[dict.gardenStatus] }}
-                        data={data}
+                        key={filteredPlants.id}
+                        item={{ id: filteredPlants.id, status: filteredPlants[dict.gardenStatus] }}
+                        data={filteredPlants}
                         mapper={mapGrowingPlant}
-                        onClick={() => handleClick(mapGrowingPlant(data))}
+                        onClick={() => handleClick(mapGrowingPlant(filteredPlants))}
                         ref={updatePlant}
                       >
-                        {(data) => (
-                          <PlantCardContent data={data} />
+                        {(filteredPlants) => (
+                          <PlantCardContent data={filteredPlants} />
                         )}
                       </KanbanCard>
                     ))}

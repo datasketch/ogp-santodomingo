@@ -22,7 +22,9 @@ function ComplaintCardContent ({ data }) {
           position="absolute"
           top={4}
           right={4}
-        >{data.source}</Badge>
+        >
+          {data.source}
+        </Badge>
       )}
       <Stack spacing={2} alignItems="flex-start">
         {data.fullName && (
