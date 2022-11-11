@@ -55,8 +55,7 @@ function Summary () {
       <Box mt={6}>
         <Box display="flex" rowGap={6} flexDirection={{ base: 'column', lg: 'row' }} alignItems="center" justifyContent="space-between" mb={4}>
           <Heading color="gray.700">Reporte</Heading>
-          <Box display="flex" alignItems="center" flexWrap="wrap" justifyContent="space-between" rowGap={4} columnGap={{ xl: 10 }}>
-            <DownloadCSV data={dataTable} label='reporte_denuncias'/>
+          <Box display="flex" alignItems="center" flexWrap="wrap" justifyContent="space-between" rowGap={4} columnGap={{ xl: 6 }}>
             <Box display="flex" width={{ base: '45%', lg: '30%', xl: 'auto' }} alignItems="center" columnGap={1}>
               <Text flexShrink={0}>Desde: </Text>
               <Input type="date" value={startDate} max={currentDate} onChange={startDateChangeHandler} />
@@ -68,6 +67,7 @@ function Summary () {
             <Button width={{ base: '100%', lg: '30%', xl: 'auto' }} colorScheme='blackAlpha' variant='outline' onClick={clearInputsClickHandler}>
               Restablecer filtros
             </Button>
+            <DownloadCSV data={dataTable} label='reporte_denuncias'/>
           </Box>
         </Box>
 

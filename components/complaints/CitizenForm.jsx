@@ -15,7 +15,7 @@ const Map = dynamic(() => import('../../components/Map'), {
 function CitizenForm ({ id, data = {}, onSubmit }) {
   const { center, defaultValues, coordinates, setCoordinates } = useComplaintForm(data)
 
-  const { handleSubmit, register, formState: { errors } } = useForm({
+  const { handleSubmit, register, formState: { errors, isSubmitting } } = useForm({
     mode: 'onBlur',
     defaultValues
   })

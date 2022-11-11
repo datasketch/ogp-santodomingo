@@ -1,12 +1,12 @@
 import { Box, Button, Checkbox, FormControl, FormErrorMessage, FormHelperText, FormLabel, Heading, Input, Select, Stack, Textarea } from '@chakra-ui/react'
 import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import axios from 'axios'
 import dynamic from 'next/dynamic'
 import isEmail from 'validator/lib/isEmail'
 import toast, { Toaster } from 'react-hot-toast'
-import { complainantTypes, complaintTypes, affectedComponents, parishes, defendantTypes, sectors } from '../../utils/complaints'
+import { complainantTypes, affectedComponents, parishes, defendantTypes, sectors } from '../../utils/complaints'
 import { complaintStatusEnum } from '../../utils/complaints/enum'
 import { dictionary } from '../../utils/complaints/dictionary'
 
@@ -18,36 +18,40 @@ function CitizenFormPage () {
   const router = useRouter()
   const center = { lat: -0.254167, lng: -79.1719 }
 
-  const { handleSubmit, register, reset, formState: { errors, isSubmitting } } = useForm({
+  const { handleSubmit, register, formState: { errors, isSubmitting } } = useForm({
     mode: 'onBlur'
   })
+
+  useEffect(() => {
+    console.log(isSubmitting)
+  }, [isSubmitting])
 
   const [complainantType, setcomplainantType] = useState('')
   const [canton, setCanton] = useState('')
   const [coordinates, setCoordinates] = useState(`${center.lat}, ${center.lng}`)
 
-  const onSubmit = data => {
+  const onSubmit = async data => {
     const info = {
       ...data,
       [dictionary.location]: coordinates,
       [dictionary.affectedComponent]: data[dictionary.affectedComponent].join(', '),
       [dictionary.source]: 'Ciudadano',
-      [dictionary.complaintStatus]: complaintStatusEnum.RECEIVED
+      [dictionary.complaintStatus]: complaintStatusEnum.RECEIVED,
+      [dictionary.complaintType]: 'Online'
     }
 
-    const op = axios.post('/api/complaints', info)
-
-    toast.promise(op, {
-      loading: 'Enviando...',
-      success: 'Éxito',
-      error: error => {
-        console.log(error)
-        return 'Se ha presentado un error'
-      }
-    }).then(() => {
-      router.push('/denuncias/ciudadania')
-      reset()
-    })
+    try {
+      await axios.post('/api/complaints', info)
+      toast.success('Denuncia guardada')
+      await new Promise((resolve) => {
+        setTimeout(() => {
+          router.reload()
+          resolve()
+        }, 300)
+      })
+    } catch (error) {
+      toast.error('Se ha presentado un error')
+    }
   }
 
   return (
@@ -114,18 +118,6 @@ function CitizenFormPage () {
           <FormControl isRequired>
             <FormLabel>Fecha del incidente</FormLabel>
             <Input type="datetime-local" {...register(dictionary.incidentDate)} />
-          </FormControl>
-          <FormControl isRequired isDisabled>
-            <FormLabel>Tipo de denuncia</FormLabel>
-            <Select
-              placeholder='Seleccione una opción'
-              defaultValue="Online"
-              {...register(dictionary.complaintType)}
-            >
-              {complaintTypes.map(option => (
-                <option value={option} key={option}>{option}</option>
-              ))}
-            </Select>
           </FormControl>
           <FormControl isInvalid={errors && errors[dictionary.affectedComponent]}>
             <FormLabel>Componente afectado</FormLabel>
@@ -217,7 +209,7 @@ function CitizenFormPage () {
           <Button
             type='submit'
             colorScheme={'teal'}
-            disabled={isSubmitting}
+            isLoading={isSubmitting}
           >
             Enviar
           </Button>

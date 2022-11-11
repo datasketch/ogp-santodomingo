@@ -19,9 +19,7 @@ function ComplaintCardContent ({ data }) {
           rounded="2xl"
           py={1}
           px={2}
-          position="absolute"
-          top={4}
-          right={4}
+          mb={2}
         >
           {data.source}
         </Badge>
