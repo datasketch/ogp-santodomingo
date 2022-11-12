@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { Box, Button, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerFooter, DrawerHeader, DrawerOverlay, FormControl, FormHelperText, Input, Select, Stack, Tab, Table, TableContainer, TabList, TabPanel, TabPanels, Tabs, Tbody, Td, Text, Th, Thead, Tr } from '@chakra-ui/react'
+import { Box, Button, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerHeader, DrawerOverlay, FormControl, FormHelperText, Input, Select, Stack, Tab, Table, TableContainer, TabList, TabPanel, TabPanels, Tabs, Tbody, Td, Text, Th, Thead, Tr } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import isEmpty from 'lodash.isempty'
 import PropTypes from 'prop-types'
@@ -32,7 +32,7 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
   const [newPlant, setNewPlant] = useState([])
   const [previousPlants, setPreviousPlants] = useState([])
 
-  const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm({
+  const { register, handleSubmit, reset, formState: { isSubmitted } } = useForm({
     mode: 'onBlur',
     defaultValues: {
       [dictionary.name]: data.name,
@@ -106,7 +106,9 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
       {
         revalidate: true
       }).then(() => {
+      // setTimeout(() => {
       handleClose()
+      // }, 300)
     })
     const plants = { previousPlants, newPlant }
     updateDetails(plants)
@@ -395,12 +397,11 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
                       </Tbody>
                     </Table>
                   </TableContainer>
-                  <DrawerFooter>
-                    <Button variant='outline' mr={3} onClick={handleClose}>
-                      Cancelar
-                    </Button>
-                    <Button form="edit-order" colorScheme='blue' type="submit" disabled={isSubmitting}>Guardar</Button>
-                  </DrawerFooter>
+                  <Button variant='outline' mr={3} onClick={handleClose}>
+                    Cancelar
+                  </Button>
+                  <Button colorScheme='teal' type="submit" isLoading={isSubmitted} >Guardar</Button>
+
                 </TabPanel>
               </TabPanels>
             </form>
