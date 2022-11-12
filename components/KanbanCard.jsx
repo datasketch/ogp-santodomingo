@@ -35,7 +35,6 @@ function KanbanCard ({ item, data, onClick, mapper = (_) => _, children }) {
       }}
       onClick={onClick}
     >
-      &#173;
       {children(cardData)}
     </Box>
   )

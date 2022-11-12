@@ -18,7 +18,7 @@ function PublicServantFormPage () {
   const router = useRouter()
   const center = { lat: -0.254167, lng: -79.1719 }
 
-  const { handleSubmit, register, reset, formState: { errors, isSubmitting } } = useForm({
+  const { handleSubmit, register, formState: { errors, isSubmitting } } = useForm({
     mode: 'onBlur'
   })
 
@@ -26,26 +26,26 @@ function PublicServantFormPage () {
   const [canton, setCanton] = useState('')
   const [coordinates, setCoordinates] = useState(`${center.lat}, ${center.lng}`)
 
-  const onSubmit = data => {
+  const onSubmit = async data => {
     const info = {
       ...data,
       [dictionary.location]: coordinates,
       [dictionary.affectedComponent]: data[dictionary.affectedComponent].join(', '),
       [dictionary.source]: 'Funcionario'
     }
-    const op = axios.post('/api/complaints', info)
 
-    toast.promise(op, {
-      loading: 'Enviando...',
-      success: 'Éxito',
-      error: error => {
-        console.log(error)
-        return 'Se ha presentado un error'
-      }
-    }).then(() => {
-      router.push('/denuncias/funcionarios')
-      reset()
-    })
+    try {
+      await axios.post('/api/complaints', info)
+      toast.success('Denuncia guardada')
+      await new Promise((resolve) => {
+        setTimeout(() => {
+          router.reload()
+          resolve()
+        }, 300)
+      })
+    } catch (error) {
+      toast.error('Se ha presentado un error')
+    }
   }
 
   return (
@@ -234,7 +234,7 @@ function PublicServantFormPage () {
           <Button
             type='submit'
             colorScheme={'teal'}
-            disabled={isSubmitting}
+            isLoading={isSubmitting}
           >
             Enviar
           </Button>
