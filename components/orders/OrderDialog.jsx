@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { Box, Button, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerHeader, DrawerOverlay, FormControl, FormHelperText, Input, Select, Stack, Tab, Table, TableContainer, TabList, TabPanel, TabPanels, Tabs, Tbody, Td, Text, Th, Thead, Tr } from '@chakra-ui/react'
+import { Box, Button, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerFooter, DrawerHeader, DrawerOverlay, FormControl, FormHelperText, Input, Select, Stack, Tab, Table, TableContainer, TabList, TabPanel, TabPanels, Tabs, Tbody, Td, Text, Th, Thead, Tr } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import isEmpty from 'lodash.isempty'
 import PropTypes from 'prop-types'
@@ -397,11 +397,12 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
                       </Tbody>
                     </Table>
                   </TableContainer>
-                  <Button variant='outline' mr={3} onClick={handleClose}>
-                    Cancelar
-                  </Button>
-                  <Button colorScheme='teal' type="submit" isLoading={isSubmitted} >Guardar</Button>
-
+                  <DrawerFooter>
+                    <Button variant='outline' mr={3} onClick={handleClose}>
+                      Cancelar
+                    </Button>
+                    <Button colorScheme='teal' type="submit" isLoading={isSubmitted} >Guardar</Button>
+                  </DrawerFooter>
                 </TabPanel>
               </TabPanels>
             </form>

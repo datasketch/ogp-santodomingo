@@ -18,7 +18,7 @@ function PublicServantFormPage () {
   const router = useRouter()
   const center = { lat: -0.254167, lng: -79.1719 }
 
-  const { handleSubmit, register, formState: { errors, isSubmitting } } = useForm({
+  const { handleSubmit, register, formState: { errors, isSubmitted } } = useForm({
     mode: 'onBlur'
   })
 
@@ -234,7 +234,7 @@ function PublicServantFormPage () {
           <Button
             type='submit'
             colorScheme={'teal'}
-            isLoading={isSubmitting}
+            isLoading={isSubmitted}
           >
             Enviar
           </Button>

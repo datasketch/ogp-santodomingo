@@ -26,7 +26,7 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
   const { data /* error */ } = useSWR('/api/inventory', (url) => axios.get(url).then(res => res.data))
   const { data: dataPlants /* error: errorPlants */ } = useSWR('/api/plants-list', (url) => axios.get(url).then(res => res.data))
 
-  const { handleSubmit, register, formState: { errors, isSubmitting, isValid } } = useForm({ mode: 'onBlur' })
+  const { handleSubmit, register, reset, formState: { errors, isSubmitted, isValid } } = useForm({ mode: 'onBlur' })
   const { center, coordinates, setCoordinates } = useComplaintForm(data)
 
   const handleAddNewOrder = (data, coordinate) => {
@@ -43,22 +43,19 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
       [dictionary.status]: 'Recibido',
       Plantas: details
     }
-
-    if (input.Plantas.length) {
-      const op = axios.post('/api/orders', input)
-      mutate(
-        '/api/orders',
-        () => toast.promise(op, {
-          loading: 'Actualizando base de datos',
-          success: () => 'Guardado',
-          error: () => 'Se ha presentado un error'
-        }),
-        {
-          revalidate: true
-        })
-      return
-    }
-    toast.error('Debe agregar plantas a la orden')
+    const op = axios.post('/api/orders', input)
+    mutate(
+      '/api/orders',
+      () => toast.promise(op, {
+        loading: 'Actualizando base de datos',
+        success: () => 'Guardado',
+        error: () => 'Se ha presentado un error'
+      }),
+      {
+        revalidate: true
+      })
+    reset()
+    onClose()
   }
 
   const parsedData = parseData((data || []), {
@@ -141,36 +138,36 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
                     </Box>
                     <FormControl isRequired>
                       <FormLabel>Nombre beneficiario</FormLabel>
-                      <Input type='text' {...register(dictionary.name, { required: 'Este campo es requerido' })} />
+                      <Input type='text' {...register(dictionary.name, { required: 'Este Campo es requerido' })} />
                       {errors[dictionary.name] && <Alert status='error'>
                         <AlertIcon />
-                        Este campo es requerido
+                       {errors[dictionary.name].message}
                       </Alert>}
                     </FormControl>
                     <Box display="flex" gap={6} alignItems="center">
                       <FormControl isRequired>
                         <FormLabel>Cédula</FormLabel>
-                        <Input type='number' {...register(dictionary.identifier, { required: 'Este campo es requerido' })} />
+                        <Input type='number' {...register(dictionary.identifier, { required: 'Este Campo es requerido' })} />
                         {errors[dictionary.identifier] && <Alert status='error'>
                           <AlertIcon />
-                          Este campo es requerido
+                          {errors[dictionary.identifier].message}
                         </Alert>}
                       </FormControl>
                       <FormControl isRequired>
                         <FormLabel>Teléfono</FormLabel>
-                        <Input type='tel' {...register(dictionary.phoneNumber, { required: 'Este campo es requerido' })} />
+                        <Input type='tel' {...register(dictionary.phoneNumber, { required: 'Este Campo es requerido' })} />
                         {errors[dictionary.phoneNumber] && <Alert status='error'>
                           <AlertIcon />
-                          Este campo es requerido
+                          {errors[dictionary.phoneNumber].message}
                         </Alert>}
                       </FormControl>
                     </Box>
                     <FormControl isRequired>
                       <FormLabel >Dirección</FormLabel>
-                      <Input type='text' {...register(dictionary.address, { required: 'Este campo es requerido' })} />
+                      <Input type='text' {...register(dictionary.address, { required: 'Este Campo es requerido' })} />
                       {errors[dictionary.address] && <Alert status='error'>
                         <AlertIcon />
-                        Este campo es requerido
+                        {errors[dictionary.address].message}
                       </Alert>}
                     </FormControl>
 
@@ -179,7 +176,7 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
                       <Select
                         placeholder='Seleccione una opción'
                         onInput={e => setCanton(e.target.value)}
-                        {...register(dictionary.canton, { required: 'Seleccione una opción' })}
+                        {...register(dictionary.canton, { required: true })}
                       >
                         {['Santo Domingo', 'La Concordia'].map(el =>
                           <option key={el} value={el}>{el}</option>
@@ -195,7 +192,7 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
                       <FormLabel >Parroquia</FormLabel>
                       <Select
                         placeholder='Seleccione una opción'
-                        {...register(dictionary.parish, { required: 'Seleccione una opción' })}>
+                        {...register(dictionary.parish, { required: true })}>
                         {parishesPlants[canton]?.map(el =>
                           <option key={el} value={el}>{el}</option>
                         )}
@@ -319,7 +316,8 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
                     <Button
                       colorScheme='teal'
                       type='submit'
-                      disabled={isSubmitting}
+                      isDisabled={plants.length === 0}
+                      isLoading={isSubmitted}
                     >
                       Enviar
                     </Button>

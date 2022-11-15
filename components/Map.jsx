@@ -32,8 +32,6 @@ function Map ({ center, onMarkerMove }) {
   const updatePosition = (e) => {
     const value = e.target.value
     const { key } = e.target.dataset
-    console.log(value)
-    console.log(isFloat(value))
     if (!isFloat(value)) return
     setPosition(prev => ({ ...prev, [key]: +value }))
     onMarkerMove(position)

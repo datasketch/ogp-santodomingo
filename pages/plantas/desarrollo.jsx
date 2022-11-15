@@ -21,17 +21,14 @@ import useFilterByDate from '../../hooks/use-filtered-data'
 import { removeAccents } from '../../utils/orders'
 
 function GrowingPlantsPage () {
-  const { data, error, mutate } = useSWR('/api/plants', (url) => axios.get(url).then(res => res.data))
+  const { data = [], error, mutate } = useSWR('/api/plants', (url) => axios.get(url).then(res => res.data))
   const { isOpen: isOpenAddPlant, onOpen: onOpenAddPlant, onClose: onCloseAddPlant } = useDisclosure()
   const { isOpen: isOpenUpdatePlant, onOpen: onOpenUpdatePlant, onClose: onCloseUpdatePlant } = useDisclosure()
   const addPlant = useRef()
   const updatePlant = useRef()
   const [selectedData, setSelectedData] = useState()
   const [search, setSearch] = useState('')
-  const filteredPlants = data?.filter(({ Planta }) => {
-    const normalized = removeAccents(Planta).toLowerCase()
-    return normalized.includes(removeAccents(search).toLowerCase())
-  })
+
   const {
     startDate,
     endDate,
@@ -40,17 +37,21 @@ function GrowingPlantsPage () {
     endDateChangeHandler,
     clearInputsClickHandler,
     filteredData
-  } = useFilterByDate(filteredPlants, dict.transplantDate)
+  } = useFilterByDate(data, dict.transplantDate)
+  const filteredPlants = filteredData?.filter(({ Planta }) => {
+    const normalized = removeAccents(Planta).toLowerCase()
+    return normalized.includes(removeAccents(search).toLowerCase())
+  })
 
   if (error) return <Text align="center" color="red">Se ha presentado un error</Text>
 
   if (!data) return <Text align="center">Cargando tablero de gestión...</Text>
 
-  const columns = groupBy(filteredData, dict.gardenStatus)
+  const columns = groupBy(filteredPlants, dict.gardenStatus)
 
   const handleDrop = async (id, target) => {
-    const update = [...filteredPlants]
-    const index = filteredPlants.findIndex(item => item.id === id)
+    const update = [...data]
+    const index = data.findIndex(item => item.id === id)
 
     update[index][dict.gardenStatus] = target
 
@@ -85,7 +86,7 @@ function GrowingPlantsPage () {
   return (
     <>
       <Box as="div" mt={4}>
-        {filteredPlants.length
+        {data.length
           ? (
             <>
               <Stack display="flex" flexDir={{ base: 'column', lg: 'row' }} justifyContent={{ lg: 'space-between' }} spacing={{ base: 4, lg: 0 }} mb={8}>
@@ -128,17 +129,17 @@ function GrowingPlantsPage () {
                     cards={columns[status] || []}
                     onDrop={handleDrop}
                   >
-                    {(columns[status] || []).map(filteredPlants => (
+                    {(columns[status] || []).map(data => (
                       <KanbanCard
-                        key={filteredPlants.id}
-                        item={{ id: filteredPlants.id, status: filteredPlants[dict.gardenStatus] }}
-                        data={filteredPlants}
+                        key={data.id}
+                        item={{ id: data.id, status: data[dict.gardenStatus] }}
+                        data={data}
                         mapper={mapGrowingPlant}
-                        onClick={() => handleClick(mapGrowingPlant(filteredPlants))}
+                        onClick={() => handleClick(mapGrowingPlant(data))}
                         ref={updatePlant}
                       >
-                        {(filteredPlants) => (
-                          <PlantCardContent data={filteredPlants} />
+                        {(data) => (
+                          <PlantCardContent data={data} />
                         )}
                       </KanbanCard>
                     ))}

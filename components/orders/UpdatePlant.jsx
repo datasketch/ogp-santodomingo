@@ -14,7 +14,7 @@ function UpdatePlant ({ isOpen, btnRef, onClose, data = {}, setData }) {
   const { data: dataApiPlantsList, error } = useSWR('/api/plants-list', (url) => axios.get(url).then(res => res.data))
   const [showContainerInput, setShowContainerInput] = useState(false)
   const [containerData, setContainerData] = useState()
-  const { handleSubmit, register, reset } = useForm({
+  const { handleSubmit, register, reset, formState: { isSubmitted } } = useForm({
     mode: 'onBlur',
     defaultValues: {
       [d.transplantDate]: data.transplantDate ? format(new Date(data.transplantDate), 'yyyy-MM-dd') : null,
@@ -194,6 +194,7 @@ function UpdatePlant ({ isOpen, btnRef, onClose, data = {}, setData }) {
               <Button
                 type='submit'
                 colorScheme={'teal'}
+                isLoading={isSubmitted}
               >
                 Enviar
               </Button>

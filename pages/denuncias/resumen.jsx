@@ -22,7 +22,7 @@ function Summary () {
     startDateChangeHandler,
     endDateChangeHandler,
     clearInputsClickHandler,
-    filteredData
+    filteredData = []
   } = useFilterByDate(data)
 
   if (error) return <Text align="center" color="red">Se ha presentado un error</Text>
@@ -51,7 +51,6 @@ function Summary () {
 
   return (
     <>
-
       <Box mt={6}>
         <Box display="flex" rowGap={6} flexDirection={{ base: 'column', lg: 'row' }} alignItems="center" justifyContent="space-between" mb={4}>
           <Heading color="gray.700">Reporte</Heading>

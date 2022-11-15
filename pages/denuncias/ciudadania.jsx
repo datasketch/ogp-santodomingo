@@ -1,7 +1,7 @@
 import { Box, Button, Checkbox, FormControl, FormErrorMessage, FormHelperText, FormLabel, Heading, Input, Select, Stack, Textarea } from '@chakra-ui/react'
 import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import axios from 'axios'
 import dynamic from 'next/dynamic'
 import isEmail from 'validator/lib/isEmail'
@@ -18,13 +18,9 @@ function CitizenFormPage () {
   const router = useRouter()
   const center = { lat: -0.254167, lng: -79.1719 }
 
-  const { handleSubmit, register, formState: { errors, isSubmitting } } = useForm({
+  const { handleSubmit, register, formState: { errors, isSubmitted } } = useForm({
     mode: 'onBlur'
   })
-
-  useEffect(() => {
-    console.log(isSubmitting)
-  }, [isSubmitting])
 
   const [complainantType, setcomplainantType] = useState('')
   const [canton, setCanton] = useState('')
@@ -209,7 +205,7 @@ function CitizenFormPage () {
           <Button
             type='submit'
             colorScheme={'teal'}
-            isLoading={isSubmitting}
+            isLoading={isSubmitted}
           >
             Enviar
           </Button>
