@@ -19,10 +19,10 @@ function ComplaintCardContent ({ data }) {
           rounded="2xl"
           py={1}
           px={2}
-          position="absolute"
-          top={4}
-          right={4}
-        >{data.source}</Badge>
+          mb={2}
+        >
+          {data.source}
+        </Badge>
       )}
       <Stack spacing={2} alignItems="flex-start">
         {data.fullName && (

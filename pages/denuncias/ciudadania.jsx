@@ -6,7 +6,8 @@ import axios from 'axios'
 import dynamic from 'next/dynamic'
 import isEmail from 'validator/lib/isEmail'
 import toast, { Toaster } from 'react-hot-toast'
-import { complainantTypes, complaintTypes, affectedComponents, parishes, defendantTypes, sectors, complaintStatusEnum } from '../../utils/complaints'
+import { complainantTypes, affectedComponents, parishes, defendantTypes, sectors } from '../../utils/complaints'
+import { complaintStatusEnum } from '../../utils/complaints/enum'
 import { dictionary } from '../../utils/complaints/dictionary'
 
 const Map = dynamic(() => import('../../components/Map'), {
@@ -17,7 +18,7 @@ function CitizenFormPage () {
   const router = useRouter()
   const center = { lat: -0.254167, lng: -79.1719 }
 
-  const { handleSubmit, register, formState: { errors, isSubmitting } } = useForm({
+  const { handleSubmit, register, formState: { errors, isSubmitted } } = useForm({
     mode: 'onBlur'
   })
 
@@ -25,27 +26,28 @@ function CitizenFormPage () {
   const [canton, setCanton] = useState('')
   const [coordinates, setCoordinates] = useState(`${center.lat}, ${center.lng}`)
 
-  const onSubmit = data => {
+  const onSubmit = async data => {
     const info = {
       ...data,
       [dictionary.location]: coordinates,
       [dictionary.affectedComponent]: data[dictionary.affectedComponent].join(', '),
       [dictionary.source]: 'Ciudadano',
-      [dictionary.complaintStatus]: complaintStatusEnum.RECEIVED
+      [dictionary.complaintStatus]: complaintStatusEnum.RECEIVED,
+      [dictionary.complaintType]: 'Online'
     }
 
-    const op = axios.post('/api/complaints', info)
-
-    toast.promise(op, {
-      loading: 'Enviando...',
-      success: 'Éxito',
-      error: error => {
-        console.log(error)
-        return 'Se ha presentado un error'
-      }
-    }).then(() => {
-      router.push('/')
-    })
+    try {
+      await axios.post('/api/complaints', info)
+      toast.success('Denuncia guardada')
+      await new Promise((resolve) => {
+        setTimeout(() => {
+          router.reload()
+          resolve()
+        }, 300)
+      })
+    } catch (error) {
+      toast.error('Se ha presentado un error')
+    }
   }
 
   return (
@@ -56,6 +58,7 @@ function CitizenFormPage () {
       py={4}
       mx="auto"
     >
+
       <Toaster />
       <Heading size="lg">Formulario de denuncias</Heading>
       <form action="" onSubmit={handleSubmit(onSubmit)}>
@@ -112,18 +115,6 @@ function CitizenFormPage () {
             <FormLabel>Fecha del incidente</FormLabel>
             <Input type="datetime-local" {...register(dictionary.incidentDate)} />
           </FormControl>
-          <FormControl isRequired isDisabled>
-            <FormLabel>Tipo de denuncia</FormLabel>
-            <Select
-              placeholder='Seleccione una opción'
-              defaultValue="Online"
-              {...register(dictionary.complaintType)}
-            >
-              {complaintTypes.map(option => (
-                <option value={option} key={option}>{option}</option>
-              ))}
-            </Select>
-          </FormControl>
           <FormControl isInvalid={errors && errors[dictionary.affectedComponent]}>
             <FormLabel>Componente afectado</FormLabel>
             <Stack direction='row' spacing={3}>
@@ -141,9 +132,9 @@ function CitizenFormPage () {
             </Stack>
             {errors && errors[dictionary.affectedComponent]
               ? (
-              <FormErrorMessage>
-                {errors[dictionary.affectedComponent].message || errors[dictionary.affectedComponent].root.message}
-              </FormErrorMessage>
+                <FormErrorMessage>
+                  {errors[dictionary.affectedComponent].message || errors[dictionary.affectedComponent].root.message}
+                </FormErrorMessage>
                 )
               : <FormHelperText>Seleccione al menos un componente</FormHelperText>
             }
@@ -214,7 +205,7 @@ function CitizenFormPage () {
           <Button
             type='submit'
             colorScheme={'teal'}
-            disabled={isSubmitting}
+            isLoading={isSubmitted}
           >
             Enviar
           </Button>

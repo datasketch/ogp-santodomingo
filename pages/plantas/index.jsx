@@ -73,6 +73,8 @@ export default function PlantsHomePage () {
         isOpen={isOpen}
         onClose={onClose}
         data={selectedData}
+        key={selectedData}
+        setSelectedData={setSelectedData}
       />}
       <Box as="div" mt={4}>
         {data.length

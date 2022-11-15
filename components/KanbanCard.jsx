@@ -12,13 +12,15 @@ function KanbanCard ({ item, data, onClick, mapper = (_) => _, children }) {
       })
     })
   )
+
   const cardData = mapper(data)
   return (
     <Box
       as="div"
       role="group"
       rounded="lg"
-      p={4}
+      px={4}
+      py={4}
       boxShadow="lg"
       cursor="grab"
       minW={200}

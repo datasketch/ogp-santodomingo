@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { Box, Button, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerFooter, DrawerHeader, DrawerOverlay, FormControl, FormHelperText, Input, Select, Stack, Tab, Table, TableContainer, TabList, TabPanel, TabPanels, Tabs, Tbody, Td, Text, Textarea, Th, Thead, Tr } from '@chakra-ui/react'
+import { Box, Button, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerFooter, DrawerHeader, DrawerOverlay, FormControl, FormHelperText, Input, Select, Stack, Tab, Table, TableContainer, TabList, TabPanel, TabPanels, Tabs, Tbody, Td, Text, Th, Thead, Tr } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import isEmpty from 'lodash.isempty'
 import PropTypes from 'prop-types'
@@ -19,12 +19,10 @@ const Map = dynamic(() => import('../../components/Map'), {
   ssr: false
 })
 
-function OrderDialog ({ isOpen, onClose, data = {} }) {
+function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
   const [headers, setHeaders] = useState([])
   const [rows, setRows] = useState([])
   const [addedPlant, setAddedPlant] = useState({})
-  const [addPlantRow, setAddPlantRow] = useState(false)
-  const [enableSave, setEnableSave] = useState(false)
   const [coordinates, setCoordinates] = useState('-0.254167, -79.1719')
   const [position, setPosition] = useState({ lat: -0.254167, lng: -79.1719 })
   const [canton, setCanton] = useState('')
@@ -34,10 +32,7 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
   const [newPlant, setNewPlant] = useState([])
   const [previousPlants, setPreviousPlants] = useState([])
 
-  const { data: inventory, error } = useSWR('/api/inventory', (url) => axios.get(url).then(res => res.data))
-  const { data: allPlants, error: plantsError } = useSWR('/api/plants-list')
-
-  const { register, handleSubmit } = useForm({
+  const { register, handleSubmit, reset, formState: { isSubmitted } } = useForm({
     mode: 'onBlur',
     defaultValues: {
       [dictionary.name]: data.name,
@@ -55,6 +50,10 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
       [dictionary.status]: data.status
     }
   })
+
+  const { data: inventory, error } = useSWR('/api/inventory', (url) => axios.get(url).then(res => res.data))
+  const { data: allPlants, error: plantsError } = useSWR('/api/plants-list')
+
   const parsedData = parseData((inventory || []), {
     omit: [
       inventoryDictionary.unitsReadyForDelivery,
@@ -90,9 +89,6 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
   if (error || plantsError) return <p>Se ha presentado un error</p>
   if (!inventory) return null
 
-  // const groupedByName = Array.from(group(inventory, d => d.Planta))
-  // const names = groupedByName.map(([name]) => name)
-
   const onSubmit = (formData, coordinates) => {
     const input = {
       ...formData,
@@ -110,7 +106,9 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
       {
         revalidate: true
       }).then(() => {
-      onClose()
+      // setTimeout(() => {
+      handleClose()
+      // }, 300)
     })
     const plants = { previousPlants, newPlant }
     updateDetails(plants)
@@ -186,21 +184,15 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
     ]
     setData(state)
   }
-  const handleCancel = () => {
-    setAddPlantRow(false)
-    setAddedPlant({})
-    setSelectedPlant({})
-    setEnableSave(false)
-  }
 
   const handleClose = () => {
-    setAddPlantRow(false)
+    onClose()
     setAddedPlant({})
     setSelectedPlant({})
-    setEnableSave(false)
     setNewPlant([])
     setPreviousPlants([])
-    onClose()
+    reset()
+    setSelectedData()
   }
 
   return (
@@ -226,14 +218,14 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
             </Box>}
           </Box>
         </DrawerHeader>
-        <DrawerBody>
+        <DrawerBody key={data}>
           <Tabs>
             <TabList>
               <Tab><Text as='b'>Información General</Text></Tab>
               <Tab><Text as='b'>Informes</Text></Tab>
               <Tab><Text as='b'>Actualizar Pedido</Text></Tab>
             </TabList>
-            <form id="edit-order" onSubmit={handleSubmit((data) => onSubmit(data, coordinates))}>
+            <form id="edit-order" key={data} onSubmit={handleSubmit((data) => onSubmit(data, coordinates))}>
               <TabPanels>
                 <TabPanel>
                   <Stack spacing={4}>
@@ -253,8 +245,13 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                       <Input type='text' {...register(dictionary.name)} />
                     </Box>
                     <Box fontSize="md">
-                      <Text letterSpacing="wide">Nombre beneficiario</Text>
-                      <Input type='date' {...register(dictionary.date)} value={format(new Date(data.date).getTime(), 'yyyy-MM-dd')} />
+                      <Text letterSpacing="wide">Fecha</Text>
+                      <Input
+                        type='date'
+                        {...register(dictionary.date, {
+                          value: format(new Date(data.date).getTime(), 'yyyy-MM-dd')
+                        })}
+                      />
                     </Box>
 
                     <Box fontSize="md">
@@ -263,7 +260,7 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                     </Box>
 
                     <Box fontSize="md">
-                      <Text letterSpacing="wide">Contacto</Text>
+                      <Text letterSpacing="wide">Teléfono de contacto</Text>
                       <Input {...register(dictionary.phoneNumber)} />
                     </Box>
 
@@ -276,9 +273,9 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                       <Text letterSpacing="wide">Cantón</Text>
                       <Select
                         placeholder='Seleccione una opción'
-                        {...register(dictionary.canton)}
-                        onChange={(e) => setCanton(e.target.value)}
-                        defaultChecked={data.canton}
+                        {...register(dictionary.canton, {
+                          onChange: (e) => setCanton(e.target.value)
+                        })}
                       >
                         {['Santo Domingo', 'La Concordia'].map(el =>
                           <option key={el} value={el}>{el}</option>
@@ -290,7 +287,8 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                       <Text letterSpacing="wide">Parroquia</Text>
                       <Select
                         placeholder='Seleccione una opción'
-                        {...register(dictionary.parish)}>
+                        {...register(dictionary.parish)}
+                      >
                         {parishesPlants[canton]?.map(el =>
                           <option key={el} value={el}>{el}</option>
                         )}
@@ -328,12 +326,6 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                       </Tbody>
                     </Table>
                   </TableContainer>
-                  <DrawerFooter>
-                    <Button variant='outline' mr={3} onClick={handleClose}>
-                      Cancelar
-                    </Button>
-                    <Button form="edit-order" colorScheme='blue' type="submit">Guardar</Button>
-                  </DrawerFooter>
                 </TabPanel>
                 <TabPanel>
                   <Stack spacing={4}>
@@ -341,20 +333,9 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                       <Text letterSpacing="wide">Subsidio o venta</Text>
                       <Input type='text' {...register(dictionary.subsidy)} />
                     </Box>
-
-                    <Box fontSize="md">
-                      <Text letterSpacing="wide">Informe</Text>
-                      <Textarea {...register(dictionary.report)} resize='none' />
-                    </Box>
-
                     <Box fontSize="md">
                       <Text letterSpacing="wide">Colaboradores</Text>
                       <Input type='text' {...register(dictionary.collaborators)} />
-                    </Box>
-
-                    <Box fontSize="md">
-                      <Text letterSpacing="wide">Arboles sembrados</Text>
-                      <Input type='text' {...register(dictionary.plantedTrees)} />
                     </Box>
 
                     <Box fontSize="md">
@@ -366,7 +347,7 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
 
                     <Box fontSize="md">
                       <Text letterSpacing="wide">Fecha de medición</Text>
-                      <Input type='date' {...register(dictionary.measurementDate, { value: data.measurementDate, valueAsDate: true })} value={format(new Date(data.measurementDate).getTime(), 'yyyy-MM-dd')} />
+                      <Input type='date' {...register(dictionary.measurementDate, { value: data.measurementDate, valueAsDate: true })} defaultValue={format(new Date(data.measurementDate).getTime(), 'yyyy-MM-dd')} />
                     </Box>
 
                     <Box fontSize="md">
@@ -374,12 +355,7 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                       <Input type='text' {...register(dictionary.actor)} />
                     </Box>
                   </Stack>
-                  <DrawerFooter>
-                    <Button variant='outline' mr={3} onClick={handleClose}>
-                      Cancelar
-                    </Button>
-                    <Button form="edit-order" colorScheme='blue' type="submit">Guardar</Button>
-                  </DrawerFooter>
+
                 </TabPanel>
                 <TabPanel>
                   <TableContainer>
@@ -395,7 +371,7 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                       </Thead>
                       <Tbody style={{ overflowY: 'scroll' }}>
                         {parsedData.data.map(([plant, container, inventory], index) => (
-                          <Tr key={index}>
+                          <Tr key={plant + '-' + index}>
                             <Td>
                               {plant}
                             </Td>
@@ -407,9 +383,9 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                                 <Input
                                   type="number"
                                   defaultValue={calculateDefaultValue(plant, container, data?.details) || 0}
-                                  max={inventory}
+                                  max={inventory + calculateDefaultValue(plant, container, data?.details)}
                                   min={0}
-                                  onChange={event => handlePlantsSelect(event, index, plant, container)}
+                                  onInput={event => handlePlantsSelect(event, index, plant, container)}
                                 />
                                 <FormHelperText>
                                   Hay {inventory} unidades disponibles
@@ -425,7 +401,7 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
                     <Button variant='outline' mr={3} onClick={handleClose}>
                       Cancelar
                     </Button>
-                    <Button form="edit-order" colorScheme='blue' type="submit">Guardar</Button>
+                    <Button colorScheme='teal' type="submit" isLoading={isSubmitted} >Guardar</Button>
                   </DrawerFooter>
                 </TabPanel>
               </TabPanels>
@@ -440,7 +416,8 @@ function OrderDialog ({ isOpen, onClose, data = {} }) {
 OrderDialog.propTypes = {
   data: PropTypes.object,
   isOpen: PropTypes.bool,
-  onClose: PropTypes.func
+  onClose: PropTypes.func,
+  setSelectedData: PropTypes.func
 }
 
 export default OrderDialog

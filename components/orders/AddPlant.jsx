@@ -6,11 +6,12 @@ import { toast } from 'react-hot-toast'
 import useSWR, { mutate } from 'swr'
 import { useForm } from 'react-hook-form'
 import { growingPlantsDictionary as d } from '../../utils/orders/dictionary'
+import { gardenStatusEnum } from '../../utils/orders/enum'
 
 // eslint-disable-next-line react/prop-types
 function AddPlant ({ isOpen, btnRef, onClose }) {
   const { data, error } = useSWR('/api/plants-list', (url) => axios.get(url).then(res => res.data))
-  const { handleSubmit, register, reset } = useForm({
+  const { handleSubmit, register, reset, formState: { isSubmitted } } = useForm({
     mode: 'onBlur'
   })
   const [showContainerInput, setShowContainerInput] = useState(false)
@@ -43,7 +44,7 @@ function AddPlant ({ isOpen, btnRef, onClose }) {
     }
     const input = {
       ...data,
-      'Estado vivero': 'Creciendo',
+      [d.gardenStatus]: gardenStatusEnum.TRANSPLANTED,
       Planta: plantObject.id,
       [d.transplantDate]: data[d.transplantDate] || null,
       [d.deliveryDate]: data[d.deliveryDate] || null
@@ -151,6 +152,7 @@ function AddPlant ({ isOpen, btnRef, onClose }) {
               <Button
                 type='submit'
                 colorScheme={'teal'}
+                isLoading={isSubmitted}
               >
                 Enviar
               </Button>

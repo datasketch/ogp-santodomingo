@@ -1,6 +1,7 @@
 import { Box, Button, Heading, Input, Text } from '@chakra-ui/react'
 import Layout from '../../components/complaints/Layout'
 import { Grid } from 'gridjs-react'
+
 import useSWR from 'swr'
 import axios from 'axios'
 import { group } from 'd3-array'
@@ -9,6 +10,7 @@ import { dictionary } from '../../utils/complaints/dictionary'
 import { parseData } from '../../utils'
 import 'gridjs/dist/theme/mermaid.css'
 import useFilterByDate from '../../hooks/use-filtered-data'
+import DownloadCSV from '../../components/DownloadCSV'
 
 function Summary () {
   const { data, error } = useSWR('/api/complaints', (url) => axios.get(url).then(res => res.data))
@@ -20,7 +22,7 @@ function Summary () {
     startDateChangeHandler,
     endDateChangeHandler,
     clearInputsClickHandler,
-    filteredData
+    filteredData = []
   } = useFilterByDate(data)
 
   if (error) return <Text align="center" color="red">Se ha presentado un error</Text>
@@ -52,7 +54,7 @@ function Summary () {
       <Box mt={6}>
         <Box display="flex" rowGap={6} flexDirection={{ base: 'column', lg: 'row' }} alignItems="center" justifyContent="space-between" mb={4}>
           <Heading color="gray.700">Reporte</Heading>
-          <Box display="flex" alignItems="center" flexWrap="wrap" justifyContent="space-between" rowGap={4} columnGap={{ xl: 10 }}>
+          <Box display="flex" alignItems="center" flexWrap="wrap" justifyContent="space-between" rowGap={4} columnGap={{ xl: 6 }}>
             <Box display="flex" width={{ base: '45%', lg: '30%', xl: 'auto' }} alignItems="center" columnGap={1}>
               <Text flexShrink={0}>Desde: </Text>
               <Input type="date" value={startDate} max={currentDate} onChange={startDateChangeHandler} />
@@ -64,8 +66,10 @@ function Summary () {
             <Button width={{ base: '100%', lg: '30%', xl: 'auto' }} colorScheme='blackAlpha' variant='outline' onClick={clearInputsClickHandler}>
               Restablecer filtros
             </Button>
+            <DownloadCSV data={dataTable} label='reporte_denuncias'/>
           </Box>
         </Box>
+
         <Grid
           {...parseData(dataTable, {
             omit: []
@@ -75,6 +79,7 @@ function Summary () {
           sort
           autoWidth
         />
+
       </Box>
     </>
   )

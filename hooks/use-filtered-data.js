@@ -6,6 +6,8 @@ function useFilterByDate (data, type) {
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
 
+  if (!data || !data.length) return {}
+
   // VARIABLES
   const currentDate = format(new Date(), 'yyyy-MM-dd')
   const hasDateFilter = startDate || endDate

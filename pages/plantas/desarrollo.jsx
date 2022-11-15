@@ -18,14 +18,17 @@ import { growingPlantsDictionary as dict } from '../../utils/orders/dictionary'
 import { gardenStatusEnum } from '../../utils/orders/enum'
 import { mapGrowingPlant } from '../../utils/orders/mapper'
 import useFilterByDate from '../../hooks/use-filtered-data'
+import { removeAccents } from '../../utils/orders'
 
 function GrowingPlantsPage () {
-  const { data, error, mutate } = useSWR('/api/plants', (url) => axios.get(url).then(res => res.data))
+  const { data = [], error, mutate } = useSWR('/api/plants', (url) => axios.get(url).then(res => res.data))
   const { isOpen: isOpenAddPlant, onOpen: onOpenAddPlant, onClose: onCloseAddPlant } = useDisclosure()
   const { isOpen: isOpenUpdatePlant, onOpen: onOpenUpdatePlant, onClose: onCloseUpdatePlant } = useDisclosure()
   const addPlant = useRef()
   const updatePlant = useRef()
   const [selectedData, setSelectedData] = useState()
+  const [search, setSearch] = useState('')
+
   const {
     startDate,
     endDate,
@@ -35,12 +38,16 @@ function GrowingPlantsPage () {
     clearInputsClickHandler,
     filteredData
   } = useFilterByDate(data, dict.transplantDate)
+  const filteredPlants = filteredData?.filter(({ Planta }) => {
+    const normalized = removeAccents(Planta).toLowerCase()
+    return normalized.includes(removeAccents(search).toLowerCase())
+  })
 
   if (error) return <Text align="center" color="red">Se ha presentado un error</Text>
 
   if (!data) return <Text align="center">Cargando tablero de gestión...</Text>
 
-  const columns = groupBy(filteredData, dict.gardenStatus)
+  const columns = groupBy(filteredPlants, dict.gardenStatus)
 
   const handleDrop = async (id, target) => {
     const update = [...data]
@@ -71,6 +78,11 @@ function GrowingPlantsPage () {
     onOpenUpdatePlant()
   }
 
+  const handleSearch = ({ target }) => {
+    const { value } = target
+    setSearch(value)
+  }
+
   return (
     <>
       <Box as="div" mt={4}>
@@ -90,7 +102,11 @@ function GrowingPlantsPage () {
                     +Agregar
                   </Button>
                 </Box>
-                <Box display="flex" gap={4} flexDirection={{ base: 'column', lg: 'row' }}>
+                <Box display="flex" alignContent={'center'} gap={4} flexDirection={{ base: 'column', lg: 'row' }}>
+                  <Box>
+                    <div style={{ height: '24px' }}></div>
+                    <Input type="text" placeholder='Buscar planta...' onChange={handleSearch} />
+                  </Box>
                   <Box>
                     <Text flexShrink={0}>Desde :</Text>
                     <Input type="date" value={startDate} max={currentDate} onChange={startDateChangeHandler} />
