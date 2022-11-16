@@ -27,10 +27,10 @@ function OrderCardContent ({ data }) {
             </Box>
           )}
           {data.details && data.details.length && (
-            <Box>
+            <Box data-details={JSON.stringify(data.details)}>
               <Text fontSize="xs" letterSpacing="wide">Total plantas</Text>
               <Badge fontSize="xx-small" rounded="2xl" py={1} px={2}>
-                {data.details.length}
+                {data.details.reduce((acc, item) => acc + item.qty, 0)}
               </Badge>
             </Box>
           )}
