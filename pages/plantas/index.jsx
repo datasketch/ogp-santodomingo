@@ -80,8 +80,8 @@ export default function PlantsHomePage () {
         {data.length
           ? (
             <>
-              <Stack display="flex" flexDir={{ base: 'column', lg: 'row' }} justifyContent={{ lg: 'space-between' }} spacing={{ base: 4, lg: 0 }} mb={8}>
-                <Box display="flex" columnGap={4} alignItems="center" justifyContent={{ base: 'space-between', lg: 'start' }} alignSelf={{ lg: 'self-end' }}>
+              <Stack dir="row" flexDir={{ base: 'column', lg: 'row' }} justifyContent={{ lg: 'space-between' }} spacing={{ base: 4, lg: 0 }} mb={8} align={{ lg: 'flex-start' }}>
+                <Box display="flex" columnGap={4} alignItems="center" justifyContent={{ base: 'space-between', lg: 'start' }}>
                   <Heading color="gray.700">Tablero de órdenes</Heading>
                   <Button
                     size={'sm'}
@@ -93,18 +93,21 @@ export default function PlantsHomePage () {
                     +Agregar
                   </Button>
                 </Box>
-                <Box display="flex" gap={4} flexDirection={{ base: 'column', lg: 'row' }}>
-                  <Box>
-                    <Text flexShrink={0}>Desde :</Text>
-                    <Input type="date" value={startDate} max={currentDate} onChange={startDateChangeHandler} />
+                <Box>
+                  <Box display="flex" gap={4} flexDirection={{ base: 'column', lg: 'row' }}>
+                    <Box>
+                      <Text flexShrink={0}>Desde :</Text>
+                      <Input type="date" value={startDate} max={currentDate} onChange={startDateChangeHandler} />
+                    </Box>
+                    <Box>
+                      <Text flexShrink={0}>Hasta :</Text>
+                      <Input type="date" value={endDate} max={currentDate} min={startDate} onChange={endDateChangeHandler} />
+                    </Box>
+                    <Button width={{ base: '100%', lg: '30%', xl: 'auto' }} colorScheme='blackAlpha' variant='outline' alignSelf={{ lg: 'self-end' }} onClick={clearInputsClickHandler}>
+                      Restablecer filtros
+                    </Button>
                   </Box>
-                  <Box>
-                    <Text flexShrink={0}>Hasta :</Text>
-                    <Input type="date" value={endDate} max={currentDate} min={startDate} onChange={endDateChangeHandler} />
-                  </Box>
-                  <Button width={{ base: '100%', lg: '30%', xl: 'auto' }} colorScheme='blackAlpha' variant='outline' alignSelf={{ lg: 'self-end' }} onClick={clearInputsClickHandler}>
-                    Restablecer filtros
-                  </Button>
+                  <Text fontSize={'sm'}>Este filtro combina fecha de orden y fecha de entrega</Text>
                 </Box>
               </Stack>
               <KanbanBoard>

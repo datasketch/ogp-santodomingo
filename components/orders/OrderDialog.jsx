@@ -22,12 +22,10 @@ const Map = dynamic(() => import('../../components/Map'), {
 function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
   const [headers, setHeaders] = useState([])
   const [rows, setRows] = useState([])
-  const [addedPlant, setAddedPlant] = useState({})
   const [coordinates, setCoordinates] = useState('-0.254167, -79.1719')
   const [position, setPosition] = useState({ lat: -0.254167, lng: -79.1719 })
   const [canton, setCanton] = useState('')
 
-  const [selectedPlant, setSelectedPlant] = useState({})
   const [plants, setPlants] = useState([])
   const [newPlant, setNewPlant] = useState([])
   const [previousPlants, setPreviousPlants] = useState([])
@@ -43,12 +41,12 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
       [dictionary.subsidy]: data.subsidy,
       [dictionary.collaborators]: data.collaborators,
       [dictionary.survival]: data.survival,
-      [dictionary.measurementDate]: data.measurementDate,
+      [dictionary.measurementDate]: data.measurementDate ? format(new Date(data.measurementDate), 'yyyy-MM-dd') : '',
       [dictionary.location]: data.location,
       [dictionary.actor]: data.actor,
       [dictionary.parish]: data.parish,
       [dictionary.status]: data.status,
-      [dictionary.deliveryDate]: data.deliveryDate
+      [dictionary.deliveryDate]: data.deliveryDate ? format(new Date(data.deliveryDate), 'yyyy-MM-dd') : ''
     }
   })
 
@@ -167,8 +165,6 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
 
   const handleClose = () => {
     onClose()
-    setAddedPlant({})
-    setSelectedPlant({})
     setNewPlant([])
     setPreviousPlants([])
     reset()
@@ -327,12 +323,22 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
 
                     <Box fontSize="md">
                       <Text letterSpacing="wide">Fecha de medición</Text>
-                      <Input type='date' {...register(dictionary.measurementDate, { value: data.measurementDate, valueAsDate: true })} defaultValue={format(new Date(data.measurementDate).getTime(), 'yyyy-MM-dd')} />
+                      <Input
+                        type='date'
+                        {...register(dictionary.measurementDate, {
+                          valueAsDate: true
+                        })}
+                      />
                     </Box>
 
                     <Box fontSize="md">
                       <Text letterSpacing="wide">Fecha de entrega</Text>
-                      <Input type='date' {...register(dictionary.deliveryDate, { value: data.deliveryDate, valueAsDate: true })} defaultValue={format(new Date(data.deliveryDate).getTime(), 'yyyy-MM-dd')} />
+                      <Input
+                        type='date'
+                        {...register(dictionary.deliveryDate, {
+                          valueAsDate: true
+                        })}
+                      />
                     </Box>
 
                     <Box fontSize="md">

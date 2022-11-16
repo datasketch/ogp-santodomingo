@@ -22,7 +22,7 @@ function OrderCardContent ({ data }) {
         <Stack w="full" direction={{ base: 'column', lg: 'row' }} justify="space-between" align="flex-start">
           {data.date && (
             <Box>
-              <Text fontSize="xs" letterSpacing="wide">Fecha</Text>
+              <Text fontSize="xs" letterSpacing="wide">Fecha de orden</Text>
               <Text fontSize="small" fontWeight="semibold">{format(new Date(data.date), 'MMMM dd, yyyy', { locale: es })}</Text>
             </Box>
           )}
@@ -35,6 +35,12 @@ function OrderCardContent ({ data }) {
             </Box>
           )}
         </Stack>
+      )}
+      {(data.deliveryDate) && (
+        <Box>
+          <Text fontSize="xs" letterSpacing="wide">Fecha de entrega</Text>
+          <Text fontSize="small" fontWeight="semibold">{format(new Date(data.deliveryDate), 'MMMM dd, yyyy', { locale: es })}</Text>
+        </Box>
       )}
       {data.canton && (
         <Box>
