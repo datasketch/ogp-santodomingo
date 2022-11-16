@@ -47,7 +47,8 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
       [dictionary.location]: data.location,
       [dictionary.actor]: data.actor,
       [dictionary.parish]: data.parish,
-      [dictionary.status]: data.status
+      [dictionary.status]: data.status,
+      [dictionary.deliveryDate]: data.deliveryDate
     }
   })
 
@@ -90,28 +91,34 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
   if (!inventory) return null
 
   const onSubmit = (formData, coordinates) => {
+    const toastId = toast.loading('Actualizando base de datos')
     const input = {
       ...formData,
       [dictionary.location]: coordinates,
       id: data.id
     }
-    const op = axios.patch('/api/orders', input)
     mutate(
       '/api/orders',
-      () => toast.promise(op, {
-        loading: 'Actualizando base de datos',
-        success: () => 'Guardado',
-        error: () => 'Se ha presentado un error'
-      }),
+      async () => {
+        try {
+          const response = await axios.patch('/api/orders', input)
+          const plants = { previousPlants, newPlant }
+          await axios.patch('/api/details', plants)
+          toast.dismiss(toastId)
+          toast.success('Guardado')
+          return response.data
+        } catch (error) {
+          toast.dismiss(toastId)
+          toast.error('Se ha presentado un error')
+        }
+      },
       {
-        revalidate: true
-      }).then(() => {
-      // setTimeout(() => {
+        revalidate: true,
+        rollbackOnError: true
+      }
+    ).then(() => {
       handleClose()
-      // }, 300)
     })
-    const plants = { previousPlants, newPlant }
-    updateDetails(plants)
   }
 
   const calculateDefaultValue = (plant, container, array) => {
@@ -140,33 +147,6 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
     }
 
     updateState(previousPlants, input, setPreviousPlants)
-  }
-
-  const updateDetails = (input) => {
-    const op = axios.patch('/api/details', input)
-    mutate(
-      '/api/orders',
-      () => (
-        toast.promise(op, {
-          loading: 'Enviando...',
-          success: 'Guardado',
-          error: error => {
-            console.log(error)
-            return 'Se ha presentado un error'
-          }
-        })
-      ),
-      {
-        revalidate: true,
-        rollbackOnError: true
-      }
-    ).then(() => {
-      setRows(prevState => ([
-        ...prevState,
-        ['', selectedPlant.Planta, addedPlant.Cantidad, selectedPlant.Contenedor, selectedPlant.Tipo]
-      ]))
-      handleClose()
-    })
   }
 
   const updateState = (previousData = [], input = {}, setData) => {
@@ -351,6 +331,11 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
                     </Box>
 
                     <Box fontSize="md">
+                      <Text letterSpacing="wide">Fecha de entrega</Text>
+                      <Input type='date' {...register(dictionary.deliveryDate, { value: data.deliveryDate, valueAsDate: true })} defaultValue={format(new Date(data.deliveryDate).getTime(), 'yyyy-MM-dd')} />
+                    </Box>
+
+                    <Box fontSize="md">
                       <Text letterSpacing="wide">Actor</Text>
                       <Input type='text' {...register(dictionary.actor)} />
                     </Box>
@@ -401,7 +386,7 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
                     <Button variant='outline' mr={3} onClick={handleClose}>
                       Cancelar
                     </Button>
-                    <Button colorScheme='teal' type="submit" isLoading={isSubmitted} >Guardar</Button>
+                    <Button colorScheme='teal' type="submit" isLoading={isSubmitted}>Guardar</Button>
                   </DrawerFooter>
                 </TabPanel>
               </TabPanels>
