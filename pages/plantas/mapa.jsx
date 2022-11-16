@@ -29,7 +29,7 @@ export default function DeliveredMap () {
     endDateChangeHandler,
     clearInputsClickHandler,
     filteredData
-  } = useFilterByDate(delivered, dictionary.deliveryDate)
+  } = useFilterByDate(delivered, '', dictionary.deliveryDate)
 
   if (error) return <Text align="center" color="red">Se ha presentado un error</Text>
 

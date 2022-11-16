@@ -37,7 +37,7 @@ function GrowingPlantsPage () {
     endDateChangeHandler,
     clearInputsClickHandler,
     filteredData
-  } = useFilterByDate(data, dict.transplantDate)
+  } = useFilterByDate(data, '', dict.transplantDate)
   const filteredPlants = filteredData?.filter(({ Planta }) => {
     const normalized = removeAccents(Planta).toLowerCase()
     return normalized.includes(removeAccents(search).toLowerCase())

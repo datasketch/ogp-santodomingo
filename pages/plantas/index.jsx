@@ -30,7 +30,7 @@ export default function PlantsHomePage () {
     endDateChangeHandler,
     clearInputsClickHandler,
     filteredData
-  } = useFilterByDate(data, dictionary.date)
+  } = useFilterByDate(data, 'plants', dictionary.date, dictionary.deliveryDate)
 
   if (error) return <Text align="center" color="red">Se ha presentado un error</Text>
 

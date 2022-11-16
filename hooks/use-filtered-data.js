@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { addDays, format, isAfter, isBefore, isEqual } from 'date-fns'
 
-function useFilterByDate (data, type) {
+function useFilterByDate (data, type = '', date, delivery) {
   // STATES
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
@@ -27,19 +27,64 @@ function useFilterByDate (data, type) {
     const startDateFormat = startDate ? format(addDays(new Date(startDate), 1), 'yyyy-MM-dd') : null
     const endDateFormat = endDate ? format(addDays(new Date(endDate), 1), 'yyyy-MM-dd') : null
 
+    if (type === 'plants') {
+      return data.filter(item => {
+        const dateType = format(new Date(item[date]), 'yyyy-MM-dd')
+        const deliveryDate = format(new Date(item[delivery]), 'yyyy-MM-dd')
+
+        if (startDateFormat && !endDateFormat) {
+          const validation = ((isBefore(new Date(startDateFormat), new Date(dateType)) || isBefore(new Date(startDateFormat), new Date(deliveryDate))) ||
+            ((isEqual(new Date(startDateFormat), new Date(dateType)) && isAfter(new Date(currentDate), new Date(dateType))) || (isEqual(new Date(startDateFormat), new Date(deliveryDate)) && isAfter(new Date(currentDate), new Date(deliveryDate)))) ||
+            (isEqual(new Date(currentDate), new Date(dateType)) ||
+              isEqual(new Date(currentDate), new Date(deliveryDate))))
+          return validation
+        }
+
+        if (!startDateFormat && endDateFormat) {
+          const validation = (
+            (isAfter(new Date(endDateFormat), new Date(dateType)) ||
+              isAfter(new Date(endDateFormat), new Date(deliveryDate))) ||
+            (isEqual(new Date(endDateFormat), new Date(dateType)) ||
+              isEqual(new Date(endDateFormat), new Date(deliveryDate)))
+          )
+          return validation
+        }
+
+        if (startDateFormat && endDateFormat) {
+          const validation = (
+            (isBefore(new Date(startDateFormat), new Date(dateType)) || isBefore(new Date(startDateFormat), new Date(deliveryDate))) ||
+            ((isEqual(new Date(startDateFormat), new Date(dateType)) && isAfter(new Date(endDateFormat), new Date(dateType))) ||
+              (isEqual(new Date(startDateFormat), new Date(deliveryDate)) && isAfter(new Date(endDateFormat), new Date(deliveryDate)))) ||
+            ((isEqual(new Date(endDateFormat), new Date(dateType))) || (isEqual(new Date(endDateFormat), new Date(deliveryDate))))
+          )
+          return validation
+        }
+      })
+    }
     return data.filter(item => {
-      const dateType = format(new Date(item[type]), 'yyyy-MM-dd')
+      const dateType = format(new Date(item[date]), 'yyyy-MM-dd')
 
       if (startDateFormat && !endDateFormat) {
-        return (isBefore(new Date(startDateFormat), new Date(dateType)) || (isEqual(new Date(startDateFormat), new Date(dateType)))) && (isAfter(new Date(currentDate), new Date(dateType)) || (isEqual(new Date(currentDate), new Date(dateType))))
+        return (
+          isBefore(new Date(startDateFormat), new Date(dateType)) ||
+          (isEqual(new Date(startDateFormat), new Date(dateType)) && isAfter(new Date(currentDate), new Date(dateType))) ||
+          isEqual(new Date(currentDate), new Date(dateType))
+        )
       }
 
       if (!startDateFormat && endDateFormat) {
-        return isAfter(new Date(endDateFormat), new Date(dateType)) || isEqual(new Date(endDateFormat), new Date(dateType))
+        return (
+          isAfter(new Date(endDateFormat), new Date(dateType)) ||
+          isEqual(new Date(endDateFormat), new Date(dateType))
+        )
       }
 
       if (startDateFormat && endDateFormat) {
-        return (isBefore(new Date(startDateFormat), new Date(dateType)) || (isEqual(new Date(startDateFormat), new Date(dateType)))) && (isAfter(new Date(endDateFormat), new Date(dateType)) || (isEqual(new Date(endDateFormat), new Date(dateType))))
+        return (
+          isBefore(new Date(startDateFormat), new Date(dateType)) ||
+          (isEqual(new Date(startDateFormat), new Date(dateType)) && isAfter(new Date(endDateFormat), new Date(dateType))) ||
+          isEqual(new Date(endDateFormat), new Date(dateType))
+        )
       }
     })
   }
