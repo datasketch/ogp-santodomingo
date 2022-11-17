@@ -28,8 +28,6 @@ function useFilterByDate (data, type = '', date, delivery) {
       return data.filter(item => {
         const itemDate = format(new Date(item[date]), 'yyyy-MM-dd')
         const deliveryDate = item[delivery] ? format(new Date(item[delivery]), 'yyyy-MM-dd') : null
-        console.log(deliveryDate)
-        console.log(deliveryDate)
         if (startDateFormat && !endDateFormat) {
           const validation = (
             isAfter(new Date(itemDate), new Date(startDateFormat)) ||
