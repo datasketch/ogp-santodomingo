@@ -17,6 +17,7 @@ export const dictionary = {
   actor: 'Actor',
   report: 'Informe',
   plantedTrees: 'Arboles sembrados',
+  typeBeneficiary: 'Tipo de Beneficiario',
   createdAt: 'created_at',
   updatedAt: 'updated_at',
   id: 'id'
@@ -49,3 +50,13 @@ export const inventoryDictionary = {
   unitsDelivered: 'Unidades entregadas',
   type: 'Tipo'
 }
+
+export const typeBeneficiary = [
+  'Unidades Educativas',
+  'Personas Naturales',
+  'Instituciones públicas',
+  'Empresas Privadas',
+  'Ferias y Eventos',
+  'Campañas de Educación Ambiental',
+  'Otras'
+]

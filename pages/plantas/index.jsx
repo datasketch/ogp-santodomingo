@@ -15,6 +15,7 @@ import OrderDialog from '../../components/orders/OrderDialog'
 import Layout from '../../components/orders/Layout'
 import NewOrder from '../../components/orders/NewOrder'
 import useFilterByDate from '../../hooks/use-filtered-data'
+import { removeAccents } from '../../utils/orders'
 
 export default function PlantsHomePage () {
   const { data, error, mutate } = useSWR('/api/orders', (url) => axios.get(url).then(res => res.data))
@@ -22,6 +23,7 @@ export default function PlantsHomePage () {
   const { isOpen: isOpen2, onOpen: onOpen2, onClose: onClose2 } = useDisclosure()
   const btnRef = useRef()
   const [selectedData, setSelectedData] = useState()
+  const [query, setQuery] = useState('')
   const {
     startDate,
     endDate,
@@ -35,8 +37,6 @@ export default function PlantsHomePage () {
   if (error) return <Text align="center" color="red">Se ha presentado un error</Text>
 
   if (!data) return <Text align="center">Cargando tablero de gestión...</Text>
-
-  const columns = groupBy(filteredData, dictionary.status)
 
   const handleDrop = async (id, target) => {
     const update = [...data]
@@ -67,6 +67,24 @@ export default function PlantsHomePage () {
     setSelectedData(data)
   }
 
+  const cleanFilters = () => {
+    clearInputsClickHandler()
+    setQuery('')
+  }
+
+  function filterByQuery ({ [dictionary.order]: orden, [dictionary.name]: nombre }) {
+    if (query === '') return true
+    return orden === +query || removeAccents(nombre)?.includes(removeAccents(query))
+  }
+
+  const filterDataByQuery = filteredData.filter(filterByQuery)
+
+  const handleQuery = ({ target }) => {
+    const { value } = target
+    setQuery(value)
+  }
+  const columns = groupBy(filterDataByQuery, dictionary.status)
+
   return (
     <>
       {selectedData && <OrderDialog
@@ -95,6 +113,10 @@ export default function PlantsHomePage () {
                 </Box>
                 <Box display="flex" gap={4} flexDirection={{ base: 'column', lg: 'row' }}>
                   <Box>
+                    <Text flexShrink={0}>Nombre de beneficiario / #Orden</Text>
+                    <Input type="text" value={query} onChange={handleQuery} placeholder='Buscar...'/>
+                  </Box>
+                  <Box>
                     <Text flexShrink={0}>Desde :</Text>
                     <Input type="date" value={startDate} max={currentDate} onChange={startDateChangeHandler} />
                   </Box>
@@ -102,7 +124,7 @@ export default function PlantsHomePage () {
                     <Text flexShrink={0}>Hasta :</Text>
                     <Input type="date" value={endDate} max={currentDate} min={startDate} onChange={endDateChangeHandler} />
                   </Box>
-                  <Button width={{ base: '100%', lg: '30%', xl: 'auto' }} colorScheme='blackAlpha' variant='outline' alignSelf={{ lg: 'self-end' }} onClick={clearInputsClickHandler}>
+                  <Button width={{ base: '100%', lg: '30%', xl: 'auto' }} colorScheme='blackAlpha' variant='outline' alignSelf={{ lg: 'self-end' }} onClick={cleanFilters}>
                     Restablecer filtros
                   </Button>
                 </Box>
@@ -116,13 +138,14 @@ export default function PlantsHomePage () {
                     cards={columns[status] || []}
                     onDrop={handleDrop}
                   >
+
                     {(columns[status] || []).map(data => (
                       <KanbanCard
-                        key={data.id}
-                        item={{ id: data.id, status: data[dictionary.status] }}
-                        data={data}
-                        mapper={mapOrder}
-                        onClick={() => handleClick(mapOrder(data))}
+                      key={data.id}
+                      item={{ id: data.id, status: data[dictionary.status] }}
+                      data={data}
+                      mapper={mapOrder}
+                      onClick={() => handleClick(mapOrder(data))}
                       >
                         {(data) => (
                           <OrderCardContent data={data} />

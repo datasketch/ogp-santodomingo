@@ -18,7 +18,6 @@ function InventoryPage () {
   return (
     <Box position="relative">
       <Box display={'flex'} justifyContent='space-between'>
-
       <Heading color="gray.700" >Inventario
       </Heading>
         <DownloadCSV data={data} label='inventario' />

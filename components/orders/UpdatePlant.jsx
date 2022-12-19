@@ -126,7 +126,7 @@ function UpdatePlant ({ isOpen, btnRef, onClose, data = {}, setData }) {
                   {...register(d.gardenStatus)}
                 >
                   {Object.values(gardenStatusEnum).map(status => (
-                    <option key={status} value={status}>{status}</option>
+                    <option key={status} selected={data.gardenStatus === status} value={status}>{status}</option>
                   ))}
                 </Select>
               </FormControl>
