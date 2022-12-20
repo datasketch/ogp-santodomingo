@@ -4,7 +4,6 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import axios from 'axios'
 import dynamic from 'next/dynamic'
-import isEmail from 'validator/lib/isEmail'
 import toast from 'react-hot-toast'
 import Layout from '../../components/complaints/Layout'
 import { complainantTypes, complaintStatuses, complaintTypes, affectedComponents, parishes, defendantTypes, sectors } from '../../utils/complaints'
@@ -89,12 +88,10 @@ function PublicServantFormPage () {
             </FormControl>
           )}
           <FormControl
-            isInvalid={errors && errors[dictionary.email]}
+            // isInvalid={errors && errors[dictionary.email]}
           >
             <FormLabel>Email</FormLabel>
-            <Input type="email" {...register(dictionary.email, {
-              validate: v => isEmail(v) || 'Por favor introduzca un email válido'
-            })} />
+            <Input type="email" {...register(dictionary.email)} />
             { errors && errors[dictionary.email] && (
                 <FormErrorMessage>
                   {errors[dictionary.email].message}
@@ -128,13 +125,9 @@ function PublicServantFormPage () {
               ))}
             </Select>
           </FormControl>
-          <FormControl isRequired>
+          <FormControl>
             <FormLabel>Fecha de denuncia</FormLabel>
             <Input type="date" {...register(dictionary.complaintDate)} />
-          </FormControl>
-          <FormControl isRequired>
-            <FormLabel>Iniciales funcionario receptor</FormLabel>
-            <Input {...register(dictionary.receivingOfficer)} />
           </FormControl>
           <FormControl>
             <FormLabel>Fecha del incidente</FormLabel>
@@ -216,6 +209,10 @@ function PublicServantFormPage () {
           <FormControl isRequired>
             <FormLabel>Nombre del denunciado</FormLabel>
             <Input {...register(dictionary.defendantName)} />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Actividad denunciada</FormLabel>
+            <Input {...register(dictionary.reportedActivity)} />
           </FormControl>
           <FormControl>
             <FormLabel>Descripción del acto que se denuncia</FormLabel>

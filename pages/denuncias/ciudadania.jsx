@@ -189,6 +189,10 @@ function CitizenFormPage () {
             <Input {...register(dictionary.defendantName)} />
           </FormControl>
           <FormControl>
+            <FormLabel>Actividad denunciada</FormLabel>
+            <Input {...register(dictionary.reportedActivity)} />
+          </FormControl>
+          <FormControl>
             <FormLabel>Descripción del acto que se denuncia</FormLabel>
             <Textarea {...register(dictionary.description)} />
           </FormControl>
@@ -201,6 +205,20 @@ function CitizenFormPage () {
                 setCoordinates(`${lat}, ${lng}`)
               }}
             />
+          </FormControl>
+          <Box>
+            <p><b>Aviso de responsabilidad:</b> Recuerde que toda información falsa será sancionada y puede incurrir en procesos legales.</p>
+          </Box>
+          <FormControl isRequired display={'inline-flex'} alignItems='center' >
+            <Checkbox
+              alignSelf={'start'}
+              marginTop='1.5'
+              marginRight='1.5'
+              colorScheme={'teal'}
+              {...register(dictionary.informationStatement)} />
+            <FormLabel>
+              Declaro que toda la información proporcionada es verdadera, correcta, y puede ser verificada
+            </FormLabel>
           </FormControl>
           <Button
             type='submit'

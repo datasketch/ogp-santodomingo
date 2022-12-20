@@ -1,6 +1,6 @@
 import { icon } from 'leaflet'
 import PropTypes from 'prop-types'
-import { MapContainer, Marker, TileLayer } from 'react-leaflet'
+import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-leaflet'
 import { useMemo, useRef, useState } from 'react'
 import { Box, FormControl, FormHelperText, Input } from '@chakra-ui/react'
 import isFloat from 'validator/lib/isFloat'
@@ -17,7 +17,8 @@ function Map ({ center, onMarkerMove }) {
   const [position, setPosition] = useState(center)
   const eventHandlers = useMemo(
     () => ({
-      dragend () {
+      dragend (e) {
+        console.log(e)
         const marker = markerRef.current
         if (marker != null) {
           const coords = marker.getLatLng()
@@ -37,9 +38,23 @@ function Map ({ center, onMarkerMove }) {
     onMarkerMove(position)
   }
 
+  function CheckPosition () {
+    const globalMap = useMap()
+    // eslint-disable-next-line no-unused-vars
+    const map = useMapEvents({
+      dblclick: ({ latlng }) => {
+        setPosition(latlng)
+      },
+      moveend: (e) => {
+        setPosition(globalMap.getCenter())
+      }
+    })
+    return null
+  }
+
   return (
     <>
-      <MapContainer center={center} zoom={15} scrollWheelZoom={false} style={{ height: '500px' }}>
+      <MapContainer center={center} zoom={15} doubleClickZoom={false} scrollWheelZoom={true} style={{ height: '500px' }}>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -51,6 +66,8 @@ function Map ({ center, onMarkerMove }) {
           eventHandlers={eventHandlers}
           draggable
         />
+        <CheckPosition/>
+
       </MapContainer>
       <Box display='flex' gap={10} alignItems="center" >
         <FormControl>
@@ -58,7 +75,7 @@ function Map ({ center, onMarkerMove }) {
           <Input
             type='number'
             ref={latRef}
-            value={position?.lat}
+            value={position?.lat.toFixed(8)}
             onChange={updatePosition}
             autoComplete='off'
             data-key='lat'
@@ -69,7 +86,7 @@ function Map ({ center, onMarkerMove }) {
           <Input
             type='number'
             ref={lngRef}
-            value={position?.lng}
+            value={position?.lng.toFixed(8)}
             onChange={updatePosition}
             autoComplete='off'
             data-key='lng'
