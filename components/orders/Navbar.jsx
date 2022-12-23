@@ -16,6 +16,9 @@ function Navbar () {
       <NextLink href="/plantas/reporte" passHref>
         <Link p={[1, 2]}>Reporte(Plantas entregadas)</Link>
       </NextLink>
+      <NextLink href="/plantas/mapa" passHref>
+        <Link p={[1, 2]}>Mapa</Link>
+      </NextLink>
     </Flex>
   )
 }
