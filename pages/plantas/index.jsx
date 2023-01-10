@@ -37,7 +37,7 @@ export default function PlantsHomePage () {
   if (error) return <Text align="center" color="red">Se ha presentado un error</Text>
 
   if (!data) return <Text align="center">Cargando tablero de gestión...</Text>
-
+  const numberOrders = data.map(({ [dictionary.order]: orden }) => orden)
   const handleDrop = async (id, target) => {
     const update = [...data]
     const index = data.findIndex(item => item.id === id)
@@ -77,7 +77,7 @@ export default function PlantsHomePage () {
     return orden === +query || removeAccents(nombre)?.includes(removeAccents(query))
   }
 
-  const filterDataByQuery = filteredData.filter(filterByQuery)
+  const filterDataByQuery = filteredData?.filter(filterByQuery)
 
   const handleQuery = ({ target }) => {
     const { value } = target
@@ -114,7 +114,7 @@ export default function PlantsHomePage () {
                 <Box display="flex" gap={4} flexDirection={{ base: 'column', lg: 'row' }}>
                   <Box>
                     <Text flexShrink={0}>Nombre de beneficiario / #Orden</Text>
-                    <Input type="text" value={query} onChange={handleQuery} placeholder='Buscar...'/>
+                    <Input type="text" value={query} onChange={handleQuery} placeholder='Buscar...' />
                   </Box>
                   <Box>
                     <Text flexShrink={0}>Desde :</Text>
@@ -141,11 +141,11 @@ export default function PlantsHomePage () {
 
                     {(columns[status] || []).map(data => (
                       <KanbanCard
-                      key={data.id}
-                      item={{ id: data.id, status: data[dictionary.status] }}
-                      data={data}
-                      mapper={mapOrder}
-                      onClick={() => handleClick(mapOrder(data))}
+                        key={data.id}
+                        item={{ id: data.id, status: data[dictionary.status] }}
+                        data={data}
+                        mapper={mapOrder}
+                        onClick={() => handleClick(mapOrder(data))}
                       >
                         {(data) => (
                           <OrderCardContent data={data} />
@@ -155,7 +155,7 @@ export default function PlantsHomePage () {
                   </KanbanColumn>
                 ))}
               </KanbanBoard>
-              <NewOrder isOpen={isOpen2} onClose={onClose2} btnRef={btnRef} />
+              <NewOrder isOpen={isOpen2} onClose={onClose2} btnRef={btnRef} numberOrders={numberOrders} />
             </>
             )
           : <Text align="center">No hay pedidos a gestionar</Text>}

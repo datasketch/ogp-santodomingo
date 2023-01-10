@@ -215,7 +215,7 @@ function CitizenFormPage () {
               marginTop='1.5'
               marginRight='1.5'
               colorScheme={'teal'}
-              {...register(dictionary.informationStatement)} />
+            />
             <FormLabel>
               Declaro que toda la información proporcionada es verdadera, correcta, y puede ser verificada
             </FormLabel>

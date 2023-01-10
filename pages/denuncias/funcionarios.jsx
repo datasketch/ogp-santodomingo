@@ -216,7 +216,7 @@ function PublicServantFormPage () {
           </FormControl>
           <FormControl>
             <FormLabel>Descripción del acto que se denuncia</FormLabel>
-            <Textarea {...register(dictionary.description)} />
+            <Textarea {...register(dictionary.description)} resize="none"/>
           </FormControl>
           <FormControl>
             <FormLabel>Ubicación</FormLabel>

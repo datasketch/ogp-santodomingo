@@ -1,5 +1,6 @@
+/* eslint-disable react/prop-types */
 import {
-  Button, Text, Drawer, DrawerBody, DrawerContent, DrawerHeader, DrawerOverlay, FormControl, Input, TableContainer, Table, Thead, Tbody, Tr, Td, FormHelperText, FormLabel, Stack, Select, DrawerCloseButton, Box, TabPanels, TabPanel, Tabs, TabList, Tab, Alert, AlertIcon
+  Button, Text, Drawer, DrawerBody, DrawerContent, DrawerHeader, DrawerOverlay, FormControl, Input, TableContainer, Table, Thead, Tbody, Tr, Td, FormHelperText, FormLabel, Stack, Select, DrawerCloseButton, Box, TabPanels, TabPanel, Tabs, TabList, Tab, Alert, AlertIcon, FormErrorMessage
 } from '@chakra-ui/react'
 import axios from 'axios'
 import { useState } from 'react'
@@ -19,8 +20,7 @@ const Map = dynamic(() => import('../../components/Map'), {
   ssr: false
 })
 
-// eslint-disable-next-line react/prop-types
-export default function NewOrder ({ isOpen, onClose, btnRef }) {
+export default function NewOrder ({ isOpen, onClose, btnRef, numberOrders }) {
   const [plants, setPlants] = useState([])
   const [positionSlider, SetPositionSlider] = useState(0)
   const [query, setQuery] = useState('')
@@ -101,6 +101,11 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
     toast.error('Campo(s) del formulario requeridos')
   }
 
+  const valideNumOrder = (order) => {
+    const val = !numberOrders.includes(order)
+    return val
+  }
+
   const handleSearch = ({ target }) => {
     const { value } = target
     setQuery(value)
@@ -137,11 +142,19 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
 
                   <Stack dir="column" spacing={5} m={5}>
                     <Box display="flex" gap={6} alignItems="center">
-                      <FormControl >
+                      <FormControl
+                        isInvalid={errors && errors[dictionary.order]} >
                         <FormLabel>Orden #</FormLabel>
                         <Input type="number" {...register(dictionary.order, {
-                          valueAsNumber: true
-                        })} v />
+                          valueAsNumber: true,
+                          validate: v => valideNumOrder(v) || 'Numero de orden ya existente'
+                        })} />
+                        {errors && errors[dictionary.order] && (
+                          <FormErrorMessage>
+                            {errors[dictionary.order].message}
+                          </FormErrorMessage>
+                        )
+                        }
                       </FormControl>
                       <FormControl >
                         <FormLabel>Fecha</FormLabel>

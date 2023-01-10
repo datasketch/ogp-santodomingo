@@ -17,7 +17,7 @@ export const dictionary = {
   actor: 'Actor',
   report: 'Informe',
   plantedTrees: 'Arboles sembrados',
-  typeBeneficiary: 'Tipo de Beneficiario',
+  typeBeneficiary: 'Tipo de beneficiario',
   createdAt: 'created_at',
   updatedAt: 'updated_at',
   id: 'id'

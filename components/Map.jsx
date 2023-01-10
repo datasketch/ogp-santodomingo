@@ -18,7 +18,6 @@ function Map ({ center, onMarkerMove }) {
   const eventHandlers = useMemo(
     () => ({
       dragend (e) {
-        console.log(e)
         const marker = markerRef.current
         if (marker != null) {
           const coords = marker.getLatLng()
@@ -75,7 +74,7 @@ function Map ({ center, onMarkerMove }) {
           <Input
             type='number'
             ref={latRef}
-            value={position?.lat.toFixed(8)}
+            value={position?.lat?.toFixed(8)}
             onChange={updatePosition}
             autoComplete='off'
             data-key='lat'
@@ -86,7 +85,7 @@ function Map ({ center, onMarkerMove }) {
           <Input
             type='number'
             ref={lngRef}
-            value={position?.lng.toFixed(8)}
+            value={position?.lng?.toFixed(8)}
             onChange={updatePosition}
             autoComplete='off'
             data-key='lng'
