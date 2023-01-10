@@ -37,7 +37,8 @@ export default function PlantsHomePage () {
   if (error) return <Text align="center" color="red">Se ha presentado un error</Text>
 
   if (!data) return <Text align="center">Cargando tablero de gestión...</Text>
-  const numberOrders = data.map(({ [dictionary.order]: orden }) => orden)
+
+  const numberOrders = [data || []].map(({ [dictionary.order]: orden }) => orden)
   const handleDrop = async (id, target) => {
     const update = [...data]
     const index = data.findIndex(item => item.id === id)
