@@ -13,6 +13,12 @@ function Navbar () {
       <NextLink href="/plantas/inventario" passHref>
         <Link p={[1, 2]}>Inventario</Link>
       </NextLink>
+      <NextLink href="/plantas/reporte" passHref>
+        <Link p={[1, 2]}>Reporte(Plantas entregadas)</Link>
+      </NextLink>
+      <NextLink href="/plantas/mapa" passHref>
+        <Link p={[1, 2]}>Mapa</Link>
+      </NextLink>
     </Flex>
   )
 }

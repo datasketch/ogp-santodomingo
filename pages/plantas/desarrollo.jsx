@@ -29,6 +29,9 @@ function GrowingPlantsPage () {
   const [selectedData, setSelectedData] = useState()
   const [search, setSearch] = useState('')
 
+  const sortedData = data.sort((a, b) => {
+    return new Date(b[dict.transplantDate]) - new Date(a[dict.transplantDate])
+  })
   const {
     startDate,
     endDate,
@@ -37,7 +40,8 @@ function GrowingPlantsPage () {
     endDateChangeHandler,
     clearInputsClickHandler,
     filteredData
-  } = useFilterByDate(data, '', dict.transplantDate)
+  } = useFilterByDate(sortedData, dict.transplantDate)
+
   const filteredPlants = filteredData?.filter(({ Planta }) => {
     const normalized = removeAccents(Planta).toLowerCase()
     return normalized.includes(removeAccents(search).toLowerCase())
@@ -52,9 +56,7 @@ function GrowingPlantsPage () {
   const handleDrop = async (id, target) => {
     const update = [...data]
     const index = data.findIndex(item => item.id === id)
-
     update[index][dict.gardenStatus] = target
-
     const op = axios.patch('/api/plants', {
       id,
       [dict.gardenStatus]: target

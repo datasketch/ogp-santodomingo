@@ -1,5 +1,6 @@
+/* eslint-disable react/prop-types */
 import {
-  Button, Text, Drawer, DrawerBody, DrawerContent, DrawerHeader, DrawerOverlay, FormControl, Input, TableContainer, Table, Thead, Tbody, Tr, Td, FormHelperText, FormLabel, Stack, Select, DrawerCloseButton, Box, TabPanels, TabPanel, Tabs, TabList, Tab, Alert, AlertIcon
+  Button, Text, Drawer, DrawerBody, DrawerContent, DrawerHeader, DrawerOverlay, FormControl, Input, TableContainer, Table, Thead, Tbody, Tr, Td, FormHelperText, FormLabel, Stack, Select, DrawerCloseButton, Box, TabPanels, TabPanel, Tabs, TabList, Tab, Alert, AlertIcon, FormErrorMessage
 } from '@chakra-ui/react'
 import axios from 'axios'
 import { useState } from 'react'
@@ -9,22 +10,23 @@ import { format, getYear, parseISO } from 'date-fns'
 import { toast } from 'react-hot-toast'
 
 import { parseData } from '../../utils'
-import { inventoryDictionary, dictionary } from '../../utils/orders/dictionary'
+import { inventoryDictionary, dictionary, typeBeneficiary } from '../../utils/orders/dictionary'
 
 import dynamic from 'next/dynamic'
 import { useComplaintForm } from '../../hooks/use-complaint-form'
-import { parishesPlants } from '../../utils/orders'
+import { parishesPlants, removeAccents } from '../../utils/orders'
 
 const Map = dynamic(() => import('../../components/Map'), {
   ssr: false
 })
 
-// eslint-disable-next-line react/prop-types
-export default function NewOrder ({ isOpen, onClose, btnRef }) {
+export default function NewOrder ({ isOpen, onClose, btnRef, orders }) {
   const [plants, setPlants] = useState([])
   const [positionSlider, SetPositionSlider] = useState(0)
+  const [query, setQuery] = useState('')
   const { data /* error */ } = useSWR('/api/inventory', (url) => axios.get(url).then(res => res.data))
   const { data: dataPlants /* error: errorPlants */ } = useSWR('/api/plants-list', (url) => axios.get(url).then(res => res.data))
+  const numberOrders = orders?.map(({ [dictionary.order]: orden }) => orden)
 
   const { handleSubmit, register, reset, formState: { errors, isSubmitted, isValid } } = useForm({ mode: 'onBlur' })
   const { center, coordinates, setCoordinates } = useComplaintForm(data)
@@ -94,7 +96,7 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
     setPlants(state)
   }
   const [canton, setCanton] = useState('')
-  const orderNumber = Math.floor(1000 + Math.random() * 9000)
+  // const orderNumber = Math.floor(1000 + Math.random() * 9000)
 
   const handleTabsChange = (index) => {
     SetPositionSlider(index)
@@ -105,6 +107,18 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
     if (isValid) return SetPositionSlider(+target.value)
     toast.error('Campo(s) del formulario requeridos')
   }
+
+  const valideNumOrder = (order) => {
+    const val = !numberOrders.includes(order)
+    return val
+  }
+
+  const handleSearch = ({ target }) => {
+    const { value } = target
+    setQuery(value)
+  }
+
+  const filteredData = parsedData.data.filter(el => removeAccents(el[0]).includes(removeAccents(query)))
 
   return (
     <Drawer
@@ -124,7 +138,10 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
             <TabList>
               {positionSlider === 0 && <Tab><Text as='b' >Información General</Text></Tab>}
               {positionSlider === 1 && <Tab><Text as='b'>Informes</Text></Tab>}
-              {positionSlider === 2 && <Tab><Text as='b' >Pedido</Text></Tab>}
+              {positionSlider === 2 && <Tab>
+                <Text as='b' >Pedido</Text>
+
+              </Tab>}
             </TabList>
             <form action="post" style={{ display: 'flex', flexDirection: 'column', rowGap: '10px' }} onSubmit={handleSubmit((data) => handleAddNewOrder(data, coordinates))}>
               <TabPanels>
@@ -132,11 +149,19 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
 
                   <Stack dir="column" spacing={5} m={5}>
                     <Box display="flex" gap={6} alignItems="center">
-                      <FormControl >
-                        <FormLabel>Orden #{orderNumber}</FormLabel>
-                        <Input type="number" {...register('Orden', {
-                          valueAsNumber: true
-                        })} value={orderNumber} hidden />
+                      <FormControl
+                        isInvalid={errors && errors[dictionary.order]} >
+                        <FormLabel>Orden #</FormLabel>
+                        <Input type="number" {...register(dictionary.order, {
+                          valueAsNumber: true,
+                          validate: v => valideNumOrder(v) || 'Numero de orden ya existente'
+                        })} />
+                        {errors && errors[dictionary.order] && (
+                          <FormErrorMessage>
+                            {errors[dictionary.order].message}
+                          </FormErrorMessage>
+                        )
+                        }
                       </FormControl>
                       <FormControl >
                         <FormLabel>Fecha</FormLabel>
@@ -147,7 +172,7 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
                       <Input type='text' {...register(dictionary.name, { required: 'Este Campo es requerido' })} />
                       {errors[dictionary.name] && <Alert status='error'>
                         <AlertIcon />
-                       {errors[dictionary.name].message}
+                        {errors[dictionary.name].message}
                       </Alert>}
                     </FormControl>
                     <Box display="flex" gap={6} alignItems="center">
@@ -228,23 +253,41 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
                   <Stack dir="column" spacing={5} m={5}>
                     <FormControl >
                       <FormLabel >Subsidio o venta</FormLabel>
-                      <Input type='text' {...register(dictionary.subsidy)} />
-                      {errors[dictionary.subsidy] && <Alert status='error'>
+                      {/* <Input type='text' {...register(dictionary.subsidy)} /> */}
+                      <Select
+                        placeholder='Seleccione una opción'
+                        {...register(dictionary.subsidy)}>
+                        {['Subsidio', 'Venta'].map(el =>
+                          <option key={el} value={el}>{el}</option>
+                        )}
+                      </Select>
+                    </FormControl>
+
+                    <FormControl>
+                      <FormLabel >Tipo de Beneficiario</FormLabel>
+                      <Select
+                        placeholder='Seleccione una opción'
+                        {...register(dictionary.typeBeneficiary)}>
+                        {typeBeneficiary.map(el =>
+                          <option key={el} value={el}>{el}</option>
+                        )}
+                      </Select>
+                      {/* {errors[dictionary.typeBeneficiary] && <Alert status='error'>
                         <AlertIcon />
-                        Este campo es requerido
-                      </Alert>}
+                        Seleccione una opción
+                      </Alert>} */}
                     </FormControl>
 
                     <FormControl >
                       <FormLabel >Colaboradores</FormLabel>
-                      <Input type='text' {...register(dictionary.collaborators)} />
-                      {errors[dictionary.canton] && <Alert status='error'>
+                      <Input type='number' {...register(dictionary.collaborators, { valueAsNumber: true })} />
+                      {errors[dictionary.collaborators] && <Alert status='error'>
                         <AlertIcon />
                         Este campo es requerido
                       </Alert>}
                     </FormControl>
 
-                    <FormControl >
+                    {/* <FormControl >
                       <FormLabel >Supervivencia individuos</FormLabel>
                       <Input type='number' {...register(dictionary.survival, {
                         min: 0,
@@ -255,7 +298,7 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
                         <AlertIcon />
                         Este campo es requerido
                       </Alert>}
-                    </FormControl>
+                    </FormControl> */}
                     <FormControl >
                       <FormLabel >Fecha de medición</FormLabel>
                       <Input type='date' {...register(dictionary.measurementDate, { valueAsDate: true })} />
@@ -265,14 +308,14 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
                       </Alert>}
                     </FormControl>
 
-                    <FormControl >
+                    {/* <FormControl >
                       <FormLabel >Actor</FormLabel>
                       <Input type='text' {...register(dictionary.actor)} />
                       {errors[dictionary.actor] && <Alert status='error'>
                         <AlertIcon />
                         Este campo es requerido
                       </Alert>}
-                    </FormControl>
+                    </FormControl> */}
                     <Box justifyItems={'end'} display='flex' gap='2' mt={2}>
                       <Button type='button' value={0} onClick={handlePositionTab}>Atras</Button>
                       <Button type='button' value={2} onClick={e => handlePositionTab(e, 'back')}>Siguiente</Button>
@@ -280,6 +323,7 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
                   </Stack>
                 </TabPanel>
                 <TabPanel>
+                  <Input marginY={2} placeholder='Buscar planta...' onChange={handleSearch} />
                   <TableContainer>
                     <Table>
                       <Thead>
@@ -290,7 +334,7 @@ export default function NewOrder ({ isOpen, onClose, btnRef }) {
                         </Tr>
                       </Thead>
                       <Tbody>
-                        {parsedData.data.map(([plant, container, inventory], index) => (
+                        {filteredData.map(([plant, container, inventory], index) => (
                           <Tr key={index}>
                             <Td>
                               {plant}

@@ -29,6 +29,7 @@
     "next": "^12.1.4",
     "pg": "^8.8.0",
     "prop-types": "^15.8.1",
+    "query-string": "^8.1.0",
     "react": "^18.2.0",
     "react-csv": "^2.2.2",
     "react-dnd": "^16.0.1",

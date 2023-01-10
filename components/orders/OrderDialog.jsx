@@ -3,7 +3,7 @@ import { Box, Button, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, Draw
 import { useEffect, useState } from 'react'
 import isEmpty from 'lodash.isempty'
 import PropTypes from 'prop-types'
-import { orderDetailDictionary, dictionary, inventoryDictionary } from '../../utils/orders/dictionary'
+import { orderDetailDictionary, dictionary, inventoryDictionary, typeBeneficiary } from '../../utils/orders/dictionary'
 import { useForm } from 'react-hook-form'
 
 import useSWR, { mutate } from 'swr'
@@ -13,7 +13,7 @@ import { statusEnum } from '../../utils/orders/enum'
 import { parseData } from '../../utils'
 import { format } from 'date-fns'
 import dynamic from 'next/dist/shared/lib/dynamic'
-import { parishesPlants } from '../../utils/orders'
+import { parishesPlants, removeAccents } from '../../utils/orders'
 
 const Map = dynamic(() => import('../../components/Map'), {
   ssr: false
@@ -29,6 +29,7 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
   const [plants, setPlants] = useState([])
   const [newPlant, setNewPlant] = useState([])
   const [previousPlants, setPreviousPlants] = useState([])
+  const [query, setQuery] = useState('')
 
   const { register, handleSubmit, reset, formState: { isSubmitted } } = useForm({
     mode: 'onBlur',
@@ -39,6 +40,7 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
       [dictionary.phoneNumber]: data.phoneNumber,
       [dictionary.canton]: data.canton,
       [dictionary.subsidy]: data.subsidy,
+      [dictionary.typeBeneficiary]: data.typeBeneficiary,
       [dictionary.collaborators]: data.collaborators,
       [dictionary.survival]: data.survival,
       [dictionary.measurementDate]: data.measurementDate ? format(new Date(data.measurementDate), 'yyyy-MM-dd') : '',
@@ -171,6 +173,13 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
     setSelectedData()
   }
 
+  const handleSearch = ({ target }) => {
+    const { value } = target
+    setQuery(value)
+  }
+
+  const filteredDataPlants = parsedData.data.filter(el => removeAccents(el[0]).includes(removeAccents(query)))
+
   return (
     <Drawer
       isOpen={isOpen}
@@ -254,7 +263,7 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
                         })}
                       >
                         {['Santo Domingo', 'La Concordia'].map(el =>
-                          <option key={el} value={el}>{el}</option>
+                          <option selected={data.canton === el} key={el} value={el}>{el}</option>
                         )}
                       </Select>
                     </Box>
@@ -266,7 +275,7 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
                         {...register(dictionary.parish)}
                       >
                         {parishesPlants[canton]?.map(el =>
-                          <option key={el} value={el}>{el}</option>
+                          <option selected={data.parish === el} key={el} value={el}>{el}</option>
                         )}
                       </Select>
                     </Box>
@@ -283,7 +292,14 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
                     </Box>
 
                   </Stack>
-                  <Text fontSize="md" mt={6} fontWeight='bold'>Resumen de pedido</Text>
+                      <Text fontSize="md" mt={6} fontWeight='bold'>Resumen de pedido</Text>
+                 {/*  <Box display='flex' justifyContent='space-between' alignItems='center' marginTop='2'>
+                    <Box>
+                    </Box>
+                    <Box>
+                      <Input placeholder='Buscar planta...' onChange={handleSearch} />
+                    </Box>
+                  </Box> */}
                   <TableContainer mt={4}>
                     <Table>
                       <Thead>
@@ -305,21 +321,48 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
                 </TabPanel>
                 <TabPanel>
                   <Stack spacing={4}>
-                    <Box fontSize="md">
+                    {/* <Box fontSize="md">
                       <Text letterSpacing="wide">Subsidio o venta</Text>
                       <Input type='text' {...register(dictionary.subsidy)} />
+                    </Box> */}
+
+                    <Box fontSize="md">
+                      <Text letterSpacing="wide">Subsidio o venta</Text>
+                      <Select
+                        placeholder='Seleccione una opción'
+                        {...register(dictionary.subsidy)}
+                        defaultChecked={data.subsidy}
+                      >
+                        {['Subsidio', 'Venta'].map(el =>
+                          <option selected={data.subsidy === el} key={el} value={el}>{el}</option>
+                        )}
+                      </Select>
                     </Box>
+
+                    <Box fontSize="md">
+                      <Text letterSpacing="wide">Tipo de beneficiario</Text>
+                      <Select
+                        placeholder='Seleccione una opción'
+                        {...register(dictionary.typeBeneficiary)}
+                        defaultChecked={data.typeBeneficiary}
+                      >
+                        {typeBeneficiary.map(el =>
+                          <option selected={data.typeBeneficiary === el} key={el} value={el}>{el}</option>
+                        )}
+                      </Select>
+                    </Box>
+
                     <Box fontSize="md">
                       <Text letterSpacing="wide">Colaboradores</Text>
                       <Input type='text' {...register(dictionary.collaborators)} />
                     </Box>
 
-                    <Box fontSize="md">
+                    {/* <Box fontSize="md">
                       <Text letterSpacing="wide">Supervivencia individuos</Text>
                       <Input type='number' {...register(dictionary.survival, {
                         valueAsNumber: true
                       })} />
-                    </Box>
+                    </Box> */}
 
                     <Box fontSize="md">
                       <Text letterSpacing="wide">Fecha de medición</Text>
@@ -341,14 +384,16 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
                       />
                     </Box>
 
-                    <Box fontSize="md">
+                    {/* <Box fontSize="md">
                       <Text letterSpacing="wide">Actor</Text>
                       <Input type='text' {...register(dictionary.actor)} />
                     </Box>
+                    */}
                   </Stack>
 
                 </TabPanel>
                 <TabPanel>
+                  <Input marginY={2} placeholder='Buscar planta...' onChange={handleSearch} />
                   <TableContainer>
                     <Table>
                       <Thead>
@@ -361,7 +406,7 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
                         </Tr>
                       </Thead>
                       <Tbody style={{ overflowY: 'scroll' }}>
-                        {parsedData.data.map(([plant, container, inventory], index) => (
+                        {filteredDataPlants.map(([plant, container, inventory], index) => (
                           <Tr key={plant + '-' + index}>
                             <Td>
                               {plant}
