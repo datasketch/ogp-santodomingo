@@ -22,12 +22,10 @@ const Map = dynamic(() => import('../../components/Map'), {
 function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
   const [headers, setHeaders] = useState([])
   const [rows, setRows] = useState([])
-  const [addedPlant, setAddedPlant] = useState({})
   const [coordinates, setCoordinates] = useState('-0.254167, -79.1719')
   const [position, setPosition] = useState({ lat: -0.254167, lng: -79.1719 })
   const [canton, setCanton] = useState('')
 
-  const [selectedPlant, setSelectedPlant] = useState({})
   const [plants, setPlants] = useState([])
   const [newPlant, setNewPlant] = useState([])
   const [previousPlants, setPreviousPlants] = useState([])
@@ -45,11 +43,12 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
       [dictionary.typeBeneficiary]: data.typeBeneficiary,
       [dictionary.collaborators]: data.collaborators,
       [dictionary.survival]: data.survival,
-      [dictionary.measurementDate]: data.measurementDate,
+      [dictionary.measurementDate]: data.measurementDate ? format(new Date(data.measurementDate), 'yyyy-MM-dd') : '',
       [dictionary.location]: data.location,
       [dictionary.actor]: data.actor,
       [dictionary.parish]: data.parish,
-      [dictionary.status]: data.status
+      [dictionary.status]: data.status,
+      [dictionary.deliveryDate]: data.deliveryDate ? format(new Date(data.deliveryDate), 'yyyy-MM-dd') : ''
     }
   })
 
@@ -92,28 +91,34 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
   if (!inventory) return null
 
   const onSubmit = (formData, coordinates) => {
+    const toastId = toast.loading('Actualizando base de datos')
     const input = {
       ...formData,
       [dictionary.location]: coordinates,
       id: data.id
     }
-    const op = axios.patch('/api/orders', input)
     mutate(
       '/api/orders',
-      () => toast.promise(op, {
-        loading: 'Actualizando base de datos',
-        success: () => 'Guardado',
-        error: () => 'Se ha presentado un error'
-      }),
+      async () => {
+        try {
+          const response = await axios.patch('/api/orders', input)
+          const plants = { previousPlants, newPlant }
+          await axios.patch('/api/details', plants)
+          toast.dismiss(toastId)
+          toast.success('Guardado')
+          return response.data
+        } catch (error) {
+          toast.dismiss(toastId)
+          toast.error('Se ha presentado un error')
+        }
+      },
       {
-        revalidate: true
-      }).then(() => {
-      // setTimeout(() => {
+        revalidate: true,
+        rollbackOnError: true
+      }
+    ).then(() => {
       handleClose()
-      // }, 300)
     })
-    const plants = { previousPlants, newPlant }
-    updateDetails(plants)
   }
 
   const calculateDefaultValue = (plant, container, array) => {
@@ -144,33 +149,6 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
     updateState(previousPlants, input, setPreviousPlants)
   }
 
-  const updateDetails = (input) => {
-    const op = axios.patch('/api/details', input)
-    mutate(
-      '/api/orders',
-      () => (
-        toast.promise(op, {
-          loading: 'Enviando...',
-          success: 'Guardado',
-          error: error => {
-            console.log(error)
-            return 'Se ha presentado un error'
-          }
-        })
-      ),
-      {
-        revalidate: true,
-        rollbackOnError: true
-      }
-    ).then(() => {
-      setRows(prevState => ([
-        ...prevState,
-        ['', selectedPlant.Planta, addedPlant.Cantidad, selectedPlant.Contenedor, selectedPlant.Tipo]
-      ]))
-      handleClose()
-    })
-  }
-
   const updateState = (previousData = [], input = {}, setData) => {
     const matchIndex = previousData.findIndex(plant => plant.Planta === input.Planta)
     if (matchIndex === -1) {
@@ -189,8 +167,6 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
 
   const handleClose = () => {
     onClose()
-    setAddedPlant({})
-    setSelectedPlant({})
     setNewPlant([])
     setPreviousPlants([])
     reset()
@@ -390,7 +366,22 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
 
                     <Box fontSize="md">
                       <Text letterSpacing="wide">Fecha de medición</Text>
-                      <Input type='date' {...register(dictionary.measurementDate, { value: data.measurementDate, valueAsDate: true })} defaultValue={format(new Date(data.measurementDate).getTime(), 'yyyy-MM-dd')} />
+                      <Input
+                        type='date'
+                        {...register(dictionary.measurementDate, {
+                          valueAsDate: true
+                        })}
+                      />
+                    </Box>
+
+                    <Box fontSize="md">
+                      <Text letterSpacing="wide">Fecha de entrega</Text>
+                      <Input
+                        type='date'
+                        {...register(dictionary.deliveryDate, {
+                          valueAsDate: true
+                        })}
+                      />
                     </Box>
 
                     {/* <Box fontSize="md">
@@ -446,7 +437,7 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
                     <Button variant='outline' mr={3} onClick={handleClose}>
                       Cancelar
                     </Button>
-                    <Button colorScheme='teal' type="submit" isLoading={isSubmitted} >Guardar</Button>
+                    <Button colorScheme='teal' type="submit" isLoading={isSubmitted}>Guardar</Button>
                   </DrawerFooter>
                 </TabPanel>
               </TabPanels>

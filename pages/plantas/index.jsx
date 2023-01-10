@@ -33,7 +33,7 @@ export default function PlantsHomePage () {
     endDateChangeHandler,
     clearInputsClickHandler,
     filteredData
-  } = useFilterByDate(data, dictionary.date)
+  } = useFilterByDate(data, 'plants', dictionary.date, dictionary.deliveryDate)
 
   if (error) return <Text align="center" color="red">Se ha presentado un error</Text>
 
@@ -99,8 +99,8 @@ export default function PlantsHomePage () {
         {data.length
           ? (
             <>
-              <Stack display="flex" flexDir={{ base: 'column', lg: 'row' }} justifyContent={{ lg: 'space-between' }} spacing={{ base: 4, lg: 0 }} mb={8}>
-                <Box display="flex" columnGap={4} alignItems="center" justifyContent={{ base: 'space-between', lg: 'start' }} alignSelf={{ lg: 'self-end' }}>
+              <Stack dir="row" flexDir={{ base: 'column', lg: 'row' }} justifyContent={{ lg: 'space-between' }} spacing={{ base: 4, lg: 0 }} mb={8} align={{ lg: 'flex-start' }}>
+                <Box display="flex" columnGap={4} alignItems="center" justifyContent={{ base: 'space-between', lg: 'start' }}>
                   <Heading color="gray.700">Tablero de órdenes</Heading>
                   <Button
                     size={'sm'}

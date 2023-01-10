@@ -32,6 +32,7 @@ export default function NewOrder ({ isOpen, onClose, btnRef, orders }) {
   const { center, coordinates, setCoordinates } = useComplaintForm(data)
 
   const handleAddNewOrder = (data, coordinate) => {
+    const toastId = toast.loading('Actualizando base de datos')
     const details = plants.reduce((acc, plant) => {
       const match = dataPlants.find(p => p.Planta === plant.Planta && p.Contenedor === plant.Contenedor)
       if (!match) return acc
@@ -45,19 +46,24 @@ export default function NewOrder ({ isOpen, onClose, btnRef, orders }) {
       [dictionary.status]: 'Recibido',
       Plantas: details
     }
-    const op = axios.post('/api/orders', input)
     mutate(
       '/api/orders',
-      () => toast.promise(op, {
-        loading: 'Actualizando base de datos',
-        success: () => 'Guardado',
-        error: () => 'Se ha presentado un error'
-      }),
+      async (cachedValue) => {
+        try {
+          await axios.post('/api/orders', input)
+          toast.dismiss(toastId)
+          toast.success('Guardado')
+        } catch (error) {
+          toast.dismiss(toastId)
+          toast.error('Se ha presentado un error')
+        }
+      },
       {
         revalidate: true
-      })
-    reset()
-    onClose()
+      }).then(() => {
+      reset()
+      onClose()
+    })
   }
 
   const parsedData = parseData((data || []), {

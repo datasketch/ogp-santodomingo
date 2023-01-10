@@ -22,19 +22,25 @@ function OrderCardContent ({ data }) {
         <Stack w="full" direction={{ base: 'column', lg: 'row' }} justify="space-between" align="flex-start">
           {data.date && (
             <Box>
-              <Text fontSize="xs" letterSpacing="wide">Fecha</Text>
+              <Text fontSize="xs" letterSpacing="wide">Fecha de orden</Text>
               <Text fontSize="small" fontWeight="semibold">{format(new Date(data.date), 'MMMM dd, yyyy', { locale: es })}</Text>
             </Box>
           )}
           {data.details && data.details.length && (
-            <Box>
+            <Box data-details={JSON.stringify(data.details)}>
               <Text fontSize="xs" letterSpacing="wide">Total plantas</Text>
               <Badge fontSize="xx-small" rounded="2xl" py={1} px={2}>
-                {data.details.length}
+                {data.details.reduce((acc, item) => acc + item.qty, 0)}
               </Badge>
             </Box>
           )}
         </Stack>
+      )}
+      {(data.deliveryDate) && (
+        <Box>
+          <Text fontSize="xs" letterSpacing="wide">Fecha de entrega</Text>
+          <Text fontSize="small" fontWeight="semibold">{format(new Date(data.deliveryDate), 'MMMM dd, yyyy', { locale: es })}</Text>
+        </Box>
       )}
       {data.canton && (
         <Box>
