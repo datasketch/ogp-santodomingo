@@ -20,12 +20,13 @@ const Map = dynamic(() => import('../../components/Map'), {
   ssr: false
 })
 
-export default function NewOrder ({ isOpen, onClose, btnRef, numberOrders }) {
+export default function NewOrder ({ isOpen, onClose, btnRef, orders }) {
   const [plants, setPlants] = useState([])
   const [positionSlider, SetPositionSlider] = useState(0)
   const [query, setQuery] = useState('')
   const { data /* error */ } = useSWR('/api/inventory', (url) => axios.get(url).then(res => res.data))
   const { data: dataPlants /* error: errorPlants */ } = useSWR('/api/plants-list', (url) => axios.get(url).then(res => res.data))
+  const numberOrders = orders?.map(({ [dictionary.order]: orden }) => orden)
 
   const { handleSubmit, register, reset, formState: { errors, isSubmitted, isValid } } = useForm({ mode: 'onBlur' })
   const { center, coordinates, setCoordinates } = useComplaintForm(data)

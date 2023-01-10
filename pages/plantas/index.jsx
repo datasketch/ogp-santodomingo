@@ -23,6 +23,7 @@ export default function PlantsHomePage () {
   const { isOpen: isOpen2, onOpen: onOpen2, onClose: onClose2 } = useDisclosure()
   const btnRef = useRef()
   const [selectedData, setSelectedData] = useState()
+  // const [numbersP, setSelectedData] = useState()
   const [query, setQuery] = useState('')
   const {
     startDate,
@@ -38,7 +39,6 @@ export default function PlantsHomePage () {
 
   if (!data) return <Text align="center">Cargando tablero de gestión...</Text>
 
-  const numberOrders = [data || []].map(({ [dictionary.order]: orden }) => orden)
   const handleDrop = async (id, target) => {
     const update = [...data]
     const index = data.findIndex(item => item.id === id)
@@ -156,7 +156,7 @@ export default function PlantsHomePage () {
                   </KanbanColumn>
                 ))}
               </KanbanBoard>
-              <NewOrder isOpen={isOpen2} onClose={onClose2} btnRef={btnRef} numberOrders={numberOrders} />
+              <NewOrder isOpen={isOpen2} onClose={onClose2} btnRef={btnRef} orders={data} />
             </>
             )
           : <Text align="center">No hay pedidos a gestionar</Text>}
