@@ -40,7 +40,7 @@ JOIN
                 CASE
                     WHEN ped."Estado vivero" = 'Lista para entrega' THEN
                         CASE
-                            WHEN ped."Fecha de entrega" < ? THEN ped."Cantidad"
+                            WHEN ped."Fecha de entrega" <= ? THEN ped."Cantidad"
                             ELSE 0
                         END
                     ELSE 0
@@ -57,7 +57,8 @@ JOIN
     ) ul
     ON (ue."Planta" = ul."Planta" OR ue."Planta" IS NULL AND ul."Planta" IS NULL)
     AND (ue."Tipo" = ul."Tipo" OR ue."Tipo" IS NULL AND ul."Tipo" IS NULL)
-    AND (ue."Contenedor" = ul."Contenedor" OR ue."Contenedor" IS NULL AND ul."Contenedor" IS NULL);
+    AND (ue."Contenedor" = ul."Contenedor" OR ue."Contenedor" IS NULL AND ul."Contenedor" IS NULL)
+    WHERE (ul. "Unidades listas para entrega" - ue. "Unidades entregadas") > 0;
 `
 
 export default async function handler (req, res) {
@@ -77,7 +78,7 @@ export default async function handler (req, res) {
       data = await knex('inventario').where('Inventario', '>', 0)
     } else {
       const rawResult = await knex.raw(rawQuery, [query.filter])
-      data = rawResult.rows.filter(row => +row.Inventario > 0)
+      data = rawResult.rows
     }
 
     await knex.destroy()

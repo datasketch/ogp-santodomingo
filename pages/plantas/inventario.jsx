@@ -32,7 +32,7 @@ function InventoryPage () {
         </Heading>
         <Box display="flex" columnGap={4}>
           <Box alignItems="center" display="flex" columnGap={1}>
-            <Text flexShrink={0}>Fecha de entrega: </Text>
+            <Text flexShrink={0}>Fecha de entrega (hasta): </Text>
             <Input type="date" value={selectedDate} max={currentDate} onChange={handleChange} />
           </Box>
           <DownloadCSV data={data} label='inventario' />
