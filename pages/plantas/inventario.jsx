@@ -1,4 +1,4 @@
-import { Box, Heading, Input, Text } from '@chakra-ui/react'
+import { Box, Input, Heading, Text } from '@chakra-ui/react'
 import axios from 'axios'
 import { Grid } from 'gridjs-react'
 import useSWR from 'swr'
@@ -12,12 +12,18 @@ import { useState } from 'react'
 import queryString from 'query-string'
 
 function InventoryPage () {
-  const [selectedDate, setSelectedDate] = useState('')
-  const { data, error } = useSWR(['/api/inventory', selectedDate], (url, selectedDate) => axios.get(url + '?' + queryString.stringify({ filter: selectedDate })).then(res => res.data))
+  const [selectedSinceDate, setSelectedSinceDate] = useState('')
+  const [selectedUntilDate, setSelectedUntilDate] = useState('')
+  const { data, error } = useSWR(['/api/inventory', selectedSinceDate, selectedUntilDate], (url, selectedSinceDate, selectedUntilDate) => axios.get(url + '?' + queryString.stringify({ since: selectedSinceDate, until: selectedUntilDate })).then(res => res.data))
   const currentDate = format(new Date(), 'yyyy-MM-dd')
 
-  const handleChange = (e) => {
-    setSelectedDate(e.target.value)
+  const handleChange = (type, e) => {
+    if (type === 'since') {
+      setSelectedSinceDate(e.target.value)
+    }
+    if (type === 'until') {
+      setSelectedUntilDate(e.target.value)
+    }
   }
 
   if (error) return <Text align="center" color="red">Se ha presentado un error</Text>
@@ -32,10 +38,15 @@ function InventoryPage () {
         </Heading>
         <Box display="flex" columnGap={4}>
           <Box alignItems="center" display="flex" columnGap={1}>
+            <Text flexShrink={0}>Fecha de entrega(desde): </Text>
+            <Input type="date" value={selectedSinceDate} max={currentDate} onChange={(e) => handleChange('since', e)} />
+          </Box>
+          <Box alignItems="center" display="flex" columnGap={1}>
             <Text flexShrink={0}>Fecha de entrega (hasta): </Text>
-            <Input type="date" value={selectedDate} max={currentDate} onChange={handleChange} />
+            <Input type="date" value={selectedUntilDate} max={currentDate} onChange={(e) => handleChange('until', e)} />
           </Box>
           <DownloadCSV data={data} label='inventario' />
+
         </Box>
       </Box>
       <Grid
