@@ -1,5 +1,6 @@
+import { format } from 'date-fns'
 import { getKnex } from '../../knex'
-import { rawQuery, rawSinceQuery, rawUntilQuery } from '../../utils/orders/querys'
+import { rawQuery } from '../../utils/orders/querys'
 
 export default async function handler (req, res) {
   const { method, query } = req
@@ -15,21 +16,16 @@ export default async function handler (req, res) {
   try {
     let data = []
     const { since, until } = query
+
     if (!since && !until) {
       data = await knex('inventario').where('Inventario', '>', 0)
-    }
-    if (since && !until) {
-      const rawResult = await knex.raw(rawSinceQuery, [since])
+    } else {
+      const desde = since || format(new Date(null), 'yyyy-MM-dd')
+      const hasta = until || format(new Date(), 'yyyy-MM-dd')
+      const rawResult = await knex.raw(rawQuery, [desde, hasta])
       data = rawResult.rows.filter(row => +row.Inventario > 0)
     }
-    if (!since && until) {
-      const rawResult = await knex.raw(rawUntilQuery, [until])
-      data = rawResult.rows.filter(row => +row.Inventario > 0)
-    }
-    if (since && until) {
-      const rawResult = await knex.raw(rawQuery, [since, until])
-      data = rawResult.rows.filter(row => +row.Inventario > 0)
-    }
+
     await knex.destroy()
     return res.status(200).json(data)
   } catch (error) {
