@@ -61,7 +61,7 @@ function InventoryPage () {
           </Box>
 
           <Box >
-            <Text flexShrink={0}>Fecha de transplante </Text>
+            <Text flexShrink={0}>Fecha de trasplante </Text>
             <Box display={'flex'} gap={2}>
               <Box alignItems="center" display="flex" columnGap={1}>
                 <Text flexShrink={0}>desde : </Text>
