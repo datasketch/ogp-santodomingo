@@ -32,6 +32,7 @@ function GrowingPlantsPage () {
   const sortedData = data.sort((a, b) => {
     return new Date(b[dict.transplantDate]) - new Date(a[dict.transplantDate])
   })
+
   const {
     startDate,
     endDate,

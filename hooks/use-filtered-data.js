@@ -74,8 +74,9 @@ function useFilterByDate (data, type = '', date, delivery) {
         return null
       })
     }
+
     return data.filter(item => {
-      const dateType = format(new Date(item[date]), 'yyyy-MM-dd')
+      const dateType = format(new Date(item[date] || null), 'yyyy-MM-dd')
 
       if (startDateFormat && !endDateFormat) {
         return (
