@@ -2,6 +2,41 @@
   command = "sed -i -e \"s/AUTH_USERNAME_PLACEHOLDER/${AUTH_USERNAME}/g\" -e \"s/AUTH_PASSWORD_PLACEHOLDER/${AUTH_PASSWORD}/g\" netlify.toml && npm run build"
 
 [[headers]]
-  for = "/*"
+  for = "/"
+  [headers.values]
+    Basic-Auth = "AUTH_USERNAME_PLACEHOLDER:AUTH_PASSWORD_PLACEHOLDER"
+
+[[headers]]
+  for = "/denuncias"
+  [headers.values]
+    Basic-Auth = "AUTH_USERNAME_PLACEHOLDER:AUTH_PASSWORD_PLACEHOLDER"
+
+[[headers]]
+  for = "/denuncias/funcionarios"
+  [headers.values]
+    Basic-Auth = "AUTH_USERNAME_PLACEHOLDER:AUTH_PASSWORD_PLACEHOLDER"
+
+[[headers]]
+  for = "/denuncias/resumen"
+  [headers.values]
+    Basic-Auth = "AUTH_USERNAME_PLACEHOLDER:AUTH_PASSWORD_PLACEHOLDER"
+
+[[headers]]
+  for = "/plantas"
+  [headers.values]
+    Basic-Auth = "AUTH_USERNAME_PLACEHOLDER:AUTH_PASSWORD_PLACEHOLDER"
+
+[[headers]]
+  for = "/plantas/desarrollo"
+  [headers.values]
+    Basic-Auth = "AUTH_USERNAME_PLACEHOLDER:AUTH_PASSWORD_PLACEHOLDER"
+
+[[headers]]
+  for = "/plantas/inventario"
+  [headers.values]
+    Basic-Auth = "AUTH_USERNAME_PLACEHOLDER:AUTH_PASSWORD_PLACEHOLDER"
+
+[[headers]]
+  for = "/plantas/reporte"
   [headers.values]
     Basic-Auth = "AUTH_USERNAME_PLACEHOLDER:AUTH_PASSWORD_PLACEHOLDER"
