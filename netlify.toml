@@ -1,5 +1,5 @@
 [build]
-  command = "sed -i \"s|AUTH_USERNAME_PLACEHOLDER|${AUTH_USERNAME}|g\" netlify.toml && sed -i \"s|AUTH_PASSWORD_PLACEHOLDER|${AUTH_PASSWORD}|g\" netlify.toml && npm run build"
+  command = "sed -i -e \"s/AUTH_USERNAME_PLACEHOLDER/${AUTH_USERNAME}/g\" -e \"s/AUTH_PASSWORD_PLACEHOLDER/${AUTH_PASSWORD}/g\" netlify.toml && npm run build"
 
 [[headers]]
   for = "/*"
