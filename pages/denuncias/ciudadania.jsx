@@ -1,6 +1,6 @@
 import { Box, Button, Checkbox, FormControl, FormErrorMessage, FormHelperText, FormLabel, Heading, Input, Select, Stack, Textarea } from '@chakra-ui/react'
 import { useForm } from 'react-hook-form'
-import { useRouter } from 'next/router'
+// import { useRouter } from 'next/router'
 import { useState } from 'react'
 import axios from 'axios'
 import dynamic from 'next/dynamic'
@@ -15,10 +15,10 @@ const Map = dynamic(() => import('../../components/Map'), {
 })
 
 function CitizenFormPage () {
-  const router = useRouter()
+  // const router = useRouter()
   const center = { lat: -0.254167, lng: -79.1719 }
 
-  const { handleSubmit, register, formState: { errors, isSubmitted } } = useForm({
+  const { handleSubmit, register, formState: { errors, isSubmitted }, reset } = useForm({
     mode: 'onBlur'
   })
 
@@ -38,13 +38,11 @@ function CitizenFormPage () {
 
     try {
       await axios.post('/api/complaints', info)
-      toast.success('Denuncia guardada')
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          router.reload()
-          resolve()
-        }, 300)
+      window.scroll(0, 0)
+      toast.success('Denuncia guardada', {
+        duration: 5000
       })
+      reset()
     } catch (error) {
       toast.error('Se ha presentado un error')
     }
