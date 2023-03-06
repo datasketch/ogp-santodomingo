@@ -122,7 +122,7 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
   }
 
   const calculateDefaultValue = (plant, container, array) => {
-    const defaultValue = array.filter(pl => pl.plant === plant && pl.container === container)[0]
+    const defaultValue = array?.filter(pl => pl.plant === plant && pl.container === container)[0]
     return defaultValue?.qty || null
   }
 
@@ -170,7 +170,7 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
     setNewPlant([])
     setPreviousPlants([])
     reset()
-    setSelectedData()
+    setSelectedData(null)
   }
 
   const handleSearch = ({ target }) => {
@@ -179,7 +179,6 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
   }
 
   const filteredDataPlants = parsedData.data.filter(el => removeAccents(el[0]).includes(removeAccents(query)))
-  // debugger
 
   return (
     <Drawer
@@ -236,7 +235,7 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
                       <Input
                         type='date'
                         {...register(dictionary.date, {
-                          value: format(new Date(data.date).getTime(), 'yyyy-MM-dd'),
+                          value: data.date ? format(new Date(data.date).getTime(), 'yyyy-MM-dd') : '',
                           valueAsDate: true
                         })}
                       />

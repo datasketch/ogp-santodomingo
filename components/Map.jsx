@@ -69,7 +69,7 @@ function Map ({ center, onMarkerMove }) {
       <Box display='flex' gap={10} alignItems="center" >
         <FormControl>
           <FormHelperText>Latitud</FormHelperText>
-          <NumberInput step={0.0005} ref={latRef} value={position?.lat?.toFixed(8)} onChange={(e) => updatePosition(e, 'lat')} data-key='lat'>
+          <NumberInput step={0.0005} ref={latRef} defaultValue={position?.lat?.toFixed(8)} onChange={(e) => updatePosition(e, 'lat')} data-key='lat'>
             <NumberInputField />
             <NumberInputStepper>
               <NumberIncrementStepper />
@@ -79,7 +79,7 @@ function Map ({ center, onMarkerMove }) {
         </FormControl>
         <FormControl>
           <FormHelperText>Longitud</FormHelperText>
-          <NumberInput step={0.0005} ref={lngRef} value={position?.lng?.toFixed(8)} onChange={(e) => updatePosition(e, 'lng')} data-key='lng'>
+          <NumberInput step={0.0005} ref={lngRef} defaultValue={position?.lng?.toFixed(8)} onChange={(e) => updatePosition(e, 'lng')} data-key='lng'>
             <NumberInputField />
             <NumberInputStepper>
               <NumberIncrementStepper />
