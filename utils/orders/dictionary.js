@@ -18,6 +18,7 @@ export const dictionary = {
   report: 'Informe',
   plantedTrees: 'Arboles sembrados',
   typeBeneficiary: 'Tipo de beneficiario',
+  deliveryDate: 'Fecha de entrega',
   createdAt: 'created_at',
   updatedAt: 'updated_at',
   id: 'id'

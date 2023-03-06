@@ -48,6 +48,10 @@ function CitizenFormPage () {
     }
   }
 
+  const printScreen = () => {
+    window.print()
+  }
+
   return (
     <Box
       width="100%"
@@ -218,13 +222,20 @@ function CitizenFormPage () {
               Declaro que toda la información proporcionada es verdadera, correcta, y puede ser verificada
             </FormLabel>
           </FormControl>
-          <Button
-            type='submit'
-            colorScheme={'teal'}
-            isLoading={isSubmitted}
-          >
-            Enviar
-          </Button>
+          <Box display={'flex'} gap={2} justifyContent={'end'}>
+            <Button variant='outline' mr={3} onClick={printScreen}>
+              Imprimir
+            </Button>
+
+            <Button
+              type='submit'
+              colorScheme={'teal'}
+              isLoading={isSubmitted}
+            >
+              Enviar
+            </Button>
+
+          </Box>
         </Stack>
       </form>
     </Box>

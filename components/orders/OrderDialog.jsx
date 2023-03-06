@@ -82,7 +82,7 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
     }))
     if (data.location) {
       setCoordinates(prev => data.location || prev)
-      setPosition({ lat: data.location?.split(',')[0], lng: data.location?.split(',')[1] })
+      setPosition({ lat: +data.location?.split(',')[0], lng: +data.location?.split(',')[1] })
     }
     setCanton(data.canton || '')
   }, [data])
@@ -179,6 +179,7 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
   }
 
   const filteredDataPlants = parsedData.data.filter(el => removeAccents(el[0]).includes(removeAccents(query)))
+  // debugger
 
   return (
     <Drawer
@@ -204,16 +205,17 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
           </Box>
         </DrawerHeader>
         <DrawerBody key={data}>
-          <Tabs>
-            <TabList>
-              <Tab><Text as='b'>Información General</Text></Tab>
-              <Tab><Text as='b'>Informes</Text></Tab>
-              <Tab><Text as='b'>Actualizar Pedido</Text></Tab>
-            </TabList>
-            <form id="edit-order" key={data} onSubmit={handleSubmit((data) => onSubmit(data, coordinates))}>
+          <form id="edit-order" key={data} onSubmit={handleSubmit((data) => onSubmit(data, coordinates))}>
+            <Tabs>
+              <TabList>
+                <Tab><Text as='b'>Información General</Text></Tab>
+                <Tab><Text as='b'>Informes</Text></Tab>
+                <Tab><Text as='b'>Actualizar Pedido</Text></Tab>
+              </TabList>
               <TabPanels>
                 <TabPanel>
                   <Stack spacing={4}>
+
                     <Box fontSize="md">
                       <Text letterSpacing="wide">Estado</Text>
                       <Select
@@ -234,7 +236,8 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
                       <Input
                         type='date'
                         {...register(dictionary.date, {
-                          value: format(new Date(data.date).getTime(), 'yyyy-MM-dd')
+                          value: format(new Date(data.date).getTime(), 'yyyy-MM-dd'),
+                          valueAsDate: true
                         })}
                       />
                     </Box>
@@ -261,9 +264,10 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
                         {...register(dictionary.canton, {
                           onChange: (e) => setCanton(e.target.value)
                         })}
+                        defaultValue={data.canton}
                       >
                         {['Santo Domingo', 'La Concordia'].map(el =>
-                          <option selected={data.canton === el} key={el} value={el}>{el}</option>
+                          <option /* selected={data.canton === el} */ key={el} value={el}>{el}</option>
                         )}
                       </Select>
                     </Box>
@@ -273,9 +277,10 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
                       <Select
                         placeholder='Seleccione una opción'
                         {...register(dictionary.parish)}
+                        defaultValue={data.parish}
                       >
                         {parishesPlants[canton]?.map(el =>
-                          <option selected={data.parish === el} key={el} value={el}>{el}</option>
+                          <option key={el} value={el}>{el}</option>
                         )}
                       </Select>
                     </Box>
@@ -292,14 +297,7 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
                     </Box>
 
                   </Stack>
-                      <Text fontSize="md" mt={6} fontWeight='bold'>Resumen de pedido</Text>
-                 {/*  <Box display='flex' justifyContent='space-between' alignItems='center' marginTop='2'>
-                    <Box>
-                    </Box>
-                    <Box>
-                      <Input placeholder='Buscar planta...' onChange={handleSearch} />
-                    </Box>
-                  </Box> */}
+                  <Text fontSize="md" mt={6} fontWeight='bold'>Resumen de pedido</Text>
                   <TableContainer mt={4}>
                     <Table>
                       <Thead>
@@ -321,20 +319,15 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
                 </TabPanel>
                 <TabPanel>
                   <Stack spacing={4}>
-                    {/* <Box fontSize="md">
-                      <Text letterSpacing="wide">Subsidio o venta</Text>
-                      <Input type='text' {...register(dictionary.subsidy)} />
-                    </Box> */}
-
                     <Box fontSize="md">
                       <Text letterSpacing="wide">Subsidio o venta</Text>
                       <Select
                         placeholder='Seleccione una opción'
                         {...register(dictionary.subsidy)}
-                        defaultChecked={data.subsidy}
+                        defaultValue={data.subsidy}
                       >
                         {['Subsidio', 'Venta'].map(el =>
-                          <option selected={data.subsidy === el} key={el} value={el}>{el}</option>
+                          <option /* selected={data.subsidy === el} */ key={el} value={el}>{el}</option>
                         )}
                       </Select>
                     </Box>
@@ -344,10 +337,10 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
                       <Select
                         placeholder='Seleccione una opción'
                         {...register(dictionary.typeBeneficiary)}
-                        defaultChecked={data.typeBeneficiary}
+                        defaultValue={data.typeBeneficiary}
                       >
                         {typeBeneficiary.map(el =>
-                          <option selected={data.typeBeneficiary === el} key={el} value={el}>{el}</option>
+                          <option /* selected={data.typeBeneficiary === el} */ key={el} value={el}>{el}</option>
                         )}
                       </Select>
                     </Box>
@@ -357,14 +350,14 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
                       <Input type='text' {...register(dictionary.collaborators)} />
                     </Box>
 
-                    {/* <Box fontSize="md">
+                    <Box fontSize="md">
                       <Text letterSpacing="wide">Supervivencia individuos</Text>
                       <Input type='number' {...register(dictionary.survival, {
                         valueAsNumber: true
                       })} />
-                    </Box> */}
+                    </Box>
 
-                    <Box fontSize="md">
+                  {/*   <Box fontSize="md">
                       <Text letterSpacing="wide">Fecha de medición</Text>
                       <Input
                         type='date'
@@ -372,7 +365,7 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
                           valueAsDate: true
                         })}
                       />
-                    </Box>
+                    </Box> */}
 
                     <Box fontSize="md">
                       <Text letterSpacing="wide">Fecha de entrega</Text>
@@ -384,13 +377,7 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
                       />
                     </Box>
 
-                    {/* <Box fontSize="md">
-                      <Text letterSpacing="wide">Actor</Text>
-                      <Input type='text' {...register(dictionary.actor)} />
-                    </Box>
-                    */}
                   </Stack>
-
                 </TabPanel>
                 <TabPanel>
                   <Input marginY={2} placeholder='Buscar planta...' onChange={handleSearch} />
@@ -441,11 +428,12 @@ function OrderDialog ({ isOpen, onClose, setSelectedData, data = {} }) {
                   </DrawerFooter>
                 </TabPanel>
               </TabPanels>
-            </form>
-          </Tabs>
+            </Tabs>
+          </form>
         </DrawerBody>
       </DrawerContent>
     </Drawer>
+
   )
 }
 

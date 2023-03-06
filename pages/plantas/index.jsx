@@ -22,7 +22,8 @@ export default function PlantsHomePage () {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const { isOpen: isOpen2, onOpen: onOpen2, onClose: onClose2 } = useDisclosure()
   const btnRef = useRef()
-  const [selectedData, setSelectedData] = useState()
+
+  const [selectedData, setSelectedData] = useState(null)
   // const [numbersP, setSelectedData] = useState()
   const [query, setQuery] = useState('')
   const {
@@ -88,7 +89,7 @@ export default function PlantsHomePage () {
 
   return (
     <>
-      {selectedData && <OrderDialog
+      {selectedData !== null && <OrderDialog
         isOpen={isOpen}
         onClose={onClose}
         data={selectedData}

@@ -34,6 +34,7 @@ function KanbanCard ({ item, data, onClick, mapper = (_) => _, children }) {
         borderColor: 'blackAlpha.300'
       }}
       onClick={onClick}
+
     >
       {children(cardData)}
     </Box>
@@ -46,6 +47,7 @@ KanbanCard.propTypes = {
   mapper: PropTypes.func,
   children: PropTypes.func,
   onClick: PropTypes.func
+
 }
 
 export default KanbanCard

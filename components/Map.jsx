@@ -2,7 +2,7 @@ import { icon } from 'leaflet'
 import PropTypes from 'prop-types'
 import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-leaflet'
 import { useMemo, useRef, useState } from 'react'
-import { Box, FormControl, FormHelperText, Input } from '@chakra-ui/react'
+import { Box, FormControl, FormHelperText, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper } from '@chakra-ui/react'
 import isFloat from 'validator/lib/isFloat'
 
 const markerIcon = icon({
@@ -29,9 +29,7 @@ function Map ({ center, onMarkerMove }) {
     [onMarkerMove, position]
   )
 
-  const updatePosition = (e) => {
-    const value = e.target.value
-    const { key } = e.target.dataset
+  const updatePosition = (value, key) => {
     if (!isFloat(value)) return
     setPosition(prev => ({ ...prev, [key]: +value }))
     onMarkerMove(position)
@@ -65,31 +63,29 @@ function Map ({ center, onMarkerMove }) {
           eventHandlers={eventHandlers}
           draggable
         />
-        <CheckPosition/>
+        <CheckPosition />
 
       </MapContainer>
       <Box display='flex' gap={10} alignItems="center" >
         <FormControl>
           <FormHelperText>Latitud</FormHelperText>
-          <Input
-            type='number'
-            ref={latRef}
-            value={position?.lat?.toFixed(8)}
-            onChange={updatePosition}
-            autoComplete='off'
-            data-key='lat'
-          />
+          <NumberInput step={0.0005} ref={latRef} value={position?.lat?.toFixed(8)} onChange={(e) => updatePosition(e, 'lat')} data-key='lat'>
+            <NumberInputField />
+            <NumberInputStepper>
+              <NumberIncrementStepper />
+              <NumberDecrementStepper />
+            </NumberInputStepper>
+          </NumberInput>
         </FormControl>
         <FormControl>
           <FormHelperText>Longitud</FormHelperText>
-          <Input
-            type='number'
-            ref={lngRef}
-            value={position?.lng?.toFixed(8)}
-            onChange={updatePosition}
-            autoComplete='off'
-            data-key='lng'
-          />
+          <NumberInput step={0.0005} ref={lngRef} value={position?.lng?.toFixed(8)} onChange={(e) => updatePosition(e, 'lng')} data-key='lng'>
+            <NumberInputField />
+            <NumberInputStepper>
+              <NumberIncrementStepper />
+              <NumberDecrementStepper />
+            </NumberInputStepper>
+          </NumberInput>
         </FormControl>
       </Box>
     </>

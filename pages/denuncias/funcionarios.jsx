@@ -47,6 +47,10 @@ function PublicServantFormPage () {
     }
   }
 
+  const printScreen = () => {
+    window.print()
+  }
+
   return (
     <Box
       width="100%"
@@ -88,14 +92,14 @@ function PublicServantFormPage () {
             </FormControl>
           )}
           <FormControl
-            // isInvalid={errors && errors[dictionary.email]}
+          // isInvalid={errors && errors[dictionary.email]}
           >
             <FormLabel>Email</FormLabel>
             <Input type="email" {...register(dictionary.email)} />
-            { errors && errors[dictionary.email] && (
-                <FormErrorMessage>
-                  {errors[dictionary.email].message}
-                </FormErrorMessage>
+            {errors && errors[dictionary.email] && (
+              <FormErrorMessage>
+                {errors[dictionary.email].message}
+              </FormErrorMessage>
             )
             }
           </FormControl>
@@ -148,7 +152,7 @@ function PublicServantFormPage () {
                 </Checkbox>
               ))}
             </Stack>
-            { errors && errors[dictionary.affectedComponent]
+            {errors && errors[dictionary.affectedComponent]
               ? (
                 <FormErrorMessage>
                   {errors[dictionary.affectedComponent].message || errors[dictionary.affectedComponent].root.message}
@@ -216,7 +220,7 @@ function PublicServantFormPage () {
           </FormControl>
           <FormControl>
             <FormLabel>Descripción del acto que se denuncia</FormLabel>
-            <Textarea {...register(dictionary.description)} resize="none"/>
+            <Textarea {...register(dictionary.description)} resize="none" />
           </FormControl>
           <FormControl>
             <FormLabel>Ubicación</FormLabel>
@@ -228,13 +232,20 @@ function PublicServantFormPage () {
               }}
             />
           </FormControl>
-          <Button
-            type='submit'
-            colorScheme={'teal'}
-            isLoading={isSubmitted}
-          >
-            Enviar
-          </Button>
+          <Box display={'flex'} gap={2} justifyContent={'end'}>
+            <Button variant='outline' mr={3} onClick={printScreen}>
+              Imprimir
+            </Button>
+
+            <Button
+              type='submit'
+              colorScheme={'teal'}
+              isLoading={isSubmitted}
+            >
+              Enviar
+            </Button>
+
+          </Box>
         </Stack>
       </form>
     </Box>
