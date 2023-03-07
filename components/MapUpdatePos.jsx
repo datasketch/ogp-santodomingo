@@ -2,12 +2,13 @@ import PropTypes from 'prop-types'
 import { useEffect } from 'react'
 import { useMap } from 'react-leaflet'
 
-export const MapUpdatePos = ({ center }) => {
+export const MapUpdatePos = ({ center, children }) => {
   const map = useMap()
+
   useEffect(() => {
     map.setView(center, 15)
   }, [center])
-  return null
+  return children(map)
 }
 
 MapUpdatePos.propTypes = {

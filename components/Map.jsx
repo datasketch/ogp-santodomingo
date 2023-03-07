@@ -1,9 +1,10 @@
 import { icon } from 'leaflet'
 import PropTypes from 'prop-types'
-import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-leaflet'
+import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet'
 import { useMemo, useRef, useState } from 'react'
 import { Box, FormControl, FormHelperText, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper } from '@chakra-ui/react'
 import isFloat from 'validator/lib/isFloat'
+import { MapUpdatePos } from './MapUpdatePos'
 
 const markerIcon = icon({
   iconUrl: '/marker-icon.png',
@@ -15,9 +16,10 @@ function Map ({ center, onMarkerMove }) {
   const latRef = useRef(null)
   const lngRef = useRef(null)
   const [position, setPosition] = useState(center)
+
   const eventHandlers = useMemo(
     () => ({
-      dragend (e) {
+      dragend () {
         const marker = markerRef.current
         if (marker != null) {
           const coords = marker.getLatLng()
@@ -30,28 +32,30 @@ function Map ({ center, onMarkerMove }) {
   )
 
   const updatePosition = (value, key) => {
-    if (!isFloat(value)) return
-    setPosition(prev => ({ ...prev, [key]: +value }))
+    if (key !== '') {
+      if (!isFloat(value)) return
+      setPosition(prev => ({ ...prev, [key]: +value }))
+      return onMarkerMove(position)
+    }
+    setPosition(value)
     onMarkerMove(position)
   }
 
-  function CheckPosition () {
-    const globalMap = useMap()
+  // eslint-disable-next-line react/prop-types
+  const CheckPosition = useMemo(() => ({ globalMap }) => {
     // eslint-disable-next-line no-unused-vars
     const map = useMapEvents({
       dblclick: ({ latlng }) => {
-        setPosition(latlng)
-      },
-      moveend: (e) => {
-        setPosition(globalMap.getCenter())
+        const { lat, lng } = latlng
+        setPosition({ lat: lat.toFixed(6), lng: lng.toFixed(6) })
       }
     })
     return null
-  }
+  }, [position])
 
   return (
     <>
-      <MapContainer center={center} zoom={15} doubleClickZoom={false} scrollWheelZoom={true} style={{ height: '500px' }}>
+      <MapContainer center={center} zoom={15} doubleClickZoom={false} scrollWheelZoom={true} style={{ height: '500px' }} >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -63,13 +67,16 @@ function Map ({ center, onMarkerMove }) {
           eventHandlers={eventHandlers}
           draggable
         />
-        <CheckPosition />
+
+        <MapUpdatePos center={position} >
+          {(map) => <CheckPosition globalMap={map} />}
+        </MapUpdatePos>
 
       </MapContainer>
       <Box display='flex' gap={10} alignItems="center" >
         <FormControl>
           <FormHelperText>Latitud</FormHelperText>
-          <NumberInput step={0.0005} ref={latRef} defaultValue={position?.lat?.toFixed(8)} onChange={(e) => updatePosition(e, 'lat')} data-key='lat'>
+          <NumberInput step={0.0005} precision={6} ref={latRef} value={position?.lat} onChange={(e) => updatePosition(e, 'lat')} data-key='lat'>
             <NumberInputField />
             <NumberInputStepper>
               <NumberIncrementStepper />
@@ -77,9 +84,10 @@ function Map ({ center, onMarkerMove }) {
             </NumberInputStepper>
           </NumberInput>
         </FormControl>
+
         <FormControl>
           <FormHelperText>Longitud</FormHelperText>
-          <NumberInput step={0.0005} ref={lngRef} defaultValue={position?.lng?.toFixed(8)} onChange={(e) => updatePosition(e, 'lng')} data-key='lng'>
+          <NumberInput step={0.0005} precision={6} ref={lngRef} value={position?.lng} onChange={(e) => updatePosition(e, 'lng')} data-key='lng'>
             <NumberInputField />
             <NumberInputStepper>
               <NumberIncrementStepper />
@@ -94,9 +102,7 @@ function Map ({ center, onMarkerMove }) {
 
 Map.propTypes = {
   center: PropTypes.object,
-  onMarkerMove: PropTypes.func,
-  positionChange: PropTypes.func
-
+  onMarkerMove: PropTypes.func
 }
 
 export default Map
