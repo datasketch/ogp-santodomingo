@@ -1,13 +1,14 @@
 import { Box, Button, Checkbox, FormControl, FormErrorMessage, FormHelperText, FormLabel, Heading, Input, Select, Stack, Textarea } from '@chakra-ui/react'
 import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import axios from 'axios'
 import dynamic from 'next/dynamic'
 import toast from 'react-hot-toast'
 import Layout from '../../components/complaints/Layout'
 import { complainantTypes, complaintStatuses, complaintTypes, affectedComponents, parishes, defendantTypes, sectors } from '../../utils/complaints'
 import { dictionary } from '../../utils/complaints/dictionary'
+import ReactToPrint from 'react-to-print'
 
 const Map = dynamic(() => import('../../components/Map'), {
   ssr: false
@@ -16,6 +17,7 @@ const Map = dynamic(() => import('../../components/Map'), {
 function PublicServantFormPage () {
   const router = useRouter()
   const center = { lat: -0.254167, lng: -79.1719 }
+  const refPrint = useRef()
 
   const { handleSubmit, register, formState: { errors, isSubmitted } } = useForm({
     mode: 'onBlur'
@@ -47,10 +49,6 @@ function PublicServantFormPage () {
     }
   }
 
-  const printScreen = () => {
-    window.print()
-  }
-
   return (
     <Box
       width="100%"
@@ -58,6 +56,7 @@ function PublicServantFormPage () {
       px={16}
       py={4}
       mx="auto"
+      ref={refPrint}
     >
       <Heading size="lg">Formulario de denuncias - Funcionarios</Heading>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -233,10 +232,12 @@ function PublicServantFormPage () {
             />
           </FormControl>
           <Box display={'flex'} gap={2} justifyContent={'end'}>
-            <Button variant='outline' mr={3} onClick={printScreen}>
-              Imprimir
-            </Button>
-
+            <ReactToPrint
+              trigger={() => <Button variant='outline' mr={3}>
+                Imprimir
+              </Button>}
+              content={() => refPrint.current}
+            />
             <Button
               type='submit'
               colorScheme={'teal'}

@@ -7,6 +7,8 @@ import { dictionary } from '../../utils/complaints/dictionary'
 import { sourceEnum } from '../../utils/complaints/enum'
 import CitizenForm from './CitizenForm'
 import PublicServantForm from './PublicServantForm'
+import ReactToPrint from 'react-to-print'
+import { useRef } from 'react'
 
 function ComplaintDialog ({ isOpen, onClose, data = {} }) {
   const { mutate } = useSWRConfig()
@@ -38,6 +40,7 @@ function ComplaintDialog ({ isOpen, onClose, data = {} }) {
     ).then(() => onClose())
   }
 
+  const refPrint = useRef()
   return (
     <Drawer
       isOpen={isOpen}
@@ -49,13 +52,13 @@ function ComplaintDialog ({ isOpen, onClose, data = {} }) {
       <DrawerContent>
         <DrawerCloseButton />
         <DrawerHeader>Detalle denuncia</DrawerHeader>
-        <DrawerBody>
+        <DrawerBody ref={refPrint}>
           {data.source === sourceEnum.OFFICER && (
-              <PublicServantForm
-                id="officer"
-                data={data}
-                onSubmit={handleSubmit}
-              />
+            <PublicServantForm
+              id="officer"
+              data={data}
+              onSubmit={handleSubmit}
+            />
           )}
           {data.source === sourceEnum.CITIZEN && (
             <CitizenForm
@@ -65,7 +68,15 @@ function ComplaintDialog ({ isOpen, onClose, data = {} }) {
             />
           )}
         </DrawerBody>
+
         <DrawerFooter>
+          <ReactToPrint
+            trigger={() => <Button variant='outline' mr={3}>
+              Imprimir
+            </Button>}
+            content={() => refPrint.current}
+          />
+
           <Button variant='outline' mr={3} onClick={onClose}>
             Cancelar
           </Button>
@@ -83,7 +94,8 @@ function ComplaintDialog ({ isOpen, onClose, data = {} }) {
 ComplaintDialog.propTypes = {
   data: PropTypes.object,
   isOpen: PropTypes.bool,
-  onClose: PropTypes.func
+  onClose: PropTypes.func,
+  printScreen: PropTypes.func
 }
 
 export default ComplaintDialog
