@@ -45,12 +45,10 @@ export default function PlantsHomePage () {
     const index = data.findIndex(item => item.id === id)
 
     update[index][dictionary.status] = target
-
     const op = axios.patch('/api/orders', {
       id,
       [dictionary.status]: target
     }).then(res => res.data)
-
     mutate(
       () => toast.promise(op, {
         loading: 'Actualizando base de datos',

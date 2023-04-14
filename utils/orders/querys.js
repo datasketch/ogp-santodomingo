@@ -38,7 +38,7 @@ JOIN
                 CASE
                     WHEN ped."Estado vivero" = 'Lista para entrega' THEN
                         CASE
-                            WHEN ped."Fecha transplante" >= ? AND ped."Fecha transplante" <= ? AND ped."Fecha de entrega" >= ? AND ped."Fecha de entrega" <= ? THEN ped."Cantidad"
+                            WHEN ped."Fecha transplante" >= ? AND ped."Fecha transplante" <= ? AND ped."Fecha entrega" >= ? AND ped."Fecha entrega" <= ? THEN ped."Cantidad"
                             ELSE 0
                         END
                     ELSE 0

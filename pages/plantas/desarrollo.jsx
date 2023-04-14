@@ -29,7 +29,8 @@ function GrowingPlantsPage () {
   const [selectedData, setSelectedData] = useState()
   const [search, setSearch] = useState('')
 
-  const sortedData = data.sort((a, b) => {
+  const datas = Array.isArray(data) ? data : data.data
+  const sortedData = datas?.sort((a, b) => {
     return new Date(b[dict.transplantDate]) - new Date(a[dict.transplantDate])
   })
 

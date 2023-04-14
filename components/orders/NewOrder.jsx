@@ -10,7 +10,7 @@ import { format, getYear, parseISO } from 'date-fns'
 import { toast } from 'react-hot-toast'
 
 import { parseData } from '../../utils'
-import { inventoryDictionary, dictionary, typeBeneficiary } from '../../utils/orders/dictionary'
+import { inventoryDictionary, dictionary, typeBeneficiary, orderDetailDictionary } from '../../utils/orders/dictionary'
 
 import dynamic from 'next/dynamic'
 import { useComplaintForm } from '../../hooks/use-complaint-form'
@@ -23,11 +23,11 @@ const Map = dynamic(() => import('../../components/Map'), {
 export default function NewOrder ({ isOpen, onClose, btnRef, orders }) {
   const [plants, setPlants] = useState([])
   const [positionSlider, SetPositionSlider] = useState(0)
+  const [canton, setCanton] = useState('')
   const [query, setQuery] = useState('')
   const { data /* error */ } = useSWR('/api/inventory', (url) => axios.get(url).then(res => res.data))
   const { data: dataPlants /* error: errorPlants */ } = useSWR('/api/plants-list', (url) => axios.get(url).then(res => res.data))
   const numberOrders = orders?.map(({ [dictionary.order]: orden }) => orden)
-
   const { handleSubmit, register, reset, formState: { errors, isSubmitted, isValid } } = useForm({ mode: 'onBlur' })
   const { center, coordinates, setCoordinates } = useComplaintForm(data)
 
@@ -93,9 +93,8 @@ export default function NewOrder ({ isOpen, onClose, btnRef, orders }) {
       plantObject,
       ...plants.slice(matchIndex + 1)
     ]
-    setPlants(state)
+    return setPlants(state)
   }
-  const [canton, setCanton] = useState('')
   // const orderNumber = Math.floor(1000 + Math.random() * 9000)
 
   const handleTabsChange = (index) => {
@@ -335,7 +334,7 @@ export default function NewOrder ({ isOpen, onClose, btnRef, orders }) {
                       </Thead>
                       <Tbody>
                         {filteredData.map(([plant, container, inventory], index) => (
-                          <Tr key={index}>
+                          <Tr key={plant + container}>
                             <Td>
                               {plant}
                             </Td>
@@ -343,10 +342,11 @@ export default function NewOrder ({ isOpen, onClose, btnRef, orders }) {
                               {container}
                             </Td>
                             <Td>
-                              <FormControl>
+                              <FormControl >
                                 <Input
+                                  key={plant + container}
                                   type="number"
-                                  defaultValue={0}
+                                  defaultValue={plants.find((p) => p[orderDetailDictionary.plant] === plant && p[orderDetailDictionary.container] === container)?.Cantidad || 0}
                                   max={inventory}
                                   min={0}
                                   onChange={event => handlePlantsSelect(event, index, plant, container)}

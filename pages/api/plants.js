@@ -27,7 +27,6 @@ export default async function handler (req, res) {
     }
 
     if (method === 'POST') {
-      // console.log(req.body)
       await knex.insert([req.body]).into('plantas_en_desarrollo')
     }
 
