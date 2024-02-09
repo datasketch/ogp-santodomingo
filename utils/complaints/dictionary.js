@@ -19,7 +19,7 @@ export const dictionary = {
   defendantType: 'Tipo de denunciado',
   defendantName: 'Nombre del denunciado',
   reportedActivity: 'Actividad denunciada',
-  description: 'Descripcion del acto que se denuncia',
+  description: 'Direccion y descripcion del acto que se denuncia',
   location: 'Ubicacion',
   createdAt: 'created_at',
   updatedAt: 'updated_at',
